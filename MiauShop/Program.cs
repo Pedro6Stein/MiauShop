@@ -31,6 +31,7 @@ builder.Services.AddScoped<IProdutoRepositorio, ProdutoRepositorio>();
 builder.Services.AddScoped<IPedidoRepositorio, PedidoRepositorio>();
 
 // Serviços
+builder.Services.Configure<OpcoesFrete>(builder.Configuration.GetSection(OpcoesFrete.Secao));
 builder.Services.AddSingleton<ICalculadoraFrete, FreteFixoComGratis>();
 builder.Services.AddScoped<ICatalogoService, CatalogoService>();
 builder.Services.AddScoped<ICarrinhoService, CarrinhoService>();

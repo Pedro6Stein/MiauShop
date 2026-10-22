@@ -610,6 +610,113 @@ a { text-decoration: none; }
     max-width: 860px;
 }
 
+/* ---------- Carrinho ---------- */
+
+.ms-carregando { opacity: .55; pointer-events: none; transition: opacity var(--ms-transicao); }
+
+.ms-barra-frete {
+    background: var(--ms-algodao);
+    border-radius: 20px;
+    padding: 1rem 1.25rem;
+}
+
+.ms-barra-frete p { margin-bottom: .6rem; }
+.ms-barra-frete .bi { color: var(--ms-menta); }
+
+.ms-barra-frete-trilho {
+    height: 10px;
+    border-radius: 999px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.ms-barra-frete-trilho > div {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--ms-menta);
+    transition: width 500ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.ms-carrinho-lista { list-style: none; padding: 0; margin: 0; }
+
+.ms-carrinho-item {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 1rem 1.25rem;
+    padding: 1rem;
+    background: #fff;
+    border: 1px solid var(--ms-borda);
+    border-radius: 20px;
+    margin-bottom: .75rem;
+}
+
+.ms-carrinho-foto { border-radius: 16px; overflow: hidden; background: var(--ms-rosa); aspect-ratio: 1; }
+.ms-carrinho-foto img { width: 100%; height: 100%; object-fit: cover; }
+
+.ms-carrinho-info { display: flex; flex-direction: column; gap: .15rem; min-width: 0; }
+.ms-carrinho-info .ms-card-nome { min-height: 0; }
+.ms-carrinho-unitario { font-size: .88rem; color: var(--ms-ameixa-suave); }
+
+.ms-selo-mini {
+    background: var(--ms-framboesa);
+    color: #fff;
+    font-size: .7rem;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: .05rem .45rem;
+    margin-left: .25rem;
+}
+
+.ms-quantidade-pequena button { width: 32px; height: 32px; font-size: 1rem; }
+.ms-quantidade button:disabled { opacity: .4; }
+.ms-quantidade-valor { min-width: 34px; text-align: center; font-weight: 700; }
+
+.ms-carrinho-subtotal { text-align: right; }
+.ms-carrinho-subtotal .ms-preco { font-size: 1.2rem; display: block; }
+
+.ms-link-remover {
+    border: 0;
+    background: none;
+    padding: 0;
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--ms-cinza-rosado);
+    text-decoration: underline;
+}
+
+.ms-link-remover:hover { color: var(--ms-framboesa); }
+
+.ms-resumo {
+    position: sticky;
+    top: 6rem;
+    background: #fff;
+    border: 1px solid var(--ms-borda);
+    border-radius: 24px;
+    padding: 1.5rem;
+}
+
+.ms-resumo dl { margin: 1rem 0 1.5rem; }
+.ms-resumo dl > div { display: flex; justify-content: space-between; padding: .4rem 0; }
+.ms-resumo dt { font-weight: 600; }
+.ms-resumo dd { margin: 0; font-weight: 700; }
+
+.ms-resumo-total {
+    border-top: 1px solid var(--ms-borda);
+    margin-top: .5rem;
+    padding-top: .9rem !important;
+    font-size: 1.25rem;
+}
+
+.ms-resumo-total dd { font-family: var(--ms-fonte-titulo); font-weight: 600; font-size: 1.5rem; }
+.ms-resumo-nota { font-size: .8rem; color: var(--ms-cinza-rosado); margin: 1rem 0 0; text-align: center; }
+
+@media (max-width: 575.98px) {
+    /* Celular: foto + informações em cima; quantidade e subtotal embaixo. */
+    .ms-carrinho-item { grid-template-columns: 72px minmax(0, 1fr); }
+    .ms-carrinho-item .ms-quantidade { justify-self: start; }
+}
+
 /* ---------- Aviso "Adicionado ao carrinho" ---------- */
 
 .ms-aviso {

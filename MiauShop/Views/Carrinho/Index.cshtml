@@ -1,0 +1,18 @@
+@model CarrinhoViewModel
+@{
+    ViewData["Title"] = "Seu carrinho";
+}
+
+<nav aria-label="Você está em" class="mb-2">
+    <ol class="breadcrumb small mb-0">
+        <li class="breadcrumb-item"><a href="/">Início</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Carrinho</li>
+    </ol>
+</nav>
+
+<h1 class="mb-4">Seu carrinho</h1>
+
+@* Esta área é trocada pelo HTML que o servidor devolve a cada alteração. *@
+<div data-area-carrinho aria-live="polite">
+    <partial name="_Conteudo" model="Model" />
+</div>

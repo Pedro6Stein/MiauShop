@@ -1,10 +1,17 @@
+using MiauShop.Models.ViewModels;
+using MiauShop.Services;
 using MiauShop.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MiauShop.Controllers;
 
-public class CarrinhoController(ICarrinhoService carrinhoService) : Controller
+public class CarrinhoController(ICarrinhoService carrinhoService, ICatalogoService catalogoService) : Controller
 {
+    private const int QuantidadeSugestoes = 4;
+
+    // GET /Carrinho
+    public async Task<IActionResult> Index() => View(await MontarModeloAsync());
+
     // POST /Carrinho/Adicionar
     // ValidateAntiForgeryToken: só aceita o envio vindo de um formulário da própria loja.
     [HttpPost]
@@ -31,5 +38,44 @@ public class CarrinhoController(ICarrinhoService carrinhoService) : Controller
         return querJson
             ? Json(new { quantidade = carrinhoService.ContarItens() })
             : Redirect("/Carrinho");
+    }
+
+    // POST /Carrinho/AlterarQuantidade (botões − e + de cada item)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AlterarQuantidade(int variacaoId, int quantidade)
+    {
+        carrinhoService.AlterarQuantidade(variacaoId, quantidade);
+        return await RespostaAsync();
+    }
+
+    // POST /Carrinho/Remover
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Remover(int variacaoId)
+    {
+        carrinhoService.Remover(variacaoId);
+        return await RespostaAsync();
+    }
+
+    // Pelo JavaScript (cabeçalho X-Parcial): devolve só o conteúdo do carrinho já renderizado.
+    // Sem JavaScript: recarrega a página do carrinho.
+    private async Task<IActionResult> RespostaAsync() =>
+        Request.Headers.ContainsKey("X-Parcial")
+            ? PartialView("_Conteudo", await MontarModeloAsync())
+            : RedirectToAction(nameof(Index));
+
+    private async Task<CarrinhoViewModel> MontarModeloAsync()
+    {
+        var carrinho = await carrinhoService.ObterAsync();
+
+        return new CarrinhoViewModel
+        {
+            Carrinho = carrinho,
+            QuantidadeMaxima = CarrinhoService.QuantidadeMaxima,
+            Sugestoes = carrinho.Vazio
+                ? (await catalogoService.ListarDestaquesAsync()).Take(QuantidadeSugestoes).ToList()
+                : []
+        };
     }
 }

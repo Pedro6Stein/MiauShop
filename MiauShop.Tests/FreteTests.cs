@@ -1,10 +1,15 @@
 using MiauShop.Services;
+using Microsoft.Extensions.Options;
 
 namespace MiauShop.Tests;
 
 public class FreteTests
 {
-    private readonly FreteFixoComGratis _frete = new();
+    private readonly FreteFixoComGratis _frete = new(Options.Create(new OpcoesFrete
+    {
+        ValorFixo = 19.90m,
+        MinimoParaFreteGratis = 150m
+    }));
 
     [Fact]
     public void AbaixoDoMinimo_CobraFreteFixoEInformaQuantoFalta()

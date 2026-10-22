@@ -17,6 +17,10 @@ public class Carrinho
     public int QuantidadeItens => Linhas.Sum(l => l.Quantidade);
     public decimal Subtotal => Linhas.Sum(l => l.Subtotal);
     public decimal Total => Subtotal + Frete;
+
+    // Quanto da barra de frete grátis já está cheio (0 a 100).
+    public int PercentualFreteGratis =>
+        FaltaParaFreteGratis <= 0 ? 100 : (int)(Subtotal / (Subtotal + FaltaParaFreteGratis) * 100);
 }
 
 public record LinhaCarrinho(ProdutoVariacao Variacao, int Quantidade)

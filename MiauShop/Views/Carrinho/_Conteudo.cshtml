@@ -1,0 +1,129 @@
+@model CarrinhoViewModel
+@{
+    var carrinho = Model.Carrinho;
+}
+@* data-total-itens: o JavaScript lê daqui o número do ícone do carrinho (vem do servidor). *@
+<div data-total-itens="@carrinho.QuantidadeItens">
+    @if (carrinho.ItensForamRemovidos)
+    {
+        <div class="alert alert-warning" role="alert">
+            Alguns itens não estão mais disponíveis e foram removidos do seu carrinho.
+        </div>
+    }
+
+    @if (carrinho.Vazio)
+    {
+        <div class="ms-vazio mb-5">
+            <i class="bi bi-bag-heart" aria-hidden="true"></i>
+            <h2 class="h4">Seu carrinho está vazio</h2>
+            <p>Que tal escolher um mimo para seu pet?</p>
+            <a class="ms-botao" href="/Produtos">Ver produtos</a>
+        </div>
+
+        @if (Model.Sugestoes.Count > 0)
+        {
+            <h2 class="h3 mb-3">Os queridinhos da semana</h2>
+            <div class="row row-cols-2 row-cols-lg-4 g-3 g-md-4">
+                @foreach (var produto in Model.Sugestoes)
+                {
+                    <div class="col"><partial name="_ProdutoCard" model="produto" /></div>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="ms-barra-frete mb-3">
+                    @if (carrinho.Frete == 0)
+                    {
+                        <p><i class="bi bi-gift" aria-hidden="true"></i> <strong>Você ganhou frete grátis!</strong></p>
+                    }
+                    else
+                    {
+                        <p>Faltam <strong>@carrinho.FaltaParaFreteGratis.ToString("C")</strong> para o frete grátis</p>
+                    }
+                    <div class="ms-barra-frete-trilho" role="progressbar" aria-label="Progresso para o frete grátis"
+                         aria-valuenow="@carrinho.PercentualFreteGratis" aria-valuemin="0" aria-valuemax="100">
+                        <div style="width: @carrinho.PercentualFreteGratis%"></div>
+                    </div>
+                </div>
+
+                <ul class="ms-carrinho-lista">
+                    @foreach (var linha in carrinho.Linhas)
+                    {
+                        var variacao = linha.Variacao;
+                        var produto = variacao.Produto;
+                        var url = $"/Produtos/{produto.Slug}";
+
+                        <li class="ms-carrinho-item">
+                            <a class="ms-carrinho-foto" href="@url" tabindex="-1" aria-hidden="true">
+                                <img src="@produto.ImagemPrincipalUrl()" alt="" width="96" height="96" />
+                            </a>
+
+                            <div class="ms-carrinho-info">
+                                <a class="ms-card-nome mb-0" href="@url">@produto.Nome</a>
+                                @if (!variacao.EhUnica())
+                                {
+                                    <span class="ms-card-categoria">Tamanho: @variacao.Nome</span>
+                                }
+                                <span class="ms-carrinho-unitario">
+                                    @linha.PrecoUnitario.ToString("C") cada
+                                    @if (produto.EmPromocao())
+                                    {
+                                        <span class="ms-selo-mini">-@produto.PercentualDesconto()%</span>
+                                    }
+                                </span>
+                            </div>
+
+                            @* − e + enviam a quantidade nova já definida pelo servidor (atual − 1 / atual + 1). *@
+                            <form class="ms-quantidade ms-quantidade-pequena" method="post" action="/Carrinho/AlterarQuantidade" data-form-parcial>
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="variacaoId" value="@variacao.Id" />
+                                <button type="submit" name="quantidade" value="@(linha.Quantidade - 1)"
+                                        aria-label="@(linha.Quantidade == 1 ? "Remover" : "Diminuir quantidade de") @produto.Nome">
+                                    <i class="bi @(linha.Quantidade == 1 ? "bi-trash3" : "bi-dash")" aria-hidden="true"></i>
+                                </button>
+                                <span class="ms-quantidade-valor" aria-label="Quantidade">@linha.Quantidade</span>
+                                <button type="submit" name="quantidade" value="@(linha.Quantidade + 1)"
+                                        disabled="@(linha.Quantidade >= Model.QuantidadeMaxima)"
+                                        aria-label="Aumentar quantidade de @produto.Nome">
+                                    <i class="bi bi-plus" aria-hidden="true"></i>
+                                </button>
+                            </form>
+
+                            <div class="ms-carrinho-subtotal">
+                                <span class="ms-preco">@linha.Subtotal.ToString("C")</span>
+                                <form method="post" action="/Carrinho/Remover" data-form-parcial>
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="variacaoId" value="@variacao.Id" />
+                                    <button class="ms-link-remover" type="submit">Remover</button>
+                                </form>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            <div class="col-lg-4">
+                <aside class="ms-resumo" aria-labelledby="titulo-resumo">
+                    <h2 class="h4" id="titulo-resumo">Resumo do pedido</h2>
+                    <dl>
+                        <div><dt>Subtotal (@carrinho.QuantidadeItens @(carrinho.QuantidadeItens == 1 ? "item" : "itens"))</dt><dd>@carrinho.Subtotal.ToString("C")</dd></div>
+                        <div>
+                            <dt>Frete</dt>
+                            <dd>@(carrinho.Frete == 0 ? "Grátis" : carrinho.Frete.ToString("C"))</dd>
+                        </div>
+                        <div class="ms-resumo-total"><dt>Total</dt><dd>@carrinho.Total.ToString("C")</dd></div>
+                    </dl>
+                    <a class="ms-botao ms-botao-grande w-100" href="/Checkout">
+                        Finalizar compra <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                    </a>
+                    <a class="d-block text-center fw-bold mt-3" href="/Produtos">Continuar comprando</a>
+                    <p class="ms-resumo-nota"><i class="bi bi-info-circle" aria-hidden="true"></i> Compra demonstrativa: nenhum valor será cobrado.</p>
+                </aside>
+            </div>
+        </div>
+    }
+</div>

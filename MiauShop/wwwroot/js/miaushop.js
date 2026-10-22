@@ -28,25 +28,59 @@ if (window.gsap && !reduzirMovimento) {
     });
 }
 
+// Regra deste arquivo: o JavaScript NÃO calcula preço nem guarda regra de negócio.
+// Ele só pede ao servidor um pedaço de HTML já pronto e coloca na tela.
+
 // ---------- Página do produto ----------
 
-// Seletor de quantidade (− e +), sempre entre 1 e 10.
+// Botões − e +: usam o min/max que o servidor escreveu no campo (stepDown/stepUp respeitam esses limites).
 document.querySelectorAll('[data-quantidade]').forEach(caixa => {
     const campo = caixa.querySelector('input');
-    const limitar = valor => Math.min(Math.max(parseInt(valor, 10) || 1, 1), parseInt(campo.max, 10));
-
-    caixa.querySelector('[data-menos]').addEventListener('click', () => campo.value = limitar(+campo.value - 1));
-    caixa.querySelector('[data-mais]').addEventListener('click', () => campo.value = limitar(+campo.value + 1));
-    campo.addEventListener('change', () => campo.value = limitar(campo.value));
+    caixa.querySelector('[data-menos]').addEventListener('click', () => campo.stepDown());
+    caixa.querySelector('[data-mais]').addEventListener('click', () => campo.stepUp());
 });
 
-// Troca de tamanho: atualiza o preço mostrado (o valor que vale é sempre o do servidor).
-document.querySelectorAll('input[name="variacaoId"][data-preco]').forEach(opcao => {
-    opcao.addEventListener('change', () => {
-        document.querySelector('[data-preco]:not(input)').textContent = opcao.dataset.preco;
-        const antigo = document.querySelector('[data-preco-antigo]:not(input)');
-        if (antigo) antigo.textContent = opcao.dataset.precoAntigo;
+// Troca de tamanho: pede ao servidor o bloco de preço daquela variação.
+document.querySelectorAll('[data-url-preco]').forEach(form => {
+    const area = document.querySelector('[data-area-preco]');
+
+    form.querySelectorAll('input[name="variacaoId"]').forEach(opcao => {
+        opcao.addEventListener('change', async () => {
+            const resposta = await fetch(`${form.dataset.urlPreco}?variacaoId=${opcao.value}`);
+            if (resposta.ok) area.innerHTML = await resposta.text();
+        });
     });
+});
+
+// ---------- Página do carrinho ----------
+
+// Formulários do carrinho (−, +, remover): envia ao servidor e troca a área pelo HTML que ele devolve.
+// Delegado no document porque o conteúdo é substituído a cada alteração.
+document.addEventListener('submit', async evento => {
+    const form = evento.target.closest('[data-form-parcial]');
+    const area = document.querySelector('[data-area-carrinho]');
+    if (!form || !area) return;
+
+    evento.preventDefault();
+    area.classList.add('ms-carregando');
+
+    try {
+        const resposta = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form, evento.submitter), // inclui o botão clicado (quantidade nova) e o token
+            headers: { 'X-Parcial': '1' }
+        });
+
+        if (!resposta.ok) throw new Error();
+
+        area.innerHTML = await resposta.text();
+        const total = area.querySelector('[data-total-itens]');
+        if (total) window.miauAtualizarCarrinho(parseInt(total.dataset.totalItens, 10));
+    } catch {
+        window.miauAviso('Não foi possível atualizar o carrinho. Tente de novo.', false);
+    } finally {
+        area.classList.remove('ms-carregando');
+    }
 });
 
 // "Adicionar ao carrinho" sem recarregar a página: o cliente continua comprando.

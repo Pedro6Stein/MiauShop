@@ -47,4 +47,15 @@ public class ProdutosController(ICatalogoService catalogoService) : Controller
 
         return View(modelo);
     }
+
+    // GET /Produtos/moletom-pet-inverno/preco?variacaoId=7
+    // Devolve só o bloco de preço já renderizado (usado ao trocar o tamanho na página do produto).
+    [HttpGet("{slug}/preco")]
+    public async Task<IActionResult> Preco(string slug, int variacaoId)
+    {
+        var produto = await catalogoService.ObterProdutoAsync(slug);
+        var variacao = produto?.Variacoes.FirstOrDefault(v => v.Id == variacaoId);
+
+        return variacao is null ? NotFound() : PartialView("_Preco", variacao);
+    }
 }

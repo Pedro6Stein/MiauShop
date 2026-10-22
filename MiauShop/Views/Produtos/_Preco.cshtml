@@ -1,0 +1,13 @@
+@model MiauShop.Models.Entities.ProdutoVariacao
+@* Preço de uma variação. Usado na página e devolvido pelo servidor quando o tamanho muda. *@
+<div class="ms-detalhe-preco">
+    @if (Model.Produto.EmPromocao())
+    {
+        <span class="ms-preco-antigo">@Model.PrecoOriginal().ToString("C")</span>
+        <span class="ms-preco ms-preco-promo">@Model.PrecoFinal().ToString("C")</span>
+    }
+    else
+    {
+        <span class="ms-preco">@Model.PrecoFinal().ToString("C")</span>
+    }
+</div>

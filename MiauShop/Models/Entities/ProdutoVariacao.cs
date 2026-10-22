@@ -4,6 +4,11 @@ namespace MiauShop.Models.Entities;
 // É sempre uma variação (e não o produto) que vai para o carrinho e para o pedido.
 public class ProdutoVariacao : EntidadeBase
 {
+    // Nome da variação de produtos que não têm tamanho/cor.
+    public const string NomeUnica = "Único";
+
+    public bool EhUnica() => Nome == NomeUnica;
+
     public int ProdutoId { get; set; }
     public Produto Produto { get; set; } = null!;
 
@@ -20,4 +25,7 @@ public class ProdutoVariacao : EntidadeBase
 
     // Precisa do Produto carregado (Include) para funcionar.
     public decimal PrecoFinal() => Produto.PrecoAtual() + AjustePreco;
+
+    // Preço "de" (sem promoção), mostrado riscado quando o produto está em promoção.
+    public decimal PrecoOriginal() => Produto.Preco + AjustePreco;
 }

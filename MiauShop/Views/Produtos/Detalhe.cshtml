@@ -1,6 +1,6 @@
 @model ProdutoDetalheViewModel
 @using MiauShop.Models.Enums
-@using MiauShop.Services
+@inject MiauShop.Services.Interfaces.ICalculadoraFrete Frete
 @{
     var produto = Model.Produto;
     var primeira = Model.Variacoes.First();
@@ -32,16 +32,13 @@
             <h1 class="ms-detalhe-nome">@produto.Nome</h1>
             <p class="ms-detalhe-resumo">@produto.DescricaoCurta</p>
 
-            @* O preço é atualizado pelo JavaScript ao trocar de variação. *@
-            <div class="ms-detalhe-preco mb-4" aria-live="polite">
-                @if (produto.EmPromocao())
-                {
-                    <span class="ms-preco-antigo" data-preco-antigo>@((produto.Preco + primeira.AjustePreco).ToString("C"))</span>
-                }
-                <span class="ms-preco @(produto.EmPromocao() ? "ms-preco-promo" : "")" data-preco>@primeira.PrecoFinal().ToString("C")</span>
+            @* Bloco de preço renderizado pelo servidor. Ao trocar o tamanho, o JavaScript
+               pede este mesmo bloco de novo ao servidor (/Produtos/{slug}/preco) e só troca o HTML. *@
+            <div class="mb-4" aria-live="polite" data-area-preco>
+                <partial name="_Preco" model="primeira" />
             </div>
 
-            <form method="post" action="/Carrinho/Adicionar" data-form-carrinho>
+            <form method="post" action="/Carrinho/Adicionar" data-form-carrinho data-url-preco="/Produtos/@produto.Slug/preco">
                 @Html.AntiForgeryToken()
 
                 @if (Model.TemEscolhaDeVariacao)
@@ -53,9 +50,7 @@
                             {
                                 var id = $"variacao-{variacao.Id}";
                                 <input class="btn-check" type="radio" name="variacaoId" id="@id" value="@variacao.Id"
-                                       checked="@(variacao == primeira)"
-                                       data-preco="@variacao.PrecoFinal().ToString("C")"
-                                       data-preco-antigo="@((produto.Preco + variacao.AjustePreco).ToString("C"))" />
+                                       checked="@(variacao == primeira)" />
                                 <label class="ms-variacao" for="@id">
                                     @variacao.Nome
                                     @if (variacao.AjustePreco > 0)
@@ -77,7 +72,7 @@
                         <label class="ms-rotulo" for="quantidade">Quantidade</label>
                         <div class="ms-quantidade" data-quantidade>
                             <button type="button" data-menos aria-label="Diminuir quantidade"><i class="bi bi-dash" aria-hidden="true"></i></button>
-                            <input id="quantidade" name="quantidade" type="number" inputmode="numeric" value="1" min="1" max="@CarrinhoService.QuantidadeMaxima" />
+                            <input id="quantidade" name="quantidade" type="number" inputmode="numeric" value="1" min="1" max="@MiauShop.Services.CarrinhoService.QuantidadeMaxima" />
                             <button type="button" data-mais aria-label="Aumentar quantidade"><i class="bi bi-plus" aria-hidden="true"></i></button>
                         </div>
                     </div>
@@ -94,7 +89,7 @@
                 </li>
                 <li>
                     <i class="bi bi-truck" aria-hidden="true"></i>
-                    <span><strong>Frete grátis</strong> em compras a partir de @FreteFixoComGratis.MinimoParaFreteGratis.ToString("C")</span>
+                    <span><strong>Frete grátis</strong> em compras a partir de @Frete.MinimoParaFreteGratis.ToString("C0")</span>
                 </li>
                 <li>
                     <i class="bi bi-shield-check" aria-hidden="true"></i>

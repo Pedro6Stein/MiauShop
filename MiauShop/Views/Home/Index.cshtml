@@ -1,11 +1,12 @@
 ﻿@model HomeViewModel
+@inject MiauShop.Services.Interfaces.ICalculadoraFrete Frete
 @{
     ViewData["Title"] = "Tudo para cães e gatos";
 }
 
 <section class="ms-hero mb-4" aria-label="Destaque">
     <div class="ms-hero-texto" data-anima="hero">
-        <span class="ms-etiqueta"><i class="bi bi-truck" aria-hidden="true"></i> Frete grátis acima de R$ 150</span>
+        <span class="ms-etiqueta"><i class="bi bi-truck" aria-hidden="true"></i> Frete grátis acima de @Frete.MinimoParaFreteGratis.ToString("C0")</span>
         <h1>Tudo que seu pet ama, num só lugar</h1>
         <p>Brinquedos, comidinhas, roupinhas e acessórios escolhidos com carinho para cães e gatos.</p>
         <a class="ms-botao" href="/Produtos">Ver produtos <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
@@ -45,7 +46,7 @@
             <span class="ms-vantagem-icone"><i class="bi bi-truck" aria-hidden="true"></i></span>
             <div>
                 <h3 class="h5 mb-1">Frete grátis</h3>
-                <p class="mb-0 small">Em compras a partir de R$ 150. Abaixo disso, frete fixo de R$ 19,90.</p>
+                <p class="mb-0 small">Em compras a partir de @Frete.MinimoParaFreteGratis.ToString("C0"). Abaixo disso, frete fixo de @Frete.ValorFixo.ToString("C").</p>
             </div>
         </div>
         <div class="col-md-4 d-flex gap-3">

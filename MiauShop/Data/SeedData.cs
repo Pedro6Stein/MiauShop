@@ -32,7 +32,7 @@ public static class SeedData
                 "Penas coloridas e sininho para despertar o caçador que existe no seu gato.",
                 "Varinha leve com penas em tons de arco-íris e um sininho na ponta. Estimula o instinto de caça, ajuda a gastar energia e fortalece o vínculo entre você e seu gato nas brincadeiras do dia a dia.",
                 "Varinha com penas coloridas e sininho para gatos",
-                ("Único", 0m)),
+                (ProdutoVariacao.NomeUnica, 0m)),
             Produto("Bolinha Mordedor Dental", "bolinha-mordedor-dental", Animal.Cao, brinquedos, petMax,
                 29.90m, 22.90m, destaque: true,
                 "Borracha resistente com relevos que ajudam a limpar os dentes enquanto ele brinca.",
@@ -44,13 +44,13 @@ public static class SeedData
                 "Torre com plataformas em formato de nuvem para arranhar, escalar e cochilar.",
                 "Arranhador vertical com postes revestidos de sisal e plataformas acolchoadas em formato de nuvem. Protege seus móveis, oferece um mirante para o gato observar a casa e um cantinho macio para descansar.",
                 "Arranhador em torre com plataformas de nuvem e um gato no topo",
-                ("Único", 0m)),
+                (ProdutoVariacao.NomeUnica, 0m)),
             Produto("Pelúcia Osso com Apito", "pelucia-osso-com-apito", Animal.Cao, brinquedos, petMax,
                 34.90m, null, destaque: false,
                 "Pelúcia macia com apito interno, perfeita para cães que amam carregar brinquedos.",
                 "Osso de pelúcia com costura reforçada e apito interno que faz barulho a cada mordida. Ideal para cães de porte pequeno e médio que adoram carregar seus brinquedos pela casa.",
                 "Brinquedo de pelúcia coral em formato de osso",
-                ("Único", 0m)),
+                (ProdutoVariacao.NomeUnica, 0m)),
 
             // Comidinhas & Petiscos
             Produto("Bifinho de Frango Natural", "bifinho-de-frango-natural", Animal.Cao, comidinhas, naturalPet,
@@ -64,7 +64,7 @@ public static class SeedData
                 "Caixa com 12 sachês de salmão em pedaços ao molho, para gatos adultos.",
                 "Alimento úmido completo com pedaços de salmão ao molho. Ajuda na hidratação diária e agrada até os gatos mais exigentes. Caixa com 12 sachês de 85 g.",
                 "Caixa de papelão com sachês de comida para gato",
-                ("Único", 0m)),
+                (ProdutoVariacao.NomeUnica, 0m)),
             Produto("Ração Natural Filhotes", "racao-natural-filhotes", Animal.Cao, comidinhas, naturalPet,
                 119.90m, null, destaque: false,
                 "Ração natural com ingredientes selecionados para o crescimento saudável do filhote.",
@@ -76,7 +76,7 @@ public static class SeedData
                 "Petisco cremoso para dar na mão: o momento favorito do dia do seu gato.",
                 "Petisco cremoso sabor atum em tubinhos individuais, para oferecer direto na mão ou sobre a ração. Pacote com 4 unidades de 15 g.",
                 "Sachês em tubo de petisco cremoso para gatos",
-                ("Único", 0m)),
+                (ProdutoVariacao.NomeUnica, 0m)),
 
             // Roupinhas
             Produto("Moletom Pet Inverno", "moletom-pet-inverno", Animal.Ambos, roupinhas, petMax,
@@ -116,7 +116,7 @@ public static class SeedData
                 "Água sempre fresca e corrente, que incentiva o gato a beber mais.",
                 "Fonte elétrica silenciosa com filtro de carvão ativado e reservatório de 2 litros. A água em movimento atrai os gatos e ajuda a prevenir problemas urinários.",
                 "Fonte bebedouro branca para gatos com água em cascata",
-                ("Único", 0m)),
+                (ProdutoVariacao.NomeUnica, 0m)),
             Produto("Peitoral Ajustável com Guia", "peitoral-ajustavel-com-guia", Animal.Cao, acessorios, petMax,
                 59.90m, null, destaque: false,
                 "Peitoral acolchoado que não machuca o pescoço, com guia combinando.",
@@ -128,7 +128,7 @@ public static class SeedData
                 "Suporte de madeira com duas tigelas de inox, na altura certa para comer melhor.",
                 "Comedouro elevado em madeira de reflorestamento com duas tigelas de inox removíveis. A altura elevada melhora a postura durante as refeições e facilita a digestão.",
                 "Comedouro elevado de madeira com duas tigelas de inox",
-                ("Único", 0m)),
+                (ProdutoVariacao.NomeUnica, 0m)),
         };
 
         contexto.Produtos.AddRange(produtos);
