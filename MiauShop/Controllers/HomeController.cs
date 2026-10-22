@@ -1,19 +1,21 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using MiauShop.Models.ViewModels;
+using MiauShop.Services.Interfaces;
 
 namespace MiauShop.Controllers;
 
-public class HomeController : Controller
+public class HomeController(ICatalogoService catalogoService) : Controller
 {
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
-    }
+        var modelo = new HomeViewModel
+        {
+            Categorias = await catalogoService.ListarCategoriasAsync(),
+            Destaques = await catalogoService.ListarDestaquesAsync()
+        };
 
-    public IActionResult Privacy()
-    {
-        return View();
+        return View(modelo);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

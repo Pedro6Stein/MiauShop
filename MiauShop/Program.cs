@@ -55,6 +55,10 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Português do Brasil: R$ 54,90 em vez de $54.90, datas dd/mm/aaaa.
+app.UseRequestLocalization("pt-BR");
+
 app.UseRouting();
 app.UseSession();
 

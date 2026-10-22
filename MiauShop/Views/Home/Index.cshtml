@@ -1,8 +1,74 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model HomeViewModel
+@{
+    ViewData["Title"] = "Tudo para cães e gatos";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="ms-hero mb-4" aria-label="Destaque">
+    <div class="ms-hero-texto" data-anima="hero">
+        <span class="ms-etiqueta"><i class="bi bi-truck" aria-hidden="true"></i> Frete grátis acima de R$ 150</span>
+        <h1>Tudo que seu pet ama, num só lugar</h1>
+        <p>Brinquedos, comidinhas, roupinhas e acessórios escolhidos com carinho para cães e gatos.</p>
+        <a class="ms-botao" href="/Produtos">Ver produtos <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+    </div>
+    @* No celular a foto vem abaixo do texto (no computador ela é o fundo do banner). *@
+    <img class="ms-hero-imagem d-md-none" src="/img/banners/banner-01.webp" alt="" />
+</section>
+
+<nav class="d-flex flex-wrap gap-2 mb-5" aria-label="Categorias">
+    @foreach (var categoria in Model.Categorias)
+    {
+        <a class="ms-chip" href="/Produtos?categoria=@categoria.Slug">
+            <i class="bi @categoria.Icone" aria-hidden="true"></i>@categoria.Nome
+        </a>
+    }
+</nav>
+
+<section class="mb-5" aria-labelledby="titulo-destaques">
+    <div class="ms-secao-titulo">
+        <h2 id="titulo-destaques">Os queridinhos da semana</h2>
+        <a class="fw-bold" href="/Produtos">Ver todos <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+    </div>
+    @* A grade inteira anima junto: os cards nunca ficam desalinhados durante a entrada. *@
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4" data-anima="surgir">
+        @foreach (var produto in Model.Destaques)
+        {
+            <div class="col">
+                <partial name="_ProdutoCard" model="produto" />
+            </div>
+        }
+    </div>
+</section>
+
+<section class="ms-vantagens mb-5" data-anima="surgir" aria-label="Vantagens">
+    <div class="row g-4">
+        <div class="col-md-4 d-flex gap-3">
+            <span class="ms-vantagem-icone"><i class="bi bi-truck" aria-hidden="true"></i></span>
+            <div>
+                <h3 class="h5 mb-1">Frete grátis</h3>
+                <p class="mb-0 small">Em compras a partir de R$ 150. Abaixo disso, frete fixo de R$ 19,90.</p>
+            </div>
+        </div>
+        <div class="col-md-4 d-flex gap-3">
+            <span class="ms-vantagem-icone"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
+            <div>
+                <h3 class="h5 mb-1">Direto do fornecedor</h3>
+                <p class="mb-0 small">Cada produto mostra o prazo de envio do fornecedor parceiro.</p>
+            </div>
+        </div>
+        <div class="col-md-4 d-flex gap-3">
+            <span class="ms-vantagem-icone"><i class="bi bi-geo-alt" aria-hidden="true"></i></span>
+            <div>
+                <h3 class="h5 mb-1">Acompanhe seu pedido</h3>
+                <p class="mb-0 small">Veja cada etapa da entrega com o número do pedido e seu e-mail.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="ms-promo" data-anima="surgir" aria-labelledby="titulo-promo">
+    <div class="ms-promo-texto">
+        <h2 id="titulo-promo" class="h3">Hora de brincar!</h2>
+        <p>Bolinhas, pelúcias e varinhas para gastar a energia e fortalecer a amizade.</p>
+        <a class="ms-botao" href="/Produtos?categoria=brinquedos">Ver brinquedos <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+    </div>
+</section>

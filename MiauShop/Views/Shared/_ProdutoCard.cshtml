@@ -1,0 +1,33 @@
+@model MiauShop.Models.Entities.Produto
+@{
+    var url = $"/Produtos/{Model.Slug}";
+}
+<article class="ms-card">
+    <a class="ms-card-imagem" href="@url" tabindex="-1" aria-hidden="true">
+        <img src="@Model.ImagemPrincipalUrl()" alt="" loading="lazy" width="900" height="900" />
+        @if (Model.EmPromocao())
+        {
+            <span class="ms-selo">-@Model.PercentualDesconto()%</span>
+        }
+    </a>
+    <div class="ms-card-corpo">
+        <span class="ms-card-categoria">@Model.Categoria.Nome</span>
+        <a class="ms-card-nome" href="@url">@Model.Nome</a>
+        <div class="ms-card-rodape">
+            <div class="ms-card-precos">
+                @if (Model.EmPromocao())
+                {
+                    <div class="ms-preco-antigo">@Model.Preco.ToString("C")</div>
+                    <div class="ms-preco ms-preco-promo">@Model.PrecoAtual().ToString("C")</div>
+                }
+                else
+                {
+                    <div class="ms-preco">@Model.PrecoAtual().ToString("C")</div>
+                }
+            </div>
+            <a class="ms-botao-mais" href="@url" aria-label="Ver @Model.Nome">
+                <i class="bi bi-plus-lg" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+</article>

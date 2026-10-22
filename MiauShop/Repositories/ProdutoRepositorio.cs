@@ -9,10 +9,11 @@ namespace MiauShop.Repositories;
 public class ProdutoRepositorio(AppDbContext contexto) : Repositorio<Produto>(contexto), IProdutoRepositorio
 {
     // Ponto de partida das consultas da loja: só produtos ativos de categorias ativas,
-    // já com as imagens (o card precisa da imagem principal).
+    // já com categoria e imagens (o card mostra as duas).
     private IQueryable<Produto> ProdutosDaLoja() =>
         Conjunto.AsNoTracking()
             .Where(p => p.Ativo && p.Categoria.Ativa)
+            .Include(p => p.Categoria)
             .Include(p => p.Imagens)
             .Include(p => p.Variacoes.Where(v => v.Ativa));
 
@@ -53,7 +54,6 @@ public class ProdutoRepositorio(AppDbContext contexto) : Repositorio<Produto>(co
 
     public Task<Produto?> ObterPorSlugAsync(string slug) =>
         ProdutosDaLoja()
-            .Include(p => p.Categoria)
             .Include(p => p.Fornecedor)
             .FirstOrDefaultAsync(p => p.Slug == slug);
 

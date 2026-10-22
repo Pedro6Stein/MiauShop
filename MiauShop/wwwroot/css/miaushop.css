@@ -1,0 +1,467 @@
+/* ==========================================================
+   MiauShop — identidade visual
+   Paleta tirada do fundo rosa das fotos dos produtos.
+   ========================================================== */
+
+:root {
+    --ms-ameixa: #2E1A24;        /* textos e elementos escuros */
+    --ms-ameixa-suave: #5A2433;  /* textos sobre o rosa */
+    --ms-cinza-rosado: #8A6B76;  /* textos secundários */
+    --ms-framboesa: #C92D63;     /* ações: botão principal, promoção */
+    --ms-framboesa-escura: #A8204F;
+    --ms-rosa: #F4C2C6;          /* fundo atrás das fotos */
+    --ms-algodao: #FDF1F2;       /* fundo de seções */
+    --ms-creme: #FFFBF8;         /* fundo da página */
+    --ms-borda: #F3DCDF;
+    --ms-menta: #1F9E86;         /* sucesso, frete grátis */
+
+    --ms-fonte-titulo: 'Fredoka', system-ui, sans-serif;
+    --ms-fonte-texto: 'Nunito', system-ui, sans-serif;
+
+    --ms-raio: 20px;
+    --ms-transicao: 220ms cubic-bezier(.2, .8, .2, 1);
+
+    /* Ajusta o Bootstrap para a identidade da loja */
+    --bs-body-font-family: var(--ms-fonte-texto);
+    --bs-body-color: var(--ms-ameixa);
+    --bs-body-bg: var(--ms-creme);
+    --bs-link-color-rgb: 201, 45, 99;
+    --bs-link-hover-color-rgb: 168, 32, 79;
+    --bs-border-color: var(--ms-borda);
+}
+
+h1, h2, h3, h4, .ms-titulo {
+    font-family: var(--ms-fonte-titulo);
+    font-weight: 600;
+    letter-spacing: -.01em;
+}
+
+a { text-decoration: none; }
+
+:focus-visible {
+    outline: 3px solid var(--ms-framboesa);
+    outline-offset: 2px;
+}
+
+/* ---------- Faixa "Projeto demonstrativo" ---------- */
+
+.ms-faixa-demo {
+    background: var(--ms-ameixa);
+    color: var(--ms-algodao);
+    font-size: .8rem;
+    text-align: center;
+    padding: .4rem 1rem;
+}
+
+/* ---------- Cabeçalho ---------- */
+
+.ms-header {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    background: rgba(255, 251, 248, .92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--ms-borda);
+}
+
+.ms-logo {
+    font-family: var(--ms-fonte-titulo);
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--ms-ameixa);
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+}
+
+.ms-logo span { color: var(--ms-framboesa); }
+.ms-logo i { font-size: 1.3rem; color: var(--ms-framboesa); }
+
+.ms-busca {
+    position: relative;
+    flex: 1;
+    max-width: 460px;
+}
+
+.ms-busca input {
+    border-radius: 999px;
+    border: 1px solid var(--ms-borda);
+    background: #fff;
+    padding: .55rem 1rem .55rem 2.5rem;
+    width: 100%;
+    font-size: .95rem;
+    transition: border-color var(--ms-transicao), box-shadow var(--ms-transicao);
+}
+
+.ms-busca input:focus {
+    outline: none;
+    border-color: var(--ms-framboesa);
+    box-shadow: 0 0 0 4px rgba(201, 45, 99, .12);
+}
+
+.ms-busca i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ms-cinza-rosado);
+}
+
+.ms-nav-link {
+    color: var(--ms-ameixa);
+    font-weight: 700;
+    padding: .4rem .75rem;
+    border-radius: 999px;
+    transition: background var(--ms-transicao);
+}
+
+.ms-nav-link:hover { background: var(--ms-algodao); color: var(--ms-ameixa); }
+
+.ms-carrinho {
+    position: relative;
+    font-size: 1.5rem;
+    color: var(--ms-ameixa);
+    line-height: 1;
+}
+
+.ms-carrinho-contador {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: var(--ms-framboesa);
+    color: #fff;
+    font: 700 .7rem/20px var(--ms-fonte-texto);
+    text-align: center;
+}
+
+/* ---------- Botões ---------- */
+
+.ms-botao {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    border: 0;
+    border-radius: 999px;
+    padding: .75rem 1.5rem;
+    font-weight: 700;
+    background: var(--ms-framboesa);
+    color: #fff;
+    transition: background var(--ms-transicao), transform var(--ms-transicao);
+}
+
+.ms-botao:hover { background: var(--ms-framboesa-escura); color: #fff; transform: translateY(-2px); }
+.ms-botao i { transition: transform var(--ms-transicao); }
+.ms-botao:hover i { transform: translateX(3px); }
+
+.ms-botao-claro { background: #fff; color: var(--ms-ameixa); }
+.ms-botao-claro:hover { background: var(--ms-algodao); color: var(--ms-ameixa); }
+
+/* ---------- Banner principal ---------- */
+
+.ms-hero {
+    position: relative;
+    border-radius: 28px;
+    overflow: hidden;
+    /* #EDA0A5 = tom medido nos cantos da própria foto, para não aparecer emenda */
+    background: #EDA0A5 url('/img/banners/banner-01.webp') right center / cover no-repeat;
+    min-height: 420px;
+    display: flex;
+    align-items: center;
+}
+
+.ms-hero-texto {
+    max-width: 480px;
+    padding: 3rem;
+}
+
+.ms-hero h1 {
+    font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+    line-height: 1.05;
+    margin-bottom: 1rem;
+}
+
+.ms-hero p {
+    color: var(--ms-ameixa-suave);
+    font-size: 1.1rem;
+    margin-bottom: 1.75rem;
+}
+
+.ms-etiqueta {
+    display: inline-block;
+    background: rgba(255, 255, 255, .7);
+    color: var(--ms-ameixa-suave);
+    font-weight: 700;
+    font-size: .8rem;
+    border-radius: 999px;
+    padding: .3rem .8rem;
+    margin-bottom: 1rem;
+}
+
+/* ---------- Categorias ---------- */
+
+.ms-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .6rem 1.2rem;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid var(--ms-borda);
+    color: var(--ms-ameixa);
+    font-weight: 700;
+    transition: background var(--ms-transicao), border-color var(--ms-transicao), transform var(--ms-transicao);
+}
+
+.ms-chip i { color: var(--ms-framboesa); font-size: 1.1rem; }
+.ms-chip:hover { background: var(--ms-algodao); border-color: var(--ms-rosa); color: var(--ms-ameixa); transform: translateY(-2px); }
+
+/* ---------- Card de produto ---------- */
+
+.ms-card {
+    background: #fff;
+    border: 1px solid var(--ms-borda);
+    border-radius: var(--ms-raio);
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: transform var(--ms-transicao), box-shadow var(--ms-transicao);
+}
+
+.ms-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px -18px rgba(90, 36, 51, .35);
+}
+
+.ms-card-imagem {
+    position: relative;
+    display: block;
+    aspect-ratio: 1;
+    background: var(--ms-rosa);
+    overflow: hidden;
+}
+
+.ms-card-imagem img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 500ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.ms-card:hover .ms-card-imagem img { transform: scale(1.06); }
+
+.ms-selo {
+    position: absolute;
+    top: .75rem;
+    left: .75rem;
+    background: var(--ms-framboesa);
+    color: #fff;
+    font-weight: 700;
+    font-size: .75rem;
+    border-radius: 999px;
+    padding: .2rem .65rem;
+}
+
+.ms-card-corpo {
+    padding: 1rem 1.1rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+/* Categoria e nome com altura fixa: todos os cards ficam alinhados,
+   não importa se o nome do produto é curto ou longo. */
+.ms-card-categoria {
+    font-size: .78rem;
+    color: var(--ms-cinza-rosado);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ms-card-nome {
+    color: var(--ms-ameixa);
+    font-weight: 700;
+    line-height: 1.3;
+    margin: .15rem 0 .5rem;
+    min-height: 2.6em; /* sempre 2 linhas */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Reserva o espaço do preço antigo mesmo quando o produto não está em promoção. */
+.ms-card-precos {
+    min-height: 2.95rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.ms-card-nome:hover { color: var(--ms-framboesa); }
+
+.ms-card-rodape {
+    margin-top: auto;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+}
+
+.ms-preco-antigo { font-size: .82rem; color: var(--ms-cinza-rosado); text-decoration: line-through; }
+
+.ms-preco {
+    font-family: var(--ms-fonte-titulo);
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.1;
+}
+
+.ms-preco-promo { color: var(--ms-framboesa); }
+
+.ms-botao-mais {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: var(--ms-ameixa);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: background var(--ms-transicao), transform var(--ms-transicao);
+}
+
+.ms-botao-mais:hover { background: var(--ms-framboesa); color: #fff; transform: rotate(90deg); }
+
+/* ---------- Seções ---------- */
+
+.ms-secao-titulo {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.ms-secao-titulo h2 { font-size: 2rem; margin: 0; }
+
+.ms-vantagens {
+    background: var(--ms-algodao);
+    border-radius: 28px;
+    padding: 2rem;
+}
+
+.ms-vantagem-icone {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    border-radius: 16px;
+    background: #fff;
+    color: var(--ms-framboesa);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.ms-promo {
+    border-radius: 28px;
+    overflow: hidden;
+    /* "45% 15%": prende a foto perto do topo, onde está a cabeça do cachorro. */
+    background: #DD8B95 url('/img/banners/banner-02.webp') 45% 15% / cover no-repeat;
+    min-height: 380px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.ms-promo-texto {
+    background: rgba(255, 251, 248, .94);
+    border-radius: 24px;
+    padding: 2rem;
+    margin: 2rem;
+    max-width: 380px;
+}
+
+/* ---------- Rodapé ---------- */
+
+.ms-footer {
+    background: var(--ms-ameixa);
+    color: #E9D7DC;
+    margin-top: 5rem;
+    padding: 3rem 0 2rem;
+}
+
+.ms-footer a { color: #E9D7DC; }
+.ms-footer a:hover { color: #fff; }
+.ms-footer .ms-logo { color: #fff; }
+.ms-footer small { color: #B79AA5; }
+
+/* ---------- Animações ---------- */
+
+/* Pulinho do carrinho quando um item é adicionado (classe colocada pelo JS). */
+@keyframes ms-pulo {
+    0%, 100% { transform: scale(1); }
+    40% { transform: scale(1.25) rotate(-8deg); }
+    70% { transform: scale(.95); }
+}
+
+.ms-pulando { animation: ms-pulo 500ms ease; }
+
+/* Quem pediu "reduzir movimento" no sistema não vê animações. */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* ---------- Celular ---------- */
+
+@media (max-width: 767.98px) {
+    /* Linha 1: logo, Cães/Gatos e carrinho. Linha 2: busca ocupando a largura toda. */
+    .ms-busca { flex-basis: 100%; max-width: none; }
+    .ms-logo { font-size: 1.35rem; }
+    .ms-nav-link { padding: .35rem .5rem; }
+
+    /* No celular: texto em cima, foto embaixo (com a borda de cima esfumada no rosa). */
+    .ms-hero {
+        flex-direction: column;
+        align-items: stretch;
+        min-height: 0;
+        background-image: none;
+    }
+
+    .ms-hero-imagem {
+        width: 100%;
+        height: 260px;
+        object-fit: cover;
+        object-position: 78% center;
+        margin-top: -2.5rem;
+        -webkit-mask-image: linear-gradient(to bottom, transparent, #000 30%);
+        mask-image: linear-gradient(to bottom, transparent, #000 30%);
+    }
+
+    .ms-hero-texto { padding: 2rem 1.5rem 0; }
+    .ms-hero p { font-size: 1rem; }
+
+    .ms-preco { font-size: 1.1rem; white-space: nowrap; }
+    .ms-preco-antigo { white-space: nowrap; }
+    .ms-card-corpo { padding: .8rem .8rem .9rem; }
+    .ms-botao-mais { width: 34px; height: 34px; font-size: 1rem; }
+    .ms-secao-titulo h2 { font-size: 1.6rem; }
+    .ms-promo {
+        justify-content: center;
+        align-items: flex-end;
+        min-height: 520px;
+        background-position: 45% top;
+        background-size: auto 340px; /* cachorro inteiro em cima, texto embaixo */
+    }
+    .ms-promo-texto { margin: 1rem; }
+}
