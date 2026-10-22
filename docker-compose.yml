@@ -1,0 +1,19 @@
+# Banco PostgreSQL para desenvolvimento local.
+# Subir:  docker compose up -d
+# Parar:  docker compose down   (os dados continuam no volume)
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: miaushop-postgres
+    environment:
+      POSTGRES_DB: miaushop
+      POSTGRES_USER: miaushop
+      POSTGRES_PASSWORD: miaushop_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - miaushop-dados:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  miaushop-dados:

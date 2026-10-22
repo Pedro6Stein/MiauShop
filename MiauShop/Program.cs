@@ -1,7 +1,14 @@
+using MiauShop.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Banco de dados: a string de conexão vem do appsettings (local) ou de variável de ambiente (produção).
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("MiauShop")));
 
 var app = builder.Build();
 
