@@ -1,0 +1,58 @@
+@model MiauShop.Models.Entities.Pedido
+@using MiauShop.Models.Enums
+@{
+    ViewData["Title"] = $"Pedido #{Model.Id}";
+    var endereco = Model.EnderecoEntrega;
+}
+
+<partial name="~/Views/Checkout/_Etapas.cshtml" model="3" />
+
+<section class="ms-confirmacao mb-4" data-anima="hero">
+    <div class="ms-confirmacao-icone"><i class="bi bi-bag-check" aria-hidden="true"></i></div>
+    <h1>Pedido #@Model.Id registrado!</h1>
+    <p>Obrigado, @Model.ClienteNome.Split(' ')[0]. Enviamos os detalhes para <strong>@Model.ClienteEmail</strong> (demonstração: nenhum e-mail é enviado de verdade).</p>
+    <a class="ms-botao" href="/Pedido/Acompanhar?numero=@Model.Id">
+        Acompanhar pedido <i class="bi bi-arrow-right" aria-hidden="true"></i>
+    </a>
+</section>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <section class="ms-form-bloco">
+            <h2 class="h5">Itens</h2>
+            <ul class="ms-resumo-itens mb-0">
+                @foreach (var item in Model.Itens)
+                {
+                    <li>
+                        <span class="ms-resumo-foto">
+                            <img src="@item.ImagemUrl" alt="" width="56" height="56" />
+                            <span class="ms-resumo-qtd">@item.Quantidade</span>
+                        </span>
+                        <span class="flex-grow-1">
+                            <span class="d-block fw-bold">@item.NomeProduto</span>
+                            <small class="text-body-secondary">@item.NomeVariacao · @item.PrecoUnitario.ToString("C") cada</small>
+                        </span>
+                        <span class="fw-bold">@item.Subtotal().ToString("C")</span>
+                    </li>
+                }
+            </ul>
+        </section>
+    </div>
+
+    <div class="col-lg-5">
+        <aside class="ms-resumo">
+            <dl class="mt-0">
+                <div><dt>Status</dt><dd><span class="ms-pilula">@Model.Status.NomeExibicao()</span></dd></div>
+                <div><dt>Pagamento</dt><dd>@Model.FormaPagamento.NomeExibicao() (simulado)</dd></div>
+                <div><dt>Subtotal</dt><dd>@Model.Subtotal.ToString("C")</dd></div>
+                <div><dt>Frete</dt><dd>@(Model.Frete == 0 ? "Grátis" : Model.Frete.ToString("C"))</dd></div>
+                <div class="ms-resumo-total"><dt>Total</dt><dd>@Model.Total.ToString("C")</dd></div>
+            </dl>
+            <h2 class="h6">Entrega</h2>
+            <p class="small mb-0">
+                @endereco.Logradouro, @endereco.Numero@(endereco.Complemento is null ? "" : $" - {endereco.Complemento}")<br />
+                @endereco.Bairro · @endereco.Cidade/@endereco.Uf · CEP @endereco.Cep
+            </p>
+        </aside>
+    </div>
+</div>

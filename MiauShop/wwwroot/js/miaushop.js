@@ -83,6 +83,66 @@ document.addEventListener('submit', async evento => {
     }
 });
 
+// ---------- Checkout ----------
+
+// CEP: ao sair do campo, pede o endereço ao servidor do MiauShop (que consulta o ViaCEP)
+// e coloca nos campos o que o servidor devolveu.
+document.querySelectorAll('[data-cep-url]').forEach(campoCep => {
+    const form = campoCep.form;
+    const status = form.querySelector('[data-cep-status]');
+    const campo = nome => form.querySelector(`[name="Dados.${nome}"]`);
+
+    campoCep.addEventListener('change', async () => {
+        status.textContent = 'Buscando endereço...';
+
+        const resposta = await fetch(`${campoCep.dataset.cepUrl}?cep=${encodeURIComponent(campoCep.value)}`);
+        if (!resposta.ok) {
+            status.textContent = 'CEP não encontrado. Preencha o endereço abaixo.';
+            return;
+        }
+
+        const endereco = await resposta.json();
+        campo('Logradouro').value = endereco.logradouro;
+        campo('Bairro').value = endereco.bairro;
+        campo('Cidade').value = endereco.cidade;
+        campo('Uf').value = endereco.uf;
+        status.textContent = '';
+        campo('Numero').focus();
+    });
+});
+
+// Payment Brick do Mercado Pago (modo teste). Chave, valor e e-mail vêm escritos pelo servidor.
+// Ao clicar em "Pagar", NADA é enviado ao Mercado Pago: guardamos só o método escolhido
+// e mostramos a janela "pagamento bloqueado".
+// Espera o "load" porque o SDK do Mercado Pago é carregado depois deste arquivo.
+window.addEventListener('load', () => {
+const areaBrick = document.getElementById('mercado-pago-brick');
+
+if (areaBrick && window.MercadoPago) {
+    const mp = new MercadoPago(areaBrick.dataset.mpPublicKey, { locale: 'pt-BR' });
+
+    mp.bricks().create('payment', 'mercado-pago-brick', {
+        initialization: {
+            amount: Number(areaBrick.dataset.mpValor),
+            payer: { email: areaBrick.dataset.mpEmail }
+        },
+        customization: {
+            paymentMethods: { bankTransfer: 'all', creditCard: 'all', debitCard: 'all', ticket: 'all' },
+            visual: { style: { customVariables: { baseColor: '#C92D63' } } }
+        },
+        callbacks: {
+            onReady: () => { },
+            onError: erro => console.error('Mercado Pago:', erro),
+            onSubmit: ({ selectedPaymentMethod }) => {
+                document.querySelector('[data-metodo-escolhido]').value = selectedPaymentMethod;
+                bootstrap.Modal.getOrCreateInstance('#modal-demo').show();
+                return Promise.resolve(); // encerra o "carregando" do botão sem processar pagamento
+            }
+        }
+    });
+}
+});
+
 // "Adicionar ao carrinho" sem recarregar a página: o cliente continua comprando.
 document.querySelectorAll('[data-form-carrinho]').forEach(form => {
     form.addEventListener('submit', async evento => {

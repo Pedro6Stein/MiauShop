@@ -1,0 +1,94 @@
+@model CheckoutViewModel
+@{
+    ViewData["Title"] = "Seus dados";
+}
+
+<partial name="_Etapas" model="1" />
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <form method="post" asp-action="Index" class="ms-form" novalidate>
+            <div asp-validation-summary="ModelOnly" class="alert alert-warning"></div>
+
+            <section class="ms-form-bloco">
+                <h1 class="h3">Seus dados</h1>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label asp-for="Dados.Nome" class="form-label"></label>
+                        <input asp-for="Dados.Nome" class="form-control" autocomplete="name" />
+                        <span asp-validation-for="Dados.Nome" class="ms-erro"></span>
+                    </div>
+                    <div class="col-md-7">
+                        <label asp-for="Dados.Email" class="form-label"></label>
+                        <input asp-for="Dados.Email" class="form-control" type="email" autocomplete="email" />
+                        <span asp-validation-for="Dados.Email" class="ms-erro"></span>
+                    </div>
+                    <div class="col-md-5">
+                        <label asp-for="Dados.Telefone" class="form-label"></label>
+                        <input asp-for="Dados.Telefone" class="form-control" type="tel" autocomplete="tel" placeholder="(11) 91234-5678" />
+                        <span asp-validation-for="Dados.Telefone" class="ms-erro"></span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ms-form-bloco">
+                <h2 class="h4">Endereço de entrega</h2>
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label asp-for="Dados.Cep" class="form-label"></label>
+                        @* Ao sair do campo, o navegador pede o endereço ao NOSSO servidor (/Checkout/Cep). *@
+                        <input asp-for="Dados.Cep" class="form-control" inputmode="numeric" autocomplete="postal-code"
+                               placeholder="00000-000" maxlength="9" data-cep-url="/Checkout/Cep" />
+                        <span asp-validation-for="Dados.Cep" class="ms-erro"></span>
+                        <small class="ms-dica" data-cep-status></small>
+                    </div>
+                    <div class="col-md-7 d-flex align-items-end">
+                        <a class="small" href="https://buscacepinter.correios.com.br/" target="_blank" rel="noopener">Não sei meu CEP</a>
+                    </div>
+                    <div class="col-md-9">
+                        <label asp-for="Dados.Logradouro" class="form-label"></label>
+                        <input asp-for="Dados.Logradouro" class="form-control" autocomplete="address-line1" />
+                        <span asp-validation-for="Dados.Logradouro" class="ms-erro"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="Dados.Numero" class="form-label"></label>
+                        <input asp-for="Dados.Numero" class="form-control" />
+                        <span asp-validation-for="Dados.Numero" class="ms-erro"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Dados.Complemento" class="form-label"></label>
+                        <input asp-for="Dados.Complemento" class="form-control" autocomplete="address-line2" placeholder="Opcional" />
+                        <span asp-validation-for="Dados.Complemento" class="ms-erro"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Dados.Bairro" class="form-label"></label>
+                        <input asp-for="Dados.Bairro" class="form-control" />
+                        <span asp-validation-for="Dados.Bairro" class="ms-erro"></span>
+                    </div>
+                    <div class="col-8 col-md-9">
+                        <label asp-for="Dados.Cidade" class="form-label"></label>
+                        <input asp-for="Dados.Cidade" class="form-control" autocomplete="address-level2" />
+                        <span asp-validation-for="Dados.Cidade" class="ms-erro"></span>
+                    </div>
+                    <div class="col-4 col-md-3">
+                        <label asp-for="Dados.Uf" class="form-label"></label>
+                        <input asp-for="Dados.Uf" class="form-control text-uppercase" maxlength="2" autocomplete="address-level1" />
+                        <span asp-validation-for="Dados.Uf" class="ms-erro"></span>
+                    </div>
+                </div>
+            </section>
+
+            <button class="ms-botao ms-botao-grande w-100" type="submit">
+                Continuar para o pagamento <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </button>
+        </form>
+    </div>
+
+    <div class="col-lg-5">
+        <partial name="_Resumo" model="Model.Carrinho" />
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,25 @@
+@model int
+@* Indicador de etapas: 1 = Seus dados, 2 = Pagamento, 3 = Confirmação. *@
+@{
+    var etapas = new[] { "Seus dados", "Pagamento", "Confirmação" };
+}
+<ol class="ms-etapas" aria-label="Etapas da compra">
+    @for (var i = 0; i < etapas.Length; i++)
+    {
+        var numero = i + 1;
+        var estado = numero < Model ? "feita" : numero == Model ? "atual" : "";
+        <li class="@estado" aria-current="@(numero == Model ? "step" : null)">
+            <span class="ms-etapa-numero">
+                @if (numero < Model)
+                {
+                    <i class="bi bi-check-lg" aria-hidden="true"></i>
+                }
+                else
+                {
+                    @numero
+                }
+            </span>
+            @etapas[i]
+        </li>
+    }
+</ol>

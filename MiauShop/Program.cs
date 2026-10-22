@@ -38,6 +38,14 @@ builder.Services.AddScoped<ICarrinhoService, CarrinhoService>();
 builder.Services.AddScoped<ICheckoutService, CheckoutService>();
 builder.Services.AddScoped<IPedidoService, PedidoService>();
 
+// Checkout: Public Key de teste do Mercado Pago (user secrets / variável de ambiente) e consulta de CEP.
+builder.Services.Configure<OpcoesMercadoPago>(builder.Configuration.GetSection(OpcoesMercadoPago.Secao));
+builder.Services.AddHttpClient<IConsultaCep, ViaCepService>(cliente =>
+{
+    cliente.BaseAddress = new Uri("https://viacep.com.br/ws/");
+    cliente.Timeout = TimeSpan.FromSeconds(5);
+});
+
 var app = builder.Build();
 
 // Cria/atualiza o banco e insere os dados de exemplo (só na primeira vez).

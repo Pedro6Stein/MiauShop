@@ -1,0 +1,31 @@
+@model MiauShop.Models.Carrinho
+@* Resumo do pedido montado pelo servidor a partir do carrinho. *@
+<aside class="ms-resumo" aria-labelledby="titulo-resumo-checkout">
+    <h2 class="h5" id="titulo-resumo-checkout">Resumo do pedido</h2>
+    <ul class="ms-resumo-itens">
+        @foreach (var linha in Model.Linhas)
+        {
+            var produto = linha.Variacao.Produto;
+            <li>
+                <span class="ms-resumo-foto">
+                    <img src="@produto.ImagemPrincipalUrl()" alt="" width="56" height="56" />
+                    <span class="ms-resumo-qtd">@linha.Quantidade</span>
+                </span>
+                <span class="flex-grow-1">
+                    <span class="d-block fw-bold">@produto.Nome</span>
+                    @if (!linha.Variacao.EhUnica())
+                    {
+                        <small class="text-body-secondary">Tamanho: @linha.Variacao.Nome</small>
+                    }
+                </span>
+                <span class="fw-bold">@linha.Subtotal.ToString("C")</span>
+            </li>
+        }
+    </ul>
+    <dl>
+        <div><dt>Subtotal</dt><dd>@Model.Subtotal.ToString("C")</dd></div>
+        <div><dt>Frete</dt><dd>@(Model.Frete == 0 ? "Grátis" : Model.Frete.ToString("C"))</dd></div>
+        <div class="ms-resumo-total"><dt>Total</dt><dd>@Model.Total.ToString("C")</dd></div>
+    </dl>
+    <a class="d-block text-center small fw-bold" href="/Carrinho">Alterar carrinho</a>
+</aside>

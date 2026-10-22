@@ -1,0 +1,98 @@
+@model CheckoutViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Pagamento";
+    var dados = Model.Dados;
+    var usaMercadoPago = Model.PublicKeyMercadoPago is not null;
+}
+
+<partial name="_Etapas" model="2" />
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <section class="ms-form-bloco">
+            <div class="d-flex justify-content-between align-items-start gap-3">
+                <div>
+                    <h2 class="h5 mb-1">Entrega para @dados.Nome</h2>
+                    <p class="mb-0 small">
+                        @dados.Logradouro, @dados.Numero@(string.IsNullOrWhiteSpace(dados.Complemento) ? "" : $" - {dados.Complemento}")<br />
+                        @dados.Bairro · @dados.Cidade/@dados.Uf.ToUpperInvariant() · CEP @dados.Cep
+                    </p>
+                </div>
+                <a class="small fw-bold" href="/Checkout">Alterar</a>
+            </div>
+        </section>
+
+        <section class="ms-form-bloco">
+            <h1 class="h3">Pagamento</h1>
+            <div class="ms-aviso-demo">
+                <i class="bi bi-shield-exclamation" aria-hidden="true"></i>
+                <span>Projeto demonstrativo: o pagamento será <strong>bloqueado</strong> e nada será cobrado. Não use dados reais.</span>
+            </div>
+
+            @* O formulário só envia o MÉTODO escolhido; os dados do cartão ficam no componente do Mercado Pago. *@
+            <form method="post" asp-action="Finalizar" id="form-finalizar">
+                @if (usaMercadoPago)
+                {
+                    <input type="hidden" name="metodo" data-metodo-escolhido />
+                    @* Valores escritos pelo servidor: chave pública de teste, total do carrinho e e-mail. *@
+                    <div id="mercado-pago-brick"
+                         data-mp-public-key="@Model.PublicKeyMercadoPago"
+                         data-mp-valor="@Model.Carrinho.Total.ToString(CultureInfo.InvariantCulture)"
+                         data-mp-email="@dados.Email"></div>
+                    <p class="ms-dica mt-2">Componente oficial do Mercado Pago em modo de teste. Use os cartões de teste do Mercado Pago.</p>
+                }
+                else
+                {
+                    <fieldset>
+                        <legend class="ms-rotulo">Como você quer pagar?</legend>
+                        <div class="d-grid gap-2">
+                            <label class="ms-opcao-pagamento">
+                                <input type="radio" name="metodo" value="bank_transfer" checked />
+                                <i class="bi bi-qr-code" aria-hidden="true"></i><span><strong>Pix</strong><small>Pagamento simulado</small></span>
+                            </label>
+                            <label class="ms-opcao-pagamento">
+                                <input type="radio" name="metodo" value="credit_card" />
+                                <i class="bi bi-credit-card" aria-hidden="true"></i><span><strong>Cartão de crédito</strong><small>Nenhum dado de cartão é pedido</small></span>
+                            </label>
+                            <label class="ms-opcao-pagamento">
+                                <input type="radio" name="metodo" value="ticket" />
+                                <i class="bi bi-upc" aria-hidden="true"></i><span><strong>Boleto</strong><small>Boleto simulado</small></span>
+                            </label>
+                        </div>
+                    </fieldset>
+                    <button class="ms-botao ms-botao-grande w-100 mt-4" type="button" data-bs-toggle="modal" data-bs-target="#modal-demo">
+                        <i class="bi bi-lock" aria-hidden="true"></i>Pagar @Model.Carrinho.Total.ToString("C")
+                    </button>
+                }
+
+                @* Janela do bloqueio: aparece ao clicar em pagar (nos dois modos). *@
+                <div class="modal fade" id="modal-demo" tabindex="-1" aria-labelledby="titulo-modal-demo" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content ms-modal">
+                            <div class="ms-modal-icone"><i class="bi bi-shield-lock" aria-hidden="true"></i></div>
+                            <h2 class="h4" id="titulo-modal-demo">Pagamento bloqueado</h2>
+                            <p>O MiauShop é um <strong>projeto demonstrativo</strong>. Nenhum pagamento foi processado e nenhum valor foi cobrado.</p>
+                            <p class="small text-body-secondary">Você pode registrar um pedido de demonstração para ver a confirmação e o acompanhamento.</p>
+                            <div class="d-grid gap-2">
+                                <button class="ms-botao ms-botao-grande" type="submit">Registrar pedido demonstrativo</button>
+                                <button class="ms-botao ms-botao-claro" type="button" data-bs-dismiss="modal">Voltar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+
+    <div class="col-lg-5">
+        <partial name="_Resumo" model="Model.Carrinho" />
+    </div>
+</div>
+
+@section Scripts {
+    @if (usaMercadoPago)
+    {
+        <script src="https://sdk.mercadopago.com/js/v2"></script>
+    }
+}
