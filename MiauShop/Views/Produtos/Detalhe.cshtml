@@ -1,0 +1,129 @@
+@model ProdutoDetalheViewModel
+@using MiauShop.Models.Enums
+@using MiauShop.Services
+@{
+    var produto = Model.Produto;
+    var primeira = Model.Variacoes.First();
+    ViewData["Title"] = produto.Nome;
+}
+
+<nav aria-label="Você está em" class="mb-3">
+    <ol class="breadcrumb small mb-0">
+        <li class="breadcrumb-item"><a href="/">Início</a></li>
+        <li class="breadcrumb-item"><a href="/Produtos?categoria=@produto.Categoria.Slug">@produto.Categoria.Nome</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@produto.Nome</li>
+    </ol>
+</nav>
+
+<div class="row g-4 g-lg-5 mb-5">
+    <div class="col-md-6">
+        <div class="ms-detalhe-imagem" data-anima="hero">
+            <img src="@produto.ImagemPrincipalUrl()" alt="@produto.Imagens.FirstOrDefault()?.TextoAlternativo" width="900" height="900" />
+            @if (produto.EmPromocao())
+            {
+                <span class="ms-selo">-@produto.PercentualDesconto()%</span>
+            }
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div data-anima="hero">
+            <p class="ms-card-categoria mb-1">@produto.Categoria.Nome · @produto.Animal.NomeExibicao()</p>
+            <h1 class="ms-detalhe-nome">@produto.Nome</h1>
+            <p class="ms-detalhe-resumo">@produto.DescricaoCurta</p>
+
+            @* O preço é atualizado pelo JavaScript ao trocar de variação. *@
+            <div class="ms-detalhe-preco mb-4" aria-live="polite">
+                @if (produto.EmPromocao())
+                {
+                    <span class="ms-preco-antigo" data-preco-antigo>@((produto.Preco + primeira.AjustePreco).ToString("C"))</span>
+                }
+                <span class="ms-preco @(produto.EmPromocao() ? "ms-preco-promo" : "")" data-preco>@primeira.PrecoFinal().ToString("C")</span>
+            </div>
+
+            <form method="post" action="/Carrinho/Adicionar" data-form-carrinho>
+                @Html.AntiForgeryToken()
+
+                @if (Model.TemEscolhaDeVariacao)
+                {
+                    <fieldset class="mb-4">
+                        <legend class="ms-rotulo">Tamanho</legend>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var variacao in Model.Variacoes)
+                            {
+                                var id = $"variacao-{variacao.Id}";
+                                <input class="btn-check" type="radio" name="variacaoId" id="@id" value="@variacao.Id"
+                                       checked="@(variacao == primeira)"
+                                       data-preco="@variacao.PrecoFinal().ToString("C")"
+                                       data-preco-antigo="@((produto.Preco + variacao.AjustePreco).ToString("C"))" />
+                                <label class="ms-variacao" for="@id">
+                                    @variacao.Nome
+                                    @if (variacao.AjustePreco > 0)
+                                    {
+                                        <small>+@variacao.AjustePreco.ToString("C")</small>
+                                    }
+                                </label>
+                            }
+                        </div>
+                    </fieldset>
+                }
+                else
+                {
+                    <input type="hidden" name="variacaoId" value="@primeira.Id" />
+                }
+
+                <div class="d-flex flex-wrap gap-3 align-items-end mb-4">
+                    <div>
+                        <label class="ms-rotulo" for="quantidade">Quantidade</label>
+                        <div class="ms-quantidade" data-quantidade>
+                            <button type="button" data-menos aria-label="Diminuir quantidade"><i class="bi bi-dash" aria-hidden="true"></i></button>
+                            <input id="quantidade" name="quantidade" type="number" inputmode="numeric" value="1" min="1" max="@CarrinhoService.QuantidadeMaxima" />
+                            <button type="button" data-mais aria-label="Aumentar quantidade"><i class="bi bi-plus" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+                    <button class="ms-botao ms-botao-grande flex-grow-1" type="submit">
+                        <i class="bi bi-bag-plus" aria-hidden="true"></i>Adicionar ao carrinho
+                    </button>
+                </div>
+            </form>
+
+            <ul class="ms-detalhe-info">
+                <li>
+                    <i class="bi bi-box-seam" aria-hidden="true"></i>
+                    <span>Enviado por <strong>@produto.Fornecedor.Nome</strong> em até @produto.Fornecedor.PrazoEnvioDias dias úteis</span>
+                </li>
+                <li>
+                    <i class="bi bi-truck" aria-hidden="true"></i>
+                    <span><strong>Frete grátis</strong> em compras a partir de @FreteFixoComGratis.MinimoParaFreteGratis.ToString("C")</span>
+                </li>
+                <li>
+                    <i class="bi bi-shield-check" aria-hidden="true"></i>
+                    <span>Compra demonstrativa: nenhum pagamento é cobrado</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<section class="ms-detalhe-descricao mb-5" aria-labelledby="titulo-descricao">
+    <h2 class="h4" id="titulo-descricao">Sobre o produto</h2>
+    <p class="mb-0">@produto.Descricao</p>
+</section>
+
+@if (Model.Relacionados.Count > 0)
+{
+    <section aria-labelledby="titulo-relacionados">
+        <div class="ms-secao-titulo">
+            <h2 id="titulo-relacionados">Você também pode gostar</h2>
+            <a class="fw-bold" href="/Produtos?categoria=@produto.Categoria.Slug">Ver mais <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <div class="row row-cols-2 row-cols-lg-4 g-3 g-md-4" data-anima="surgir">
+            @foreach (var relacionado in Model.Relacionados)
+            {
+                <div class="col">
+                    <partial name="_ProdutoCard" model="relacionado" />
+                </div>
+            }
+        </div>
+    </section>
+}

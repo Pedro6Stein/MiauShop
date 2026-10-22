@@ -389,6 +389,242 @@ a { text-decoration: none; }
     max-width: 380px;
 }
 
+.ms-botao-pequeno { padding: .5rem 1rem; font-size: .9rem; }
+.ms-botao-grande { padding: .95rem 1.75rem; font-size: 1.05rem; justify-content: center; }
+.ms-botao:disabled { opacity: .7; transform: none; }
+
+/* ---------- Listagem: filtros, ordenação, paginação ---------- */
+
+.breadcrumb { --bs-breadcrumb-divider-color: var(--ms-cinza-rosado); }
+.breadcrumb-item.active { color: var(--ms-cinza-rosado); }
+
+@media (min-width: 992px) {
+    .ms-filtros { position: sticky; top: 6rem; }
+}
+
+.ms-filtro-grupo { margin-bottom: 1.75rem; }
+
+.ms-filtro-grupo h3 {
+    font-size: .8rem;
+    font-family: var(--ms-fonte-texto);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--ms-cinza-rosado);
+    margin-bottom: .5rem;
+}
+
+.ms-filtro-opcao {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    padding: .45rem .75rem;
+    margin-bottom: .15rem;
+    border-radius: 12px;
+    color: var(--ms-ameixa);
+    font-weight: 600;
+    transition: background var(--ms-transicao), color var(--ms-transicao);
+}
+
+.ms-filtro-opcao i { color: var(--ms-framboesa); }
+.ms-filtro-opcao:hover { background: var(--ms-algodao); color: var(--ms-ameixa); }
+
+.ms-filtro-opcao.ativo { background: var(--ms-framboesa); color: #fff; }
+.ms-filtro-opcao.ativo i { color: #fff; }
+
+.ms-barra-lista {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .75rem;
+    margin-bottom: 1.5rem;
+}
+
+.ms-pilula {
+    display: inline-flex;
+    align-items: center;
+    gap: .2rem;
+    padding: .3rem .5rem .3rem .85rem;
+    border-radius: 999px;
+    background: var(--ms-algodao);
+    border: 1px solid var(--ms-rosa);
+    color: var(--ms-ameixa-suave);
+    font-size: .85rem;
+    font-weight: 700;
+}
+
+.ms-pilula:hover { background: var(--ms-rosa); color: var(--ms-ameixa); }
+.ms-limpar { font-size: .85rem; font-weight: 700; align-self: center; }
+
+.ms-ordenar {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-left: auto;
+    font-size: .9rem;
+    color: var(--ms-cinza-rosado);
+}
+
+.ms-ordenar select {
+    border: 1px solid var(--ms-borda);
+    border-radius: 999px;
+    background: #fff;
+    padding: .45rem 2rem .45rem 1rem;
+    font-weight: 700;
+    color: var(--ms-ameixa);
+}
+
+.ms-paginacao {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    gap: .4rem;
+}
+
+.ms-paginacao a {
+    min-width: 42px;
+    height: 42px;
+    padding: 0 .5rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid var(--ms-borda);
+    color: var(--ms-ameixa);
+    font-weight: 700;
+}
+
+.ms-paginacao a:hover { background: var(--ms-algodao); }
+.ms-paginacao a.ativo { background: var(--ms-ameixa); border-color: var(--ms-ameixa); color: #fff; }
+
+.ms-vazio {
+    text-align: center;
+    background: var(--ms-algodao);
+    border-radius: 28px;
+    padding: 3.5rem 1.5rem;
+}
+
+.ms-vazio > i { font-size: 3rem; color: var(--ms-framboesa); }
+
+/* ---------- Detalhe do produto ---------- */
+
+.ms-detalhe-imagem {
+    position: relative;
+    border-radius: 28px;
+    overflow: hidden;
+    background: var(--ms-rosa);
+    aspect-ratio: 1;
+}
+
+.ms-detalhe-imagem img { width: 100%; height: 100%; object-fit: cover; }
+.ms-detalhe-imagem .ms-selo { top: 1.25rem; left: 1.25rem; font-size: .95rem; padding: .3rem .9rem; }
+
+.ms-detalhe-nome { font-size: clamp(1.8rem, 3.5vw, 2.6rem); line-height: 1.1; }
+.ms-detalhe-resumo { font-size: 1.1rem; color: var(--ms-ameixa-suave); }
+
+.ms-detalhe-preco { display: flex; align-items: baseline; gap: .75rem; }
+.ms-detalhe-preco .ms-preco { font-size: 2.2rem; }
+.ms-detalhe-preco .ms-preco-antigo { font-size: 1.1rem; }
+
+.ms-rotulo {
+    display: block;
+    font-size: .85rem;
+    font-weight: 700;
+    color: var(--ms-ameixa-suave);
+    margin-bottom: .5rem;
+}
+
+/* Botões de tamanho: o input de rádio fica escondido (btn-check do Bootstrap). */
+.ms-variacao {
+    min-width: 56px;
+    padding: .6rem 1.1rem;
+    border-radius: 14px;
+    border: 2px solid var(--ms-borda);
+    background: #fff;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+    line-height: 1.15;
+    transition: border-color var(--ms-transicao), background var(--ms-transicao);
+}
+
+.ms-variacao small { display: block; font-size: .72rem; color: var(--ms-cinza-rosado); font-weight: 600; }
+.ms-variacao:hover { border-color: var(--ms-rosa); }
+.btn-check:checked + .ms-variacao { border-color: var(--ms-framboesa); background: var(--ms-algodao); }
+.btn-check:focus-visible + .ms-variacao { outline: 3px solid var(--ms-framboesa); outline-offset: 2px; }
+
+.ms-quantidade {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--ms-borda);
+    border-radius: 999px;
+    background: #fff;
+    padding: .3rem;
+}
+
+.ms-quantidade button {
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--ms-algodao);
+    color: var(--ms-ameixa);
+    font-size: 1.1rem;
+}
+
+.ms-quantidade button:hover { background: var(--ms-rosa); }
+
+.ms-quantidade input {
+    width: 48px;
+    border: 0;
+    text-align: center;
+    font-weight: 700;
+    background: transparent;
+    -moz-appearance: textfield;
+}
+
+.ms-quantidade input::-webkit-inner-spin-button,
+.ms-quantidade input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+.ms-detalhe-info {
+    list-style: none;
+    padding: 1.25rem;
+    margin: 0;
+    background: var(--ms-algodao);
+    border-radius: 20px;
+    display: grid;
+    gap: .75rem;
+}
+
+.ms-detalhe-info li { display: flex; gap: .75rem; align-items: flex-start; }
+.ms-detalhe-info i { color: var(--ms-framboesa); font-size: 1.2rem; }
+
+.ms-detalhe-descricao {
+    background: #fff;
+    border: 1px solid var(--ms-borda);
+    border-radius: 24px;
+    padding: 2rem;
+    max-width: 860px;
+}
+
+/* ---------- Aviso "Adicionado ao carrinho" ---------- */
+
+.ms-aviso {
+    --bs-toast-bg: var(--ms-ameixa);
+    --bs-toast-border-color: transparent;
+    --bs-toast-border-radius: 18px;
+    color: #fff;
+    width: auto;
+    max-width: 420px;
+}
+
+.ms-aviso .bi { color: var(--ms-rosa); font-size: 1.3rem; }
+.ms-aviso-link { color: var(--ms-rosa); font-weight: 700; white-space: nowrap; }
+.ms-aviso-link:hover { color: #fff; }
+
 /* ---------- Rodapé ---------- */
 
 .ms-footer {

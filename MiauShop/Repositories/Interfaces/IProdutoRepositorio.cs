@@ -1,5 +1,5 @@
 using MiauShop.Models.Entities;
-using MiauShop.Models.Enums;
+using MiauShop.Models;
 
 namespace MiauShop.Repositories.Interfaces;
 
@@ -7,9 +7,8 @@ public interface IProdutoRepositorio : IRepositorio<Produto>
 {
     Task<List<Produto>> ListarDestaquesAsync(int quantidade);
 
-    // Busca da loja: todos os filtros são opcionais. Devolve a página e o total (para a paginação).
-    Task<(List<Produto> Itens, int Total)> BuscarAsync(
-        Animal? animal, string? categoriaSlug, string? texto, int pagina, int itensPorPagina);
+    // Busca da loja com filtros e ordenação. Devolve a página e o total (para a paginação).
+    Task<(List<Produto> Itens, int Total)> BuscarAsync(FiltroProdutos filtro, int itensPorPagina);
 
     // Produto completo para a página de detalhe (categoria, fornecedor, variações e imagens).
     Task<Produto?> ObterPorSlugAsync(string slug);

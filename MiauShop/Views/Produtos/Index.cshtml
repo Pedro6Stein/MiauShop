@@ -1,0 +1,169 @@
+@model CatalogoViewModel
+@using MiauShop.Models
+@using MiauShop.Models.Enums
+@{
+    var filtro = Model.Filtro;
+    ViewData["Title"] = Model.Titulo;
+
+    // Link de uma opção de filtro: mantém os outros filtros e troca só este.
+    string Link(Action<FiltroProdutos> alterar) => filtro.Com(alterar).ParaUrl();
+
+    var categoriaAtual = Model.Categorias.FirstOrDefault(c => c.Slug == filtro.Categoria);
+    var faixaAtual = CatalogoViewModel.FaixasDePreco
+        .FirstOrDefault(f => f.Minimo == filtro.PrecoMin && f.Maximo == filtro.PrecoMax);
+}
+
+<nav aria-label="Você está em" class="mb-2">
+    <ol class="breadcrumb small mb-0">
+        <li class="breadcrumb-item"><a href="/">Início</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Produtos</li>
+    </ol>
+</nav>
+
+<div class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-4">
+    <div>
+        <h1 class="mb-1">@Model.Titulo</h1>
+        <p class="text-body-secondary mb-0">
+            @Model.Total @(Model.Total == 1 ? "produto encontrado" : "produtos encontrados")
+        </p>
+    </div>
+</div>
+
+<div class="row g-4">
+    @* Filtros: coluna fixa no computador, painel lateral (offcanvas) no celular. *@
+    <aside class="col-lg-3">
+        <div class="offcanvas-lg offcanvas-start" id="painel-filtros" tabindex="-1" aria-labelledby="titulo-filtros">
+            <div class="offcanvas-header">
+                <h2 class="h4 mb-0" id="titulo-filtros">Filtros</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#painel-filtros" aria-label="Fechar filtros"></button>
+            </div>
+            <div class="offcanvas-body d-block ms-filtros">
+                <div class="ms-filtro-grupo">
+                    <h3>Para quem</h3>
+                    <a class="ms-filtro-opcao @(filtro.Animal is null ? "ativo" : "")" href="@Link(f => f.Animal = null)">Cães e gatos</a>
+                    <a class="ms-filtro-opcao @(filtro.Animal == Animal.Cao ? "ativo" : "")" href="@Link(f => f.Animal = Animal.Cao)"><i class="bi bi-heart" aria-hidden="true"></i>Cães</a>
+                    <a class="ms-filtro-opcao @(filtro.Animal == Animal.Gato ? "ativo" : "")" href="@Link(f => f.Animal = Animal.Gato)"><i class="bi bi-heart" aria-hidden="true"></i>Gatos</a>
+                </div>
+
+                <div class="ms-filtro-grupo">
+                    <h3>Categoria</h3>
+                    <a class="ms-filtro-opcao @(filtro.Categoria is null ? "ativo" : "")" href="@Link(f => f.Categoria = null)">Todas</a>
+                    @foreach (var categoria in Model.Categorias)
+                    {
+                        <a class="ms-filtro-opcao @(filtro.Categoria == categoria.Slug ? "ativo" : "")" href="@Link(f => f.Categoria = categoria.Slug)">
+                            <i class="bi @categoria.Icone" aria-hidden="true"></i>@categoria.Nome
+                        </a>
+                    }
+                </div>
+
+                <div class="ms-filtro-grupo">
+                    <h3>Preço</h3>
+                    <a class="ms-filtro-opcao @(filtro.PrecoMin is null && filtro.PrecoMax is null ? "ativo" : "")" href="@Link(f => { f.PrecoMin = null; f.PrecoMax = null; })">Qualquer preço</a>
+                    @foreach (var faixa in CatalogoViewModel.FaixasDePreco)
+                    {
+                        <a class="ms-filtro-opcao @(faixa == faixaAtual && (filtro.PrecoMin is not null || filtro.PrecoMax is not null) ? "ativo" : "")"
+                           href="@Link(f => { f.PrecoMin = faixa.Minimo; f.PrecoMax = faixa.Maximo; })">@faixa.Rotulo</a>
+                    }
+                </div>
+
+                <div class="ms-filtro-grupo">
+                    <h3>Ofertas</h3>
+                    <a class="ms-filtro-opcao @(filtro.Promocao ? "ativo" : "")" href="@Link(f => f.Promocao = !f.Promocao)">
+                        <i class="bi bi-tag" aria-hidden="true"></i>Só promoções
+                    </a>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <section class="col-lg-9" aria-label="Produtos">
+        <div class="ms-barra-lista">
+            <button class="ms-botao ms-botao-claro ms-botao-pequeno d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#painel-filtros" aria-controls="painel-filtros">
+                <i class="bi bi-sliders" aria-hidden="true"></i>Filtros
+            </button>
+
+            @* Filtros ativos, cada um com um "x" para remover. *@
+            <div class="d-flex flex-wrap gap-2 flex-grow-1">
+                @if (filtro.Animal is not null)
+                {
+                    <a class="ms-pilula" href="@Link(f => f.Animal = null)" aria-label="Remover filtro @filtro.Animal.Value.NomeExibicao()">@filtro.Animal.Value.NomeExibicao() <i class="bi bi-x" aria-hidden="true"></i></a>
+                }
+                @if (categoriaAtual is not null)
+                {
+                    <a class="ms-pilula" href="@Link(f => f.Categoria = null)" aria-label="Remover filtro @categoriaAtual.Nome">@categoriaAtual.Nome <i class="bi bi-x" aria-hidden="true"></i></a>
+                }
+                @if (!string.IsNullOrWhiteSpace(filtro.Busca))
+                {
+                    <a class="ms-pilula" href="@Link(f => f.Busca = null)" aria-label="Limpar busca">"@filtro.Busca" <i class="bi bi-x" aria-hidden="true"></i></a>
+                }
+                @if (filtro.PrecoMin is not null || filtro.PrecoMax is not null)
+                {
+                    <a class="ms-pilula" href="@Link(f => { f.PrecoMin = null; f.PrecoMax = null; })" aria-label="Remover filtro de preço">@(faixaAtual.Rotulo ?? "Preço") <i class="bi bi-x" aria-hidden="true"></i></a>
+                }
+                @if (filtro.Promocao)
+                {
+                    <a class="ms-pilula" href="@Link(f => f.Promocao = false)" aria-label="Remover filtro de promoções">Promoções <i class="bi bi-x" aria-hidden="true"></i></a>
+                }
+                @if (filtro.TemFiltroAtivo)
+                {
+                    <a class="ms-limpar" href="@(new FiltroProdutos { Ordem = filtro.Ordem }.ParaUrl())">Limpar tudo</a>
+                }
+            </div>
+
+            <label class="ms-ordenar">
+                <span>Ordenar por</span>
+                <select onchange="location = this.value" aria-label="Ordenar produtos">
+                    @foreach (var ordem in Enum.GetValues<OrdenacaoProdutos>())
+                    {
+                        <option value="@Link(f => f.Ordem = ordem)" selected="@(filtro.Ordem == ordem)">@ordem.NomeExibicao()</option>
+                    }
+                </select>
+            </label>
+        </div>
+
+        @if (Model.Produtos.Count == 0)
+        {
+            <div class="ms-vazio">
+                <i class="bi bi-search-heart" aria-hidden="true"></i>
+                <h2 class="h4">Nenhum produto por aqui</h2>
+                <p>Tente outros filtros ou veja tudo o que temos para seu pet.</p>
+                <a class="ms-botao" href="/Produtos">Ver todos os produtos</a>
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-2 row-cols-md-3 g-3 g-md-4" data-anima="surgir">
+                @foreach (var produto in Model.Produtos)
+                {
+                    <div class="col">
+                        <partial name="_ProdutoCard" model="produto" />
+                    </div>
+                }
+            </div>
+
+            @if (Model.TotalPaginas > 1)
+            {
+                <nav class="mt-5" aria-label="Páginas">
+                    <ul class="ms-paginacao">
+                        @if (filtro.Pagina > 1)
+                        {
+                            <li><a href="@(filtro.Com(f => f.Pagina = filtro.Pagina - 1).ParaUrl())" aria-label="Página anterior"><i class="bi bi-chevron-left" aria-hidden="true"></i></a></li>
+                        }
+                        @for (var pagina = 1; pagina <= Model.TotalPaginas; pagina++)
+                        {
+                            var numero = pagina;
+                            <li>
+                                <a class="@(numero == filtro.Pagina ? "ativo" : "")" href="@(filtro.Com(f => f.Pagina = numero).ParaUrl())"
+                                   aria-current="@(numero == filtro.Pagina ? "page" : null)">@numero</a>
+                            </li>
+                        }
+                        @if (filtro.Pagina < Model.TotalPaginas)
+                        {
+                            <li><a href="@(filtro.Com(f => f.Pagina = filtro.Pagina + 1).ParaUrl())" aria-label="Próxima página"><i class="bi bi-chevron-right" aria-hidden="true"></i></a></li>
+                        }
+                    </ul>
+                </nav>
+            }
+        }
+    </section>
+</div>
