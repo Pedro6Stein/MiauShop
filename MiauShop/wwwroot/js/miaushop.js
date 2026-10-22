@@ -40,16 +40,32 @@ document.querySelectorAll('[data-quantidade]').forEach(caixa => {
     caixa.querySelector('[data-mais]').addEventListener('click', () => campo.stepUp());
 });
 
-// Troca de tamanho: pede ao servidor o bloco de preço daquela variação.
-document.querySelectorAll('[data-url-preco]').forEach(form => {
-    const area = document.querySelector('[data-area-preco]');
+// Troca de tamanho (página do produto ou janelinha): pede ao servidor o bloco de preço daquela variação.
+// Delegado no document porque a janelinha é criada depois que a página carrega.
+document.addEventListener('change', async evento => {
+    const opcao = evento.target;
+    const form = opcao.closest?.('[data-url-preco]');
+    if (!form || opcao.name !== 'variacaoId') return;
 
-    form.querySelectorAll('input[name="variacaoId"]').forEach(opcao => {
-        opcao.addEventListener('change', async () => {
-            const resposta = await fetch(`${form.dataset.urlPreco}?variacaoId=${opcao.value}`);
-            if (resposta.ok) area.innerHTML = await resposta.text();
-        });
-    });
+    const area = form.closest('[data-escopo-produto]').querySelector('[data-area-preco]');
+    const resposta = await fetch(`${form.dataset.urlPreco}?variacaoId=${opcao.value}`);
+    if (resposta.ok) area.innerHTML = await resposta.text();
+});
+
+// "+" de card com tamanho: busca no servidor o conteúdo da janelinha e abre.
+document.addEventListener('click', async evento => {
+    const botao = evento.target.closest('[data-escolher-url]');
+    if (!botao) return;
+
+    evento.preventDefault();
+    const resposta = await fetch(botao.dataset.escolherUrl);
+    if (!resposta.ok) {
+        window.location.href = botao.href; // sem a janelinha, vai para a página do produto
+        return;
+    }
+
+    document.querySelector('[data-modal-conteudo]').innerHTML = await resposta.text();
+    bootstrap.Modal.getOrCreateInstance('#ms-modal-escolha').show();
 });
 
 // ---------- Página do carrinho ----------
@@ -92,22 +108,33 @@ document.querySelectorAll('[data-cep-url]').forEach(campoCep => {
     const status = form.querySelector('[data-cep-status]');
     const campo = nome => form.querySelector(`[name="Dados.${nome}"]`);
 
+    // Rua e bairro ficam travados quando o CEP já os traz; senão o cliente digita.
+    // (Cidade e UF são sempre travadas na própria tela.) Quem decide no final é o servidor.
+    const preencher = (nome, valor) => {
+        const entrada = campo(nome);
+        entrada.value = valor ?? '';
+        entrada.readOnly = Boolean(valor);
+    };
+
     campoCep.addEventListener('change', async () => {
         status.textContent = 'Buscando endereço...';
 
         const resposta = await fetch(`${campoCep.dataset.cepUrl}?cep=${encodeURIComponent(campoCep.value)}`);
         if (!resposta.ok) {
-            status.textContent = 'CEP não encontrado. Preencha o endereço abaixo.';
+            ['Logradouro', 'Bairro'].forEach(nome => preencher(nome, ''));
+            campo('Cidade').value = '';
+            campo('Uf').value = '';
+            status.textContent = 'CEP não encontrado. Confira os números.';
             return;
         }
 
         const endereco = await resposta.json();
-        campo('Logradouro').value = endereco.logradouro;
-        campo('Bairro').value = endereco.bairro;
+        preencher('Logradouro', endereco.logradouro);
+        preencher('Bairro', endereco.bairro);
         campo('Cidade').value = endereco.cidade;
         campo('Uf').value = endereco.uf;
         status.textContent = '';
-        campo('Numero').focus();
+        (endereco.logradouro ? campo('Numero') : campo('Logradouro')).focus();
     });
 });
 
@@ -143,31 +170,34 @@ if (areaBrick && window.MercadoPago) {
 }
 });
 
-// "Adicionar ao carrinho" sem recarregar a página: o cliente continua comprando.
-document.querySelectorAll('[data-form-carrinho]').forEach(form => {
-    form.addEventListener('submit', async evento => {
-        evento.preventDefault();
-        const botao = form.querySelector('[type="submit"]');
-        botao.disabled = true;
+// "Adicionar ao carrinho" sem recarregar a página (página do produto, "+" do card e janelinha).
+// Delegado no document porque a janelinha é criada depois que a página carrega.
+document.addEventListener('submit', async evento => {
+    const form = evento.target.closest('[data-form-carrinho]');
+    if (!form) return;
 
-        try {
-            const resposta = await fetch(form.action, {
-                method: 'POST',
-                body: new FormData(form), // inclui o token antifalsificação
-                headers: { Accept: 'application/json' }
-            });
-            const dados = await resposta.json();
+    evento.preventDefault();
+    const botao = form.querySelector('[type="submit"]');
+    botao.disabled = true;
 
-            if (!resposta.ok) throw new Error(dados.erro);
+    try {
+        const resposta = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form), // inclui o token antifalsificação
+            headers: { Accept: 'application/json' }
+        });
+        const dados = await resposta.json();
 
-            window.miauAtualizarCarrinho(dados.quantidade);
-            window.miauAviso('Adicionado ao carrinho!', true);
-        } catch (erro) {
-            window.miauAviso(erro.message || 'Não foi possível adicionar. Tente de novo.', false);
-        } finally {
-            botao.disabled = false;
-        }
-    });
+        if (!resposta.ok) throw new Error(dados.erro);
+
+        bootstrap.Modal.getInstance('#ms-modal-escolha')?.hide();
+        window.miauAtualizarCarrinho(dados.quantidade);
+        window.miauAviso('Adicionado ao carrinho!', true);
+    } catch (erro) {
+        window.miauAviso(erro.message || 'Não foi possível adicionar. Tente de novo.', false);
+    } finally {
+        botao.disabled = false;
+    }
 });
 
 // Aviso rápido no canto da tela (toast do Bootstrap).

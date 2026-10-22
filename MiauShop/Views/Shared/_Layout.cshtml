@@ -56,6 +56,13 @@
         @RenderBody()
     </main>
 
+    @* Janelinha de tamanho do "+" dos cards: o conteúdo vem pronto do servidor. *@
+    <div class="modal fade" id="ms-modal-escolha" tabindex="-1" aria-labelledby="titulo-escolha" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content ms-modal" data-modal-conteudo></div>
+        </div>
+    </div>
+
     @* Aviso rápido usado pelo "Adicionar ao carrinho". *@
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="ms-aviso" class="toast ms-aviso" role="status" aria-live="polite" aria-atomic="true">

@@ -1,0 +1,32 @@
+@model MiauShop.Models.Entities.Produto
+@* Botões de tamanho (ou o id da variação única). Usado na página do produto e na janelinha do "+".
+   ViewData["Prefixo"] deixa os ids únicos quando os dois aparecem na mesma tela. *@
+@{
+    var prefixo = ViewData["Prefixo"] as string ?? "variacao";
+    var variacoes = Model.Variacoes.OrderBy(v => v.Ordem).ToList();
+    var primeira = variacoes.First();
+}
+@if (variacoes.Count > 1)
+{
+    <fieldset class="mb-4">
+        <legend class="ms-rotulo">Tamanho</legend>
+        <div class="d-flex flex-wrap gap-2">
+            @foreach (var variacao in variacoes)
+            {
+                var id = $"{prefixo}-{variacao.Id}";
+                <input class="btn-check" type="radio" name="variacaoId" id="@id" value="@variacao.Id" checked="@(variacao == primeira)" />
+                <label class="ms-variacao" for="@id">
+                    @variacao.Nome
+                    @if (variacao.AjustePreco > 0)
+                    {
+                        <small>+@variacao.AjustePreco.ToString("C")</small>
+                    }
+                </label>
+            }
+        </div>
+    </fieldset>
+}
+else
+{
+    <input type="hidden" name="variacaoId" value="@primeira.Id" />
+}

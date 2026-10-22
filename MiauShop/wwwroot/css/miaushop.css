@@ -815,6 +815,15 @@ a { text-decoration: none; }
 .ms-modal { border: 0; border-radius: 28px; padding: 2rem; text-align: center; }
 .ms-modal .ms-botao { justify-content: center; }
 
+/* Janelinha de tamanho do "+" */
+.ms-escolha { position: relative; }
+.ms-escolha-fechar { position: absolute; top: -.75rem; right: -.75rem; }
+.ms-escolha-foto { width: 84px; height: 84px; border-radius: 16px; object-fit: cover; background: var(--ms-rosa); flex-shrink: 0; }
+.ms-escolha .ms-detalhe-preco .ms-preco { font-size: 1.5rem; }
+
+/* O "+" do card agora pode ser um botão de formulário. */
+button.ms-botao-mais { border: 0; }
+
 .ms-modal-icone,
 .ms-confirmacao-icone {
     width: 72px;

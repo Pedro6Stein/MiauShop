@@ -27,7 +27,8 @@
     </div>
 
     <div class="col-md-6">
-        <div data-anima="hero">
+        @* data-escopo-produto: delimita onde o JS procura a área de preço deste produto. *@
+        <div data-anima="hero" data-escopo-produto>
             <p class="ms-card-categoria mb-1">@produto.Categoria.Nome · @produto.Animal.NomeExibicao()</p>
             <h1 class="ms-detalhe-nome">@produto.Nome</h1>
             <p class="ms-detalhe-resumo">@produto.DescricaoCurta</p>
@@ -41,31 +42,7 @@
             <form method="post" action="/Carrinho/Adicionar" data-form-carrinho data-url-preco="/Produtos/@produto.Slug/preco">
                 @Html.AntiForgeryToken()
 
-                @if (Model.TemEscolhaDeVariacao)
-                {
-                    <fieldset class="mb-4">
-                        <legend class="ms-rotulo">Tamanho</legend>
-                        <div class="d-flex flex-wrap gap-2">
-                            @foreach (var variacao in Model.Variacoes)
-                            {
-                                var id = $"variacao-{variacao.Id}";
-                                <input class="btn-check" type="radio" name="variacaoId" id="@id" value="@variacao.Id"
-                                       checked="@(variacao == primeira)" />
-                                <label class="ms-variacao" for="@id">
-                                    @variacao.Nome
-                                    @if (variacao.AjustePreco > 0)
-                                    {
-                                        <small>+@variacao.AjustePreco.ToString("C")</small>
-                                    }
-                                </label>
-                            }
-                        </div>
-                    </fieldset>
-                }
-                else
-                {
-                    <input type="hidden" name="variacaoId" value="@primeira.Id" />
-                }
+                <partial name="_SeletorTamanho" model="produto" />
 
                 <div class="d-flex flex-wrap gap-3 align-items-end mb-4">
                     <div>

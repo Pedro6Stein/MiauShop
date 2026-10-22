@@ -48,6 +48,15 @@ public class ProdutosController(ICatalogoService catalogoService) : Controller
         return View(modelo);
     }
 
+    // GET /Produtos/moletom-pet-inverno/escolher
+    // Conteúdo da janelinha de tamanho aberta pelo "+" do card.
+    [HttpGet("{slug}/escolher")]
+    public async Task<IActionResult> Escolher(string slug)
+    {
+        var produto = await catalogoService.ObterProdutoAsync(slug);
+        return produto is null ? NotFound() : PartialView("_EscolherTamanho", produto);
+    }
+
     // GET /Produtos/moletom-pet-inverno/preco?variacaoId=7
     // Devolve só o bloco de preço já renderizado (usado ao trocar o tamanho na página do produto).
     [HttpGet("{slug}/preco")]

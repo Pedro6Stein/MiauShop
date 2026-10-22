@@ -47,14 +47,13 @@ public class DadosCheckout
     [StringLength(80)]
     public string Bairro { get; set; } = string.Empty;
 
+    // Cidade e UF não são digitadas: o servidor preenche a partir do CEP (CheckoutController).
     [Display(Name = "Cidade")]
-    [Required(ErrorMessage = "Informe a cidade.")]
     [StringLength(80)]
     public string Cidade { get; set; } = string.Empty;
 
     [Display(Name = "UF")]
-    [Required(ErrorMessage = "Informe a UF.")]
-    [RegularExpression(@"^[A-Za-z]{2}$", ErrorMessage = "Use a sigla, ex.: SP.")]
+    [StringLength(2)]
     public string Uf { get; set; } = string.Empty;
 
     public Endereco ParaEndereco()

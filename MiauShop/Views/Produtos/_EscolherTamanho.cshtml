@@ -1,0 +1,31 @@
+@model MiauShop.Models.Entities.Produto
+@* Conteúdo da janelinha aberta pelo "+" do card em produtos com tamanho.
+   Renderizado pelo servidor (GET /Produtos/{slug}/escolher). *@
+@{
+    var primeira = Model.Variacoes.OrderBy(v => v.Ordem).First();
+    ViewData["Prefixo"] = "escolha";
+}
+<div class="ms-escolha" data-escopo-produto>
+    <button type="button" class="btn-close ms-escolha-fechar" data-bs-dismiss="modal" aria-label="Fechar"></button>
+
+    <div class="d-flex gap-3 align-items-center mb-3 text-start">
+        <img class="ms-escolha-foto" src="@Model.ImagemPrincipalUrl()" alt="" width="84" height="84" />
+        <div>
+            <h2 class="h5 mb-1" id="titulo-escolha">@Model.Nome</h2>
+            <div aria-live="polite" data-area-preco>
+                <partial name="_Preco" model="primeira" />
+            </div>
+        </div>
+    </div>
+
+    <form class="text-start" method="post" action="/Carrinho/Adicionar" data-form-carrinho data-url-preco="/Produtos/@Model.Slug/preco">
+        @Html.AntiForgeryToken()
+        <partial name="_SeletorTamanho" model="Model" view-data="ViewData" />
+        <input type="hidden" name="quantidade" value="1" />
+        <button class="ms-botao ms-botao-grande w-100" type="submit">
+            <i class="bi bi-bag-plus" aria-hidden="true"></i>Adicionar ao carrinho
+        </button>
+    </form>
+
+    <a class="d-block mt-3 small fw-bold" href="/Produtos/@Model.Slug">Ver detalhes do produto</a>
+</div>

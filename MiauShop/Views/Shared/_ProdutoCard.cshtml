@@ -25,9 +25,25 @@
                     <div class="ms-preco">@Model.PrecoAtual().ToString("C")</div>
                 }
             </div>
-            <a class="ms-botao-mais" href="@url" aria-label="Ver @Model.Nome">
-                <i class="bi bi-plus-lg" aria-hidden="true"></i>
-            </a>
+            @* "+": sem tamanho, adiciona direto ao carrinho; com tamanho, abre a janelinha de escolha
+               (sem JavaScript, o link leva para a página do produto). *@
+            @if (Model.Variacoes.Count == 1)
+            {
+                <form method="post" action="/Carrinho/Adicionar" data-form-carrinho>
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="variacaoId" value="@Model.Variacoes.First().Id" />
+                    <button class="ms-botao-mais" type="submit" aria-label="Adicionar @Model.Nome ao carrinho">
+                        <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                    </button>
+                </form>
+            }
+            else
+            {
+                <a class="ms-botao-mais" href="@url" role="button" data-escolher-url="@url/escolher"
+                   aria-label="Escolher tamanho de @Model.Nome">
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                </a>
+            }
         </div>
     </div>
 </article>

@@ -67,12 +67,12 @@
                     </div>
                     <div class="col-8 col-md-9">
                         <label asp-for="Dados.Cidade" class="form-label"></label>
-                        <input asp-for="Dados.Cidade" class="form-control" autocomplete="address-level2" />
+                        <input asp-for="Dados.Cidade" class="form-control" readonly tabindex="-1" placeholder="Preenchida pelo CEP" />
                         <span asp-validation-for="Dados.Cidade" class="ms-erro"></span>
                     </div>
                     <div class="col-4 col-md-3">
                         <label asp-for="Dados.Uf" class="form-label"></label>
-                        <input asp-for="Dados.Uf" class="form-control text-uppercase" maxlength="2" autocomplete="address-level1" />
+                        <input asp-for="Dados.Uf" class="form-control" readonly tabindex="-1" placeholder="--" />
                         <span asp-validation-for="Dados.Uf" class="ms-erro"></span>
                     </div>
                 </div>

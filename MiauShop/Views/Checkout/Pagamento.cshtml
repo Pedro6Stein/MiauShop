@@ -16,7 +16,7 @@
                     <h2 class="h5 mb-1">Entrega para @dados.Nome</h2>
                     <p class="mb-0 small">
                         @dados.Logradouro, @dados.Numero@(string.IsNullOrWhiteSpace(dados.Complemento) ? "" : $" - {dados.Complemento}")<br />
-                        @dados.Bairro · @dados.Cidade/@dados.Uf.ToUpperInvariant() · CEP @dados.Cep
+                        @dados.Bairro · @dados.Cidade/@dados.Uf · CEP @dados.ParaEndereco().Cep
                     </p>
                 </div>
                 <a class="small fw-bold" href="/Checkout">Alterar</a>
