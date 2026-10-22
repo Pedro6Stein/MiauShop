@@ -39,6 +39,13 @@ builder.Services.AddScoped<IPedidoService, PedidoService>();
 
 var app = builder.Build();
 
+// Cria/atualiza o banco e insere os dados de exemplo (só na primeira vez).
+using (var escopo = app.Services.CreateScope())
+{
+    var contexto = escopo.ServiceProvider.GetRequiredService<AppDbContext>();
+    await SeedData.InicializarAsync(contexto);
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
