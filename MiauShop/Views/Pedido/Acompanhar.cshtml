@@ -1,0 +1,136 @@
+@model AcompanhamentoViewModel
+@using MiauShop.Models.Enums
+@using MiauShop.Services
+@{
+    ViewData["Title"] = "Acompanhar pedido";
+    var pedido = Model.Pedido;
+}
+
+<nav aria-label="Você está em" class="mb-2">
+    <ol class="breadcrumb small mb-0">
+        <li class="breadcrumb-item"><a href="/">Início</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Acompanhar pedido</li>
+    </ol>
+</nav>
+
+<h1 class="mb-4">Acompanhar pedido</h1>
+
+@if (Model.Bloqueado)
+{
+    <div class="alert alert-warning" role="alert">Muitas tentativas seguidas. Aguarde um minuto e tente de novo.</div>
+}
+
+@* POST: o e-mail vai no corpo da requisição, nunca na URL. *@
+<form method="post" asp-action="Acompanhar" class="ms-form ms-form-bloco ms-busca-pedido" novalidate>
+    <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label asp-for="Busca.Numero" class="form-label"></label>
+            <input asp-for="Busca.Numero" class="form-control" inputmode="numeric" placeholder="123" />
+            <span asp-validation-for="Busca.Numero" class="ms-erro"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Busca.Email" class="form-label"></label>
+            <input asp-for="Busca.Email" class="form-control" type="email" autocomplete="email" />
+            <span asp-validation-for="Busca.Email" class="ms-erro"></span>
+        </div>
+        <div class="col-md-3">
+            <button class="ms-botao w-100 justify-content-center" type="submit">
+                <i class="bi bi-search" aria-hidden="true"></i>@(pedido is null ? "Buscar" : "Atualizar status")
+            </button>
+        </div>
+    </div>
+</form>
+
+@if (Model.BuscaFeita && pedido is null)
+{
+    <div class="ms-vazio">
+        <i class="bi bi-search-heart" aria-hidden="true"></i>
+        <h2 class="h4">Não encontramos um pedido com esses dados</h2>
+        <p class="mb-0">Confira o número do pedido e o e-mail usado na compra.</p>
+    </div>
+}
+
+@if (pedido is not null)
+{
+    <section class="ms-form-bloco" aria-labelledby="titulo-status">
+        <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-4">
+            <h2 class="h3 mb-0" id="titulo-status">Pedido #@pedido.Id</h2>
+            <span class="ms-dica mt-0">Feito em @Model.CriadoEm?.ToString("dd/MM/yyyy 'às' HH:mm")</span>
+        </div>
+
+        @if (pedido.Status == StatusPedido.Cancelado)
+        {
+            <div class="alert alert-secondary" role="status">
+                <strong>Pedido cancelado</strong> em @Model.CanceladoEm?.ToString("dd/MM/yyyy 'às' HH:mm").
+            </div>
+        }
+
+        @* Linha do tempo: estado e horário de cada etapa já vêm calculados do servidor. *@
+        <ol class="ms-linha-tempo" data-anima="surgir">
+            @foreach (var etapa in Model.Etapas)
+            {
+                var classe = etapa.Estado switch
+                {
+                    EstadoEtapa.Feita => "feita",
+                    EstadoEtapa.Atual => "atual",
+                    _ => ""
+                };
+                <li class="@classe" aria-current="@(etapa.Estado == EstadoEtapa.Atual ? "step" : null)">
+                    <span class="ms-linha-ponto">
+                        @if (etapa.Estado != EstadoEtapa.Pendente)
+                        {
+                            <i class="bi bi-check-lg" aria-hidden="true"></i>
+                        }
+                    </span>
+                    <strong>@etapa.Nome</strong>
+                    <small>@(etapa.Quando?.ToString("dd/MM 'às' HH:mm") ?? "Aguardando")</small>
+                </li>
+            }
+        </ol>
+
+        <p class="ms-dica text-center mb-0">Demonstração: os status avançam sozinhos alguns minutos após a compra. Clique em "Atualizar status" para ver.</p>
+    </section>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <section class="ms-form-bloco">
+                <h2 class="h5">Itens</h2>
+                <ul class="ms-resumo-itens mb-0">
+                    @foreach (var item in pedido.Itens)
+                    {
+                        <li>
+                            <span class="ms-resumo-foto">
+                                <img src="@item.ImagemUrl" alt="" width="56" height="56" />
+                                <span class="ms-resumo-qtd">@item.Quantidade</span>
+                            </span>
+                            <span class="flex-grow-1">
+                                <span class="d-block fw-bold">@item.NomeProduto</span>
+                                <small class="text-body-secondary">@item.NomeVariacao · @item.PrecoUnitario.ToString("C") cada</small>
+                            </span>
+                            <span class="fw-bold">@item.Subtotal().ToString("C")</span>
+                        </li>
+                    }
+                </ul>
+            </section>
+        </div>
+        <div class="col-lg-5">
+            <aside class="ms-resumo">
+                <dl class="mt-0">
+                    <div><dt>Pagamento</dt><dd>@pedido.FormaPagamento.NomeExibicao() (simulado)</dd></div>
+                    <div><dt>Subtotal</dt><dd>@pedido.Subtotal.ToString("C")</dd></div>
+                    <div><dt>Frete</dt><dd>@(pedido.Frete == 0 ? "Grátis" : pedido.Frete.ToString("C"))</dd></div>
+                    <div class="ms-resumo-total"><dt>Total</dt><dd>@pedido.Total.ToString("C")</dd></div>
+                </dl>
+                <h2 class="h6">Entrega</h2>
+                <p class="small mb-0">
+                    @pedido.EnderecoEntrega.Logradouro, @pedido.EnderecoEntrega.Numero@(pedido.EnderecoEntrega.Complemento is null ? "" : $" - {pedido.EnderecoEntrega.Complemento}")<br />
+                    @pedido.EnderecoEntrega.Bairro · @pedido.EnderecoEntrega.Cidade/@pedido.EnderecoEntrega.Uf · CEP @pedido.EnderecoEntrega.Cep
+                </p>
+            </aside>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

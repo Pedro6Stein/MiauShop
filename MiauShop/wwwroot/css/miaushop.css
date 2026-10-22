@@ -870,6 +870,68 @@ button.ms-botao-mais { border: 0; }
 .ms-confirmacao-icone { background: var(--ms-menta); color: #fff; }
 .ms-confirmacao h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); }
 
+/* ---------- Acompanhar pedido ---------- */
+
+.ms-linha-tempo {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    text-align: center;
+}
+
+.ms-linha-tempo li { position: relative; display: flex; flex-direction: column; align-items: center; gap: .3rem; }
+
+/* Trilho entre as etapas */
+.ms-linha-tempo li + li::before {
+    content: "";
+    position: absolute;
+    top: 19px;
+    right: 50%;
+    width: 100%;
+    height: 4px;
+    background: var(--ms-borda);
+    z-index: 0;
+}
+
+.ms-linha-tempo li.feita + li::before,
+.ms-linha-tempo li.feita + li.atual::before { background: var(--ms-menta); }
+
+.ms-linha-ponto {
+    position: relative;
+    z-index: 1;
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    border: 3px solid var(--ms-borda);
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.2rem;
+}
+
+.ms-linha-tempo li.feita .ms-linha-ponto { background: var(--ms-menta); border-color: var(--ms-menta); }
+.ms-linha-tempo li.atual .ms-linha-ponto {
+    background: var(--ms-framboesa);
+    border-color: var(--ms-framboesa);
+    box-shadow: 0 0 0 6px rgba(201, 45, 99, .15);
+}
+
+.ms-linha-tempo strong { font-size: .92rem; }
+.ms-linha-tempo small { font-size: .78rem; color: var(--ms-cinza-rosado); }
+.ms-linha-tempo li:not(.feita):not(.atual) strong { color: var(--ms-cinza-rosado); }
+
+@media (max-width: 575.98px) {
+    /* Celular: linha do tempo na vertical. */
+    .ms-linha-tempo { grid-template-columns: 1fr; gap: 1.25rem; text-align: left; }
+    .ms-linha-tempo li { display: grid; grid-template-columns: 42px 1fr; column-gap: .9rem; align-items: center; }
+    .ms-linha-tempo li .ms-linha-ponto { grid-row: span 2; }
+    .ms-linha-tempo li + li::before { top: -1.25rem; left: 19px; right: auto; width: 4px; height: 1.25rem; }
+}
+
 /* ---------- Aviso "Adicionado ao carrinho" ---------- */
 
 .ms-aviso {

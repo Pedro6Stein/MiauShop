@@ -46,6 +46,26 @@ builder.Services.AddHttpClient<IConsultaCep, ViaCepService>(cliente =>
     cliente.Timeout = TimeSpan.FromSeconds(5);
 });
 
+// Limitador de tentativas (recurso nativo do ASP.NET Core): busca de pedido aceita
+// no máximo 10 tentativas por minuto por IP; passou disso, volta para a tela com aviso.
+builder.Services.AddRateLimiter(opcoes =>
+{
+    opcoes.AddPolicy(MiauShop.Controllers.PedidoController.PoliticaBusca, contexto =>
+        System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+            contexto.Connection.RemoteIpAddress?.ToString() ?? "desconhecido",
+            _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+
+    opcoes.OnRejected = (contexto, _) =>
+    {
+        contexto.HttpContext.Response.Redirect("/Pedido/Acompanhar?bloqueado=true");
+        return ValueTask.CompletedTask;
+    };
+});
+
 var app = builder.Build();
 
 // Cria/atualiza o banco e insere os dados de exemplo (só na primeira vez).
@@ -69,6 +89,7 @@ app.UseHttpsRedirection();
 app.UseRequestLocalization("pt-BR");
 
 app.UseRouting();
+app.UseRateLimiter();
 app.UseSession();
 
 app.UseAuthorization();
