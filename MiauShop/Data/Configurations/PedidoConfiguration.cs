@@ -10,12 +10,10 @@ public class PedidoConfiguration : IEntityTypeConfiguration<Pedido>
     {
         builder.ToTable("Pedidos");
 
-        builder.Property(p => p.Numero).HasMaxLength(20).IsRequired();
         builder.Property(p => p.ClienteNome).HasMaxLength(120).IsRequired();
         builder.Property(p => p.ClienteEmail).HasMaxLength(160).IsRequired();
         builder.Property(p => p.ClienteTelefone).HasMaxLength(20).IsRequired();
 
-        builder.HasIndex(p => p.Numero).IsUnique();
         builder.HasIndex(p => p.ClienteEmail);
         builder.HasIndex(p => p.Status);
 

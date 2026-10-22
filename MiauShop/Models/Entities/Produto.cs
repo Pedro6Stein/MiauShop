@@ -37,6 +37,11 @@ public class Produto : EntidadeBase
     public decimal PrecoAtual() =>
         EmPromocao() ? PrecoPromocional!.Value : Preco;
 
+    // Imagem do card: a marcada como principal; se não houver, a primeira.
+    public string ImagemPrincipalUrl() =>
+        Imagens.OrderByDescending(i => i.Principal).ThenBy(i => i.Ordem)
+            .Select(i => i.Url).FirstOrDefault() ?? "/img/sem-imagem.webp";
+
     // Ex.: de R$ 50 por R$ 39 -> 22 (%)
     public int PercentualDesconto() =>
         EmPromocao() ? (int)Math.Round((1 - PrecoAtual() / Preco) * 100) : 0;

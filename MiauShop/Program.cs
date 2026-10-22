@@ -1,4 +1,8 @@
 using MiauShop.Data;
+using MiauShop.Repositories;
+using MiauShop.Repositories.Interfaces;
+using MiauShop.Services;
+using MiauShop.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +13,29 @@ builder.Services.AddControllersWithViews();
 // Banco de dados: a string de conexão vem do appsettings (local) ou de variável de ambiente (produção).
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("MiauShop")));
+
+// Sessão: guarda o carrinho do visitante (expira após 2 horas sem uso).
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(2);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+builder.Services.AddHttpContextAccessor();
+
+// Repositórios: "quando alguém pedir a interface, entregue esta classe".
+// AddScoped = uma instância por requisição, todas usando o mesmo AppDbContext.
+builder.Services.AddScoped(typeof(IRepositorio<>), typeof(Repositorio<>));
+builder.Services.AddScoped<IProdutoRepositorio, ProdutoRepositorio>();
+builder.Services.AddScoped<IPedidoRepositorio, PedidoRepositorio>();
+
+// Serviços
+builder.Services.AddSingleton<ICalculadoraFrete, FreteFixoComGratis>();
+builder.Services.AddScoped<ICatalogoService, CatalogoService>();
+builder.Services.AddScoped<ICarrinhoService, CarrinhoService>();
+builder.Services.AddScoped<ICheckoutService, CheckoutService>();
+builder.Services.AddScoped<IPedidoService, PedidoService>();
 
 var app = builder.Build();
 
@@ -22,6 +49,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseSession();
 
 app.UseAuthorization();
 

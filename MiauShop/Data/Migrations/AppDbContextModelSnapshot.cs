@@ -231,11 +231,6 @@ namespace MiauShop.Data.Migrations
                         .HasPrecision(10, 2)
                         .HasColumnType("numeric(10,2)");
 
-                    b.Property<string>("Numero")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -301,9 +296,6 @@ namespace MiauShop.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ClienteEmail");
-
-                    b.HasIndex("Numero")
-                        .IsUnique();
 
                     b.HasIndex("Status");
 

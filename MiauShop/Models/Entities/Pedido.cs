@@ -24,7 +24,7 @@ public class Pedido : EntidadeBase
     // Construtor vazio usado pelo Entity Framework ao ler do banco.
     private Pedido() { }
 
-    public string Numero { get; private set; } = string.Empty;
+    // O número do pedido mostrado ao cliente é o próprio Id (ex.: "Pedido #123").
 
     // Vazio por enquanto (compra como visitante); preparado para contas de cliente.
     public string? UsuarioId { get; private set; }
@@ -47,7 +47,6 @@ public class Pedido : EntidadeBase
 
     // Única forma de criar um pedido novo: já nasce "Recebido" e com histórico.
     public static Pedido Criar(
-        string numero,
         string clienteNome,
         string clienteEmail,
         string clienteTelefone,
@@ -57,7 +56,6 @@ public class Pedido : EntidadeBase
     {
         var pedido = new Pedido
         {
-            Numero = numero,
             ClienteNome = clienteNome,
             ClienteEmail = clienteEmail.Trim().ToLowerInvariant(),
             ClienteTelefone = clienteTelefone,
@@ -94,13 +92,18 @@ public class Pedido : EntidadeBase
     public bool PodeAvancarPara(StatusPedido novoStatus) =>
         TransicoesValidas[Status].Contains(novoStatus);
 
-    public void AlterarStatus(StatusPedido novoStatus, OrigemStatus origem, string? observacao = null)
+    // "quando" permite registrar o horário em que a mudança aconteceu
+    // (usado no avanço automático, para a linha do tempo não ficar com tudo no mesmo minuto).
+    public void AlterarStatus(StatusPedido novoStatus, OrigemStatus origem, string? observacao = null, DateTime? quando = null)
     {
         if (!PodeAvancarPara(novoStatus))
             throw new InvalidOperationException($"Não é possível mudar o pedido de {Status} para {novoStatus}.");
 
         Status = novoStatus;
-        _historico.Add(new HistoricoStatusPedido(novoStatus, origem, observacao));
+        _historico.Add(new HistoricoStatusPedido(novoStatus, origem, observacao)
+        {
+            CriadoEm = quando ?? default
+        });
     }
 
     private void RecalcularTotais()

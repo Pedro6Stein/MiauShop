@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="MiauShop.Tests/MiauShop.Tests.csproj" />
   <Project Path="MiauShop/MiauShop.csproj" />
 </Solution>

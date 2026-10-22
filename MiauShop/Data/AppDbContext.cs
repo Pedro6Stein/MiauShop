@@ -57,7 +57,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         {
             if (entrada.State == EntityState.Added)
             {
-                entrada.Entity.CriadoEm = agora;
+                // Só preenche se ninguém definiu antes (ex.: histórico com horário retroativo).
+                if (entrada.Entity.CriadoEm == default)
+                    entrada.Entity.CriadoEm = agora;
+
                 entrada.Entity.AtualizadoEm = agora;
             }
             else if (entrada.State == EntityState.Modified)
