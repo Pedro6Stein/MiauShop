@@ -63,7 +63,7 @@
     else
     {
         <div class="table-responsive">
-            <table class="table align-middle mb-0">
+            <table class="table align-middle mb-0 ms-tabela-cartoes">
                 <thead>
                     <tr><th>Pedido</th><th>Cliente</th><th>Data</th><th>Status</th><th class="text-end">Total</th></tr>
                 </thead>
@@ -71,11 +71,11 @@
                     @foreach (var pedido in Model.Ultimos)
                     {
                         <tr>
-                            <td class="fw-bold">#@pedido.Id</td>
-                            <td>@pedido.ClienteNome</td>
-                            <td>@MiauShop.Services.LinhaDoTempo.ParaBrasilia(pedido.CriadoEm).ToString("dd/MM/yyyy HH:mm")</td>
-                            <td><span class="ms-pilula">@pedido.Status.NomeExibicao()</span></td>
-                            <td class="text-end fw-bold">@pedido.Total.ToString("C")</td>
+                            <td data-label="Pedido" class="fw-bold"><a href="/Admin/Pedidos/Detalhe/@pedido.Id">#@pedido.Id</a></td>
+                            <td data-label="Cliente">@pedido.ClienteNome</td>
+                            <td data-label="Data">@MiauShop.Services.LinhaDoTempo.ParaBrasilia(pedido.CriadoEm).ToString("dd/MM/yyyy HH:mm")</td>
+                            <td data-label="Status"><span class="ms-status ms-status-@pedido.Status">@pedido.Status.NomeExibicao()</span></td>
+                            <td data-label="Total" class="text-end fw-bold">@pedido.Total.ToString("C")</td>
                         </tr>
                     }
                 </tbody>

@@ -48,16 +48,16 @@
         <section class="ms-form-bloco">
             <h2 class="h5">Histórico</h2>
             <div class="table-responsive">
-                <table class="table align-middle mb-0 ms-tabela">
+                <table class="table align-middle mb-0 ms-tabela ms-tabela-cartoes">
                     <thead><tr><th>Status</th><th>Quando</th><th>Origem</th><th>Observação</th></tr></thead>
                     <tbody>
                         @foreach (var linha in Model.Historico)
                         {
                             <tr>
-                                <td class="fw-semibold">@linha.Status</td>
-                                <td>@linha.Quando.ToString("dd/MM/yyyy HH:mm")</td>
-                                <td>@linha.Origem</td>
-                                <td>@linha.Observacao</td>
+                                <td data-label="Status" class="fw-semibold">@linha.Status</td>
+                                <td data-label="Quando">@linha.Quando.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td data-label="Origem">@linha.Origem</td>
+                                <td data-label="Observação">@linha.Observacao</td>
                             </tr>
                         }
                     </tbody>

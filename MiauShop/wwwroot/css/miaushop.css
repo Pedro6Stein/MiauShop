@@ -1074,12 +1074,70 @@ button.ms-botao-mais { border: 0; }
 .ms-totais > div { display: flex; justify-content: space-between; padding: .35rem 0; }
 .ms-totais dd { margin: 0; font-weight: 700; }
 
+/* Tabelas do painel no celular: cada linha vira um cartão, com o nome do campo
+   (atributo data-label de cada célula) ao lado do valor. Nada de rolar para o lado. */
+@media (max-width: 767.98px) {
+    .ms-tabela-cartoes thead { display: none; }
+
+    .ms-tabela-cartoes,
+    .ms-tabela-cartoes tbody,
+    .ms-tabela-cartoes tr,
+    .ms-tabela-cartoes td { display: block; width: 100%; }
+
+    .ms-tabela-cartoes tr {
+        border: 1px solid var(--ms-borda);
+        border-radius: 16px;
+        padding: .6rem .9rem;
+        margin-bottom: .75rem;
+        background: #fff;
+    }
+
+    .ms-tabela-cartoes td {
+        border: 0;
+        padding: .3rem 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        text-align: right !important;
+    }
+
+    .ms-tabela-cartoes td::before {
+        content: attr(data-label);
+        flex-shrink: 0;
+        font-size: .75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: var(--ms-cinza-rosado);
+        text-align: left;
+    }
+
+    .ms-tabela-cartoes td:not([data-label])::before { content: none; }
+    .ms-tabela-cartoes td:not([data-label]) { justify-content: flex-end; }
+    .ms-tabela-cartoes .table-responsive, .table-responsive:has(.ms-tabela-cartoes) { overflow: visible; }
+}
+
 @media (max-width: 991.98px) {
     .ms-admin { flex-direction: column; }
-    .ms-admin-menu { width: auto; height: auto; position: static; flex-direction: row; flex-wrap: wrap; align-items: center; gap: .5rem; padding: 1rem; }
-    .ms-admin-menu nav { display: flex !important; margin-top: 0 !important; }
+    /* Celular/tablet: linha 1 = logo + "Ver a loja"; linha 2 = menu que desliza para o lado. */
+    .ms-admin-menu { width: auto; height: auto; position: static; flex-direction: row; flex-wrap: wrap; align-items: center; gap: .5rem; padding: .75rem 1rem; }
+    .ms-admin-menu nav {
+        order: 3;
+        flex-basis: 100%;
+        display: flex !important;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: .4rem;
+        margin-top: .25rem !important;
+        padding-bottom: .35rem;
+        -webkit-overflow-scrolling: touch;
+    }
+    .ms-admin-menu .ms-admin-link { white-space: nowrap; flex-shrink: 0; padding: .5rem .85rem; border: 1px solid var(--ms-borda); }
+    .ms-admin-menu .ms-admin-link.ativo { border-color: var(--ms-framboesa); }
     .ms-admin-subtitulo { display: none; }
-    .ms-admin-menu .mt-auto { margin-top: 0 !important; margin-left: auto; }
+    .ms-admin-menu .mt-auto { margin-top: 0 !important; margin-left: auto; border: 0; }
+    .ms-admin-topo { flex-wrap: wrap; }
     .ms-admin-topo, .ms-admin-pagina { padding: 1rem; }
     .ms-barra-linha { grid-template-columns: 110px minmax(0, 1fr) 50px; }
 }
@@ -1124,6 +1182,19 @@ button.ms-botao-mais { border: 0; }
 
 .ms-pulando { animation: ms-pulo 500ms ease; }
 
+/* Entrada do banner e do topo da página do produto, em CSS (não em JavaScript).
+   Só desliza, sem começar invisível: se a animação não rodar (prévia de link no WhatsApp,
+   modo economia de bateria, captura de tela), o conteúdo aparece do mesmo jeito. */
+@keyframes ms-entrar {
+    from { transform: translateY(24px); }
+}
+
+[data-anima="hero"] > * { animation: ms-entrar .7s cubic-bezier(.2, .8, .2, 1) both; }
+[data-anima="hero"] > :nth-child(2) { animation-delay: .08s; }
+[data-anima="hero"] > :nth-child(3) { animation-delay: .16s; }
+[data-anima="hero"] > :nth-child(4) { animation-delay: .24s; }
+[data-anima="hero"] > :nth-child(n + 5) { animation-delay: .32s; }
+
 /* Quem pediu "reduzir movimento" no sistema não vê animações. */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
@@ -1156,9 +1227,10 @@ button.ms-botao-mais { border: 0; }
         margin-top: -2.5rem;
         -webkit-mask-image: linear-gradient(to bottom, transparent, #000 30%);
         mask-image: linear-gradient(to bottom, transparent, #000 30%);
+        pointer-events: none; /* a foto sobe um pouco por baixo do texto: não pode "roubar" o toque do botão */
     }
 
-    .ms-hero-texto { padding: 2rem 1.5rem 0; }
+    .ms-hero-texto { padding: 2rem 1.5rem 0; position: relative; z-index: 1; }
     .ms-hero p { font-size: 1rem; }
 
     .ms-preco { font-size: 1.1rem; white-space: nowrap; }

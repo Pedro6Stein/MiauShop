@@ -14,18 +14,18 @@
 
 <section class="ms-form-bloco">
     <div class="table-responsive">
-        <table class="table align-middle mb-0 ms-tabela">
+        <table class="table align-middle mb-0 ms-tabela ms-tabela-cartoes">
             <thead><tr><th>Ordem</th><th>Categoria</th><th>Endereço na loja</th><th class="text-center">Produtos</th><th>Situação</th><th></th></tr></thead>
             <tbody>
                 @foreach (var linha in Model)
                 {
                     var categoria = linha.Categoria;
                     <tr>
-                        <td>@categoria.Ordem</td>
+                        <td data-label="Ordem">@categoria.Ordem</td>
                         <td class="fw-bold"><i class="bi @categoria.Icone text-danger me-2" aria-hidden="true"></i>@categoria.Nome</td>
-                        <td><code>/Produtos?categoria=@categoria.Slug</code></td>
-                        <td class="text-center">@linha.QuantidadeProdutos</td>
-                        <td><span class="ms-status @(categoria.Ativa ? "ms-status-Entregue" : "ms-status-Cancelado")">@(categoria.Ativa ? "Ativa" : "Inativa")</span></td>
+                        <td data-label="Endereço"><code>/Produtos?categoria=@categoria.Slug</code></td>
+                        <td data-label="Produtos" class="text-center">@linha.QuantidadeProdutos</td>
+                        <td data-label="Situação"><span class="ms-status @(categoria.Ativa ? "ms-status-Entregue" : "ms-status-Cancelado")">@(categoria.Ativa ? "Ativa" : "Inativa")</span></td>
                         <td class="text-end text-nowrap">
                             <a class="btn btn-sm btn-outline-secondary" asp-action="Editar" asp-route-id="@categoria.Id">@(podeAlterar ? "Editar" : "Ver")</a>
                             @if (podeAlterar && linha.QuantidadeProdutos == 0)

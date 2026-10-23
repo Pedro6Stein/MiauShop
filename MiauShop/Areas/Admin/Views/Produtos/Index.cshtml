@@ -43,22 +43,26 @@
 <section class="ms-form-bloco">
     <p class="ms-dica mt-0">@Model.Total produto(s)</p>
     <div class="table-responsive">
-        <table class="table align-middle mb-0 ms-tabela">
-            <thead><tr><th></th><th>Produto</th><th>Categoria</th><th class="text-end">Preço</th><th class="text-center">Variações</th><th>Situação</th><th></th></tr></thead>
+        <table class="table align-middle mb-0 ms-tabela ms-tabela-cartoes">
+            <thead><tr><th>Produto</th><th>Categoria</th><th class="text-end">Preço</th><th class="text-center">Variações</th><th>Situação</th><th></th></tr></thead>
             <tbody>
                 @foreach (var produto in Model.Produtos)
                 {
                     <tr>
-                        <td><img class="ms-miniatura" src="@produto.ImagemPrincipalUrl()" alt="" width="48" height="48" /></td>
                         <td>
-                            <span class="d-block fw-bold">@produto.Nome</span>
-                            @if (produto.Destaque)
-                            {
-                                <small class="text-body-secondary"><i class="bi bi-star-fill text-warning" aria-hidden="true"></i> Destaque</small>
-                            }
+                            <div class="d-flex align-items-center gap-2 text-start">
+                                <img class="ms-miniatura" src="@produto.ImagemPrincipalUrl()" alt="" width="48" height="48" />
+                                <div>
+                                    <span class="d-block fw-bold">@produto.Nome</span>
+                                    @if (produto.Destaque)
+                                    {
+                                        <small class="text-body-secondary"><i class="bi bi-star-fill text-warning" aria-hidden="true"></i> Destaque</small>
+                                    }
+                                </div>
+                            </div>
                         </td>
-                        <td>@produto.Categoria.Nome</td>
-                        <td class="text-end text-nowrap">
+                        <td data-label="Categoria">@produto.Categoria.Nome</td>
+                        <td data-label="Preço" class="text-end text-nowrap">
                             @if (produto.EmPromocao())
                             {
                                 <small class="ms-preco-antigo d-block">@produto.Preco.ToString("C")</small>
@@ -69,8 +73,8 @@
                                 <strong>@produto.Preco.ToString("C")</strong>
                             }
                         </td>
-                        <td class="text-center">@produto.Variacoes.Count(v => v.Ativa) / @produto.Variacoes.Count</td>
-                        <td><span class="ms-status @(produto.Ativo ? "ms-status-Entregue" : "ms-status-Cancelado")">@(produto.Ativo ? "Ativo" : "Inativo")</span></td>
+                        <td data-label="Variações ativas" class="text-center">@produto.Variacoes.Count(v => v.Ativa) / @produto.Variacoes.Count</td>
+                        <td data-label="Situação"><span class="ms-status @(produto.Ativo ? "ms-status-Entregue" : "ms-status-Cancelado")">@(produto.Ativo ? "Ativo" : "Inativo")</span></td>
                         <td class="text-end"><a class="btn btn-sm btn-outline-secondary" asp-action="Editar" asp-route-id="@produto.Id">@(podeAlterar ? "Editar" : "Ver")</a></td>
                     </tr>
                 }

@@ -5,22 +5,15 @@ const reduzirMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').m
 if (window.gsap && !reduzirMovimento) {
     gsap.registerPlugin(ScrollTrigger);
 
-    // Entrada do banner principal: os textos sobem um depois do outro.
-    gsap.from('[data-anima="hero"] > *', {
-        y: 30,
-        opacity: 0,
-        duration: .8,
-        stagger: .12,
-        ease: 'power3.out'
-    });
+    // (A entrada do banner é feita em CSS — ver "ms-entrar" no miaushop.css.)
 
-    // Elementos que aparecem ao rolar a página (cards, seções).
+    // Elementos que deslizam ao rolar a página (cards, seções). Só deslizam, sem começar
+    // invisíveis: se a animação travar, o conteúdo continua na tela.
     ScrollTrigger.batch('[data-anima="surgir"]', {
         start: 'top 90%',
         once: true,
         onEnter: elementos => gsap.from(elementos, {
             y: 40,
-            opacity: 0,
             duration: .7,
             stagger: .08,
             ease: 'power3.out'

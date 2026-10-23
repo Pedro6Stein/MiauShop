@@ -33,7 +33,7 @@
     else
     {
         <div class="table-responsive">
-            <table class="table align-middle mb-0 ms-tabela">
+            <table class="table align-middle mb-0 ms-tabela ms-tabela-cartoes">
                 <thead>
                     <tr>
                         <th>Pedido</th><th>Cliente</th><th>Data</th><th class="text-center">Itens</th>
@@ -44,16 +44,18 @@
                     @foreach (var pedido in Model.Pedidos)
                     {
                         <tr>
-                            <td><a class="fw-bold" href="/Admin/Pedidos/Detalhe/@pedido.Id">#@pedido.Id</a></td>
-                            <td>
-                                <span class="d-block fw-semibold">@pedido.ClienteNome</span>
-                                <small class="text-body-secondary">@pedido.ClienteEmail</small>
+                            <td data-label="Pedido"><a class="fw-bold" href="/Admin/Pedidos/Detalhe/@pedido.Id">#@pedido.Id · ver detalhes</a></td>
+                            <td data-label="Cliente">
+                                <div>
+                                    <span class="d-block fw-semibold">@pedido.ClienteNome</span>
+                                    <small class="text-body-secondary">@pedido.ClienteEmail</small>
+                                </div>
                             </td>
-                            <td>@MiauShop.Services.LinhaDoTempo.ParaBrasilia(pedido.CriadoEm).ToString("dd/MM/yyyy HH:mm")</td>
-                            <td class="text-center">@pedido.Itens.Sum(i => i.Quantidade)</td>
-                            <td>@pedido.FormaPagamento.NomeExibicao()</td>
-                            <td><span class="ms-status ms-status-@pedido.Status">@pedido.Status.NomeExibicao()</span></td>
-                            <td class="text-end fw-bold">@pedido.Total.ToString("C")</td>
+                            <td data-label="Data">@MiauShop.Services.LinhaDoTempo.ParaBrasilia(pedido.CriadoEm).ToString("dd/MM/yyyy HH:mm")</td>
+                            <td data-label="Itens" class="text-center">@pedido.Itens.Sum(i => i.Quantidade)</td>
+                            <td data-label="Pagamento">@pedido.FormaPagamento.NomeExibicao()</td>
+                            <td data-label="Status"><span class="ms-status ms-status-@pedido.Status">@pedido.Status.NomeExibicao()</span></td>
+                            <td data-label="Total" class="text-end fw-bold">@pedido.Total.ToString("C")</td>
                         </tr>
                     }
                 </tbody>
