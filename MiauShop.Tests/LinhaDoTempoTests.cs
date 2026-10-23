@@ -39,7 +39,7 @@ public class LinhaDoTempoTests
     public void PedidoCancelado_NaoTemEtapaAtual()
     {
         var pedido = NovoPedido();
-        pedido.AlterarStatus(StatusPedido.Cancelado, OrigemStatus.Admin);
+        pedido.AlterarStatus(StatusPedido.Cancelado, OrigemStatus.Admin, "Cliente desistiu da compra.");
 
         var etapas = LinhaDoTempo.Montar(pedido);
 

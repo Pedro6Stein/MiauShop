@@ -1,0 +1,75 @@
+@model PedidosListaViewModel
+@{
+    ViewData["Title"] = "Pedidos";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-3">
+    <h1 class="h2 mb-0">Pedidos</h1>
+    <form method="get" action="/Admin/Pedidos" class="ms-busca" role="search">
+        @if (Model.StatusFiltro is not null)
+        {
+            <input type="hidden" name="status" value="@Model.StatusFiltro" />
+        }
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <input type="search" name="busca" value="@Model.Busca" placeholder="Nº, nome ou e-mail" aria-label="Buscar pedidos" />
+    </form>
+</div>
+
+@* Abas por status: as contagens vêm do banco (GROUP BY). *@
+<nav class="ms-abas mb-3" aria-label="Filtrar por status">
+    @foreach (var aba in Model.Abas)
+    {
+        <a class="@(aba.Ativa ? "ativo" : "")" href="@Model.Url(aba.Status)" aria-current="@(aba.Ativa ? "page" : null)">
+            @aba.Nome <span>@aba.Quantidade</span>
+        </a>
+    }
+</nav>
+
+<section class="ms-form-bloco">
+    @if (Model.Pedidos.Count == 0)
+    {
+        <p class="text-body-secondary mb-0">Nenhum pedido encontrado.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle mb-0 ms-tabela">
+                <thead>
+                    <tr>
+                        <th>Pedido</th><th>Cliente</th><th>Data</th><th class="text-center">Itens</th>
+                        <th>Pagamento</th><th>Status</th><th class="text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pedido in Model.Pedidos)
+                    {
+                        <tr>
+                            <td><a class="fw-bold" href="/Admin/Pedidos/Detalhe/@pedido.Id">#@pedido.Id</a></td>
+                            <td>
+                                <span class="d-block fw-semibold">@pedido.ClienteNome</span>
+                                <small class="text-body-secondary">@pedido.ClienteEmail</small>
+                            </td>
+                            <td>@MiauShop.Services.LinhaDoTempo.ParaBrasilia(pedido.CriadoEm).ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="text-center">@pedido.Itens.Sum(i => i.Quantidade)</td>
+                            <td>@pedido.FormaPagamento.NomeExibicao()</td>
+                            <td><span class="ms-status ms-status-@pedido.Status">@pedido.Status.NomeExibicao()</span></td>
+                            <td class="text-end fw-bold">@pedido.Total.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
+
+@if (Model.TotalPaginas > 1)
+{
+    <nav class="mt-4" aria-label="Páginas">
+        <ul class="ms-paginacao">
+            @for (var pagina = 1; pagina <= Model.TotalPaginas; pagina++)
+            {
+                <li><a class="@(pagina == Model.Pagina ? "ativo" : "")" href="@Model.Url(Model.StatusFiltro, pagina)">@pagina</a></li>
+            }
+        </ul>
+    </nav>
+}

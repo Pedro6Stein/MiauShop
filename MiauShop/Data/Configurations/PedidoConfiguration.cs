@@ -10,6 +10,9 @@ public class PedidoConfiguration : IEntityTypeConfiguration<Pedido>
     {
         builder.ToTable("Pedidos");
 
+        // uint + IsRowVersion = coluna de sistema "xmin" do PostgreSQL (controle de concorrência otimista).
+        builder.Property(p => p.Versao).IsRowVersion();
+
         builder.Property(p => p.ClienteNome).HasMaxLength(120).IsRequired();
         builder.Property(p => p.ClienteEmail).HasMaxLength(160).IsRequired();
         builder.Property(p => p.ClienteTelefone).HasMaxLength(20).IsRequired();

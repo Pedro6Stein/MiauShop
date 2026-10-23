@@ -16,12 +16,51 @@ public class PedidoRepositorio(AppDbContext contexto) : Repositorio<Pedido>(cont
             .FirstOrDefaultAsync(p => p.Id == id);
 
     // Tudo calculado pelo banco (GROUP BY / SUM). Pedidos cancelados não contam como venda.
-    public async Task<ResumoPedidos> ObterResumoAsync(int quantidadeMaisVendidos, int quantidadeUltimos)
-    {
-        var porStatus = await Conjunto
+    public Task<Dictionary<StatusPedido, int>> ContarPorStatusAsync() =>
+        Conjunto
             .GroupBy(p => p.Status)
             .Select(g => new { Status = g.Key, Total = g.Count() })
             .ToDictionaryAsync(x => x.Status, x => x.Total);
+
+    public async Task<(List<Pedido> Itens, int Total)> ListarParaPainelAsync(
+        StatusPedido? status, string? busca, int pagina, int itensPorPagina)
+    {
+        var consulta = Conjunto.AsQueryable();
+
+        if (status is StatusPedido filtro)
+            consulta = consulta.Where(p => p.Status == filtro);
+
+        // Busca por número exato ou por parte do nome/e-mail (ILike = sem diferenciar maiúsculas).
+        if (!string.IsNullOrWhiteSpace(busca))
+        {
+            var termo = busca.Trim().TrimStart('#');
+            var padrao = $"%{termo}%";
+            consulta = int.TryParse(termo, out var numero)
+                ? consulta.Where(p => p.Id == numero)
+                : consulta.Where(p => EF.Functions.ILike(p.ClienteNome, padrao) || EF.Functions.ILike(p.ClienteEmail, padrao));
+        }
+
+        var total = await consulta.CountAsync();
+
+        // Com rastreamento (sem AsNoTracking): o avanço automático pode atualizar estes pedidos.
+        var itens = await consulta
+            .Include(p => p.Itens)
+            .Include(p => p.Historico)
+            .OrderByDescending(p => p.CriadoEm)
+            .Skip((pagina - 1) * itensPorPagina)
+            .Take(itensPorPagina)
+            .AsSplitQuery()
+            .ToListAsync();
+
+        return (itens, total);
+    }
+
+    public void DefinirVersaoOriginal(Pedido pedido, uint versao) =>
+        Contexto.Entry(pedido).Property(p => p.Versao).OriginalValue = versao;
+
+    public async Task<ResumoPedidos> ObterResumoAsync(int quantidadeMaisVendidos, int quantidadeUltimos)
+    {
+        var porStatus = await ContarPorStatusAsync();
 
         var faturamento = await Conjunto
             .Where(p => p.Status != StatusPedido.Cancelado)

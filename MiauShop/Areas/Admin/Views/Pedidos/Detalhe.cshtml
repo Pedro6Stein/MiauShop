@@ -1,0 +1,147 @@
+@model PedidoDetalheAdminViewModel
+@{
+    var pedido = Model.Pedido;
+    var endereco = pedido.EnderecoEntrega;
+    var podeAlterar = ViewData["PodeAlterar"] is true;
+    ViewData["Title"] = $"Pedido #{pedido.Id}";
+}
+
+<a class="small fw-bold" href="/Admin/Pedidos"><i class="bi bi-arrow-left" aria-hidden="true"></i> Pedidos</a>
+
+<div class="d-flex flex-wrap align-items-center gap-3 mt-2 mb-4">
+    <h1 class="h2 mb-0">Pedido #@pedido.Id</h1>
+    <span class="ms-status ms-status-@pedido.Status">@pedido.Status.NomeExibicao()</span>
+    <span class="text-body-secondary small">Feito em @Model.CriadoEm.ToString("dd/MM/yyyy 'às' HH:mm")</span>
+</div>
+
+<section class="ms-form-bloco">
+    <partial name="_LinhaDoTempo" model="Model.Etapas" />
+</section>
+
+<div class="row g-4">
+    <div class="col-xl-8">
+        <section class="ms-form-bloco">
+            <h2 class="h5">Itens</h2>
+            <ul class="ms-resumo-itens">
+                @foreach (var item in pedido.Itens)
+                {
+                    <li>
+                        <span class="ms-resumo-foto">
+                            <img src="@item.ImagemUrl" alt="" width="56" height="56" />
+                            <span class="ms-resumo-qtd">@item.Quantidade</span>
+                        </span>
+                        <span class="flex-grow-1">
+                            <span class="d-block fw-bold">@item.NomeProduto</span>
+                            <small class="text-body-secondary">@item.NomeVariacao · @item.PrecoUnitario.ToString("C") cada</small>
+                        </span>
+                        <span class="fw-bold">@item.Subtotal().ToString("C")</span>
+                    </li>
+                }
+            </ul>
+            <dl class="ms-totais mb-0">
+                <div><dt>Subtotal</dt><dd>@pedido.Subtotal.ToString("C")</dd></div>
+                <div><dt>Frete</dt><dd>@(pedido.Frete == 0 ? "Grátis" : pedido.Frete.ToString("C"))</dd></div>
+                <div class="ms-resumo-total"><dt>Total</dt><dd>@pedido.Total.ToString("C")</dd></div>
+            </dl>
+        </section>
+
+        <section class="ms-form-bloco">
+            <h2 class="h5">Histórico</h2>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0 ms-tabela">
+                    <thead><tr><th>Status</th><th>Quando</th><th>Origem</th><th>Observação</th></tr></thead>
+                    <tbody>
+                        @foreach (var linha in Model.Historico)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@linha.Status</td>
+                                <td>@linha.Quando.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@linha.Origem</td>
+                                <td>@linha.Observacao</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <div class="col-xl-4">
+        <section class="ms-form-bloco">
+            <h2 class="h5">Alterar status</h2>
+
+            @if (Model.ProximosStatus.Count == 0 && !Model.PodeCancelar)
+            {
+                <p class="text-body-secondary mb-0">Este pedido está finalizado (@pedido.Status.NomeExibicao()). Não há próximos status.</p>
+            }
+            else
+            {
+                @* Só os próximos status permitidos (calculados pelo servidor). Versao = controle de concorrência. *@
+                <form method="post" action="/Admin/Pedidos/AlterarStatus/@pedido.Id" class="ms-form">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Alteracao.Versao" value="@Model.Alteracao.Versao" />
+                    <fieldset disabled="@(!podeAlterar)">
+                        @if (Model.ProximosStatus.Count > 0)
+                        {
+                            <label class="form-label" for="novo-status">Novo status</label>
+                            <select class="form-select mb-3" id="novo-status" name="Alteracao.NovoStatus">
+                                @foreach (var status in Model.ProximosStatus)
+                                {
+                                    <option value="@status">@status.NomeExibicao()</option>
+                                }
+                            </select>
+                            <label class="form-label" for="observacao">Observação (opcional)</label>
+                            <textarea class="form-control mb-3" id="observacao" name="Alteracao.Observacao" rows="2" maxlength="300"></textarea>
+                            <button class="ms-botao w-100 justify-content-center" type="submit">Salvar status</button>
+                        }
+                    </fieldset>
+                </form>
+
+                @if (Model.PodeCancelar)
+                {
+                    <hr />
+                    <button class="ms-botao ms-botao-claro w-100 justify-content-center" type="button"
+                            data-bs-toggle="modal" data-bs-target="#modal-cancelar" disabled="@(!podeAlterar)">
+                        <i class="bi bi-x-circle" aria-hidden="true"></i>Cancelar pedido
+                    </button>
+                }
+            }
+        </section>
+
+        <section class="ms-form-bloco">
+            <h2 class="h5">Cliente</h2>
+            <p class="mb-1 fw-bold">@pedido.ClienteNome</p>
+            <p class="mb-1 small">@pedido.ClienteEmail · @pedido.ClienteTelefone</p>
+            <hr />
+            <h3 class="h6">Entrega</h3>
+            <p class="small mb-1">
+                @endereco.Logradouro, @endereco.Numero@(endereco.Complemento is null ? "" : $" - {endereco.Complemento}")<br />
+                @endereco.Bairro · @endereco.Cidade/@endereco.Uf · CEP @endereco.Cep
+            </p>
+            <hr />
+            <p class="small mb-0">Pagamento: <strong>@pedido.FormaPagamento.NomeExibicao()</strong> (simulado)</p>
+        </section>
+    </div>
+</div>
+
+@if (Model.PodeCancelar && podeAlterar)
+{
+    @* Cancelamento: confirmação + motivo obrigatório (regra validada no Pedido, no servidor). *@
+    <div class="modal fade" id="modal-cancelar" tabindex="-1" aria-labelledby="titulo-cancelar" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content ms-modal ms-form text-start" method="post" action="/Admin/Pedidos/AlterarStatus/@pedido.Id">
+                <h2 class="h4 text-center" id="titulo-cancelar">Cancelar pedido #@pedido.Id?</h2>
+                <p class="text-center text-body-secondary">O motivo fica no histórico e aparece para o cliente no acompanhamento.</p>
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Alteracao.Versao" value="@Model.Alteracao.Versao" />
+                <input type="hidden" name="Alteracao.NovoStatus" value="@MiauShop.Models.Enums.StatusPedido.Cancelado" />
+                <label class="form-label" for="motivo">Motivo do cancelamento</label>
+                <textarea class="form-control mb-3" id="motivo" name="Alteracao.Observacao" rows="3" maxlength="300" required></textarea>
+                <div class="d-grid gap-2">
+                    <button class="ms-botao" type="submit">Confirmar cancelamento</button>
+                    <button class="ms-botao ms-botao-claro" type="button" data-bs-dismiss="modal">Voltar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}

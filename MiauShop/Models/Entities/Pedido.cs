@@ -89,18 +89,30 @@ public class Pedido : EntidadeBase
         RecalcularTotais();
     }
 
+    // Controle de concorrência: mapeado para a coluna de sistema "xmin" do PostgreSQL.
+    // Se outra pessoa alterar o pedido antes de mim, a gravação é recusada (sem coluna nova no banco).
+    public uint Versao { get; private set; }
+
     public bool PodeAvancarPara(StatusPedido novoStatus) =>
         TransicoesValidas[Status].Contains(novoStatus);
+
+    // Para onde o pedido pode ir a partir do status atual (usado no seletor do painel).
+    public IReadOnlyList<StatusPedido> ProximosStatusPossiveis() => TransicoesValidas[Status];
 
     // "quando" permite registrar o horário em que a mudança aconteceu
     // (usado no avanço automático, para a linha do tempo não ficar com tudo no mesmo minuto).
     public void AlterarStatus(StatusPedido novoStatus, OrigemStatus origem, string? observacao = null, DateTime? quando = null)
     {
         if (!PodeAvancarPara(novoStatus))
-            throw new InvalidOperationException($"Não é possível mudar o pedido de {Status} para {novoStatus}.");
+            throw new InvalidOperationException(
+                $"Não é possível mudar o pedido de \"{Status.NomeExibicao()}\" para \"{novoStatus.NomeExibicao()}\".");
+
+        // Cancelamento sempre registra o motivo (ele aparece no histórico e para o cliente).
+        if (novoStatus == StatusPedido.Cancelado && string.IsNullOrWhiteSpace(observacao))
+            throw new InvalidOperationException("Informe o motivo do cancelamento.");
 
         Status = novoStatus;
-        _historico.Add(new HistoricoStatusPedido(novoStatus, origem, observacao)
+        _historico.Add(new HistoricoStatusPedido(novoStatus, origem, observacao?.Trim())
         {
             CriadoEm = quando ?? default
         });

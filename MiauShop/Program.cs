@@ -76,6 +76,10 @@ builder.Services.AddScoped<ICheckoutService, CheckoutService>();
 builder.Services.AddScoped<IPedidoService, PedidoService>();
 builder.Services.AddScoped<IAdminPedidoService, AdminPedidoService>();
 
+// Avanço automático de status (demonstração; desligável na configuração).
+builder.Services.Configure<OpcoesAvancoAutomatico>(builder.Configuration.GetSection(OpcoesAvancoAutomatico.Secao));
+builder.Services.AddSingleton<AvancoAutomatico>();
+
 // Checkout: Public Key de teste do Mercado Pago (user secrets / variável de ambiente) e consulta de CEP.
 builder.Services.Configure<OpcoesMercadoPago>(builder.Configuration.GetSection(OpcoesMercadoPago.Secao));
 builder.Services.AddHttpClient<IConsultaCep, ViaCepService>(cliente =>

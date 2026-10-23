@@ -1,0 +1,25 @@
+@model List<MiauShop.Services.EtapaPedido>
+@using MiauShop.Services
+@* Linha do tempo do pedido. Estado e horário de cada etapa já vêm calculados do servidor (LinhaDoTempo).
+   Usada no acompanhamento do cliente e no detalhe do pedido no painel. *@
+<ol class="ms-linha-tempo">
+    @foreach (var etapa in Model)
+    {
+        var classe = etapa.Estado switch
+        {
+            EstadoEtapa.Feita => "feita",
+            EstadoEtapa.Atual => "atual",
+            _ => ""
+        };
+        <li class="@classe" aria-current="@(etapa.Estado == EstadoEtapa.Atual ? "step" : null)">
+            <span class="ms-linha-ponto">
+                @if (etapa.Estado != EstadoEtapa.Pendente)
+                {
+                    <i class="bi bi-check-lg" aria-hidden="true"></i>
+                }
+            </span>
+            <strong>@etapa.Nome</strong>
+            <small>@(etapa.Quando?.ToString("dd/MM 'às' HH:mm") ?? "Aguardando")</small>
+        </li>
+    }
+</ol>

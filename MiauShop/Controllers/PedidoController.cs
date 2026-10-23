@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace MiauShop.Controllers;
 
-public class PedidoController(IPedidoService pedidoService) : Controller
+public class PedidoController(
+    IPedidoService pedidoService,
+    Microsoft.Extensions.Options.IOptions<OpcoesAvancoAutomatico> avancoAutomatico) : Controller
 {
     public const string PoliticaBusca = "busca-pedido";
 
@@ -50,7 +52,9 @@ public class PedidoController(IPedidoService pedidoService) : Controller
             Pedido = pedido,
             Etapas = LinhaDoTempo.Montar(pedido),
             CriadoEm = LinhaDoTempo.ParaBrasilia(pedido.CriadoEm),
-            CanceladoEm = LinhaDoTempo.DataDe(pedido, StatusPedido.Cancelado)
+            CanceladoEm = LinhaDoTempo.DataDe(pedido, StatusPedido.Cancelado),
+            MotivoCancelamento = pedido.Historico.FirstOrDefault(h => h.Status == StatusPedido.Cancelado)?.Observacao,
+            AvancoAutomaticoHabilitado = avancoAutomatico.Value.Habilitado
         });
     }
 }

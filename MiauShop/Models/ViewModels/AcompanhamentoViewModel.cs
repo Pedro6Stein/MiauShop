@@ -27,6 +27,8 @@ public class AcompanhamentoViewModel
     public List<EtapaPedido> Etapas { get; init; } = [];
     public DateTime? CriadoEm { get; init; }
     public DateTime? CanceladoEm { get; init; }
+    public string? MotivoCancelamento { get; init; }
+    public bool AvancoAutomaticoHabilitado { get; init; }
 
     public bool BuscaFeita { get; init; }
     public bool Bloqueado { get; init; }

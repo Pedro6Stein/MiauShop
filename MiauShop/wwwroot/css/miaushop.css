@@ -1008,6 +1008,46 @@ button.ms-botao-mais { border: 0; }
 .ms-barra-trilho > .ms-barra-status-Entregue { background: var(--ms-menta); }
 .ms-barra-trilho > .ms-barra-status-Cancelado { background: var(--ms-cinza-rosado); }
 
+.ms-abas { display: flex; flex-wrap: wrap; gap: .4rem; }
+
+.ms-abas a {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .45rem .9rem;
+    border-radius: 999px;
+    border: 1px solid var(--ms-borda);
+    background: #fff;
+    color: var(--ms-ameixa);
+    font-weight: 700;
+    font-size: .9rem;
+}
+
+.ms-abas a span { background: var(--ms-algodao); border-radius: 999px; padding: 0 .5rem; font-size: .78rem; }
+.ms-abas a.ativo { background: var(--ms-ameixa); border-color: var(--ms-ameixa); color: #fff; }
+.ms-abas a.ativo span { background: rgba(255, 255, 255, .2); }
+
+.ms-tabela th { font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--ms-cinza-rosado); font-weight: 700; }
+
+.ms-status {
+    display: inline-block;
+    padding: .2rem .7rem;
+    border-radius: 999px;
+    font-size: .8rem;
+    font-weight: 700;
+    background: var(--ms-algodao);
+    color: var(--ms-ameixa-suave);
+    white-space: nowrap;
+}
+
+.ms-status-PagamentoAprovado { background: #FFF1D6; color: #7A4E00; }
+.ms-status-Enviado { background: #E3EEFF; color: #1D4B8F; }
+.ms-status-Entregue { background: #DDF3EE; color: #0F6B59; }
+.ms-status-Cancelado { background: #EEE8EA; color: #6B5960; }
+
+.ms-totais > div { display: flex; justify-content: space-between; padding: .35rem 0; }
+.ms-totais dd { margin: 0; font-weight: 700; }
+
 @media (max-width: 991.98px) {
     .ms-admin { flex-direction: column; }
     .ms-admin-menu { width: auto; height: auto; position: static; flex-direction: row; flex-wrap: wrap; align-items: center; gap: .5rem; padding: 1rem; }

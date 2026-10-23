@@ -247,6 +247,12 @@ namespace MiauShop.Data.Migrations
                     b.Property<string>("UsuarioId")
                         .HasColumnType("text");
 
+                    b.Property<uint>("Versao")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.ComplexProperty(typeof(Dictionary<string, object>), "EnderecoEntrega", "MiauShop.Models.Entities.Pedido.EnderecoEntrega#Endereco", b1 =>
                         {
                             b1.IsRequired();
