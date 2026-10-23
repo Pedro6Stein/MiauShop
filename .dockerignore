@@ -1,0 +1,11 @@
+# Não enviar para a imagem Docker: compilações locais, testes, documentação e configurações locais.
+**/bin/
+**/obj/
+**/.vs/
+**/*.user
+.git/
+.claude/
+MiauShop.Tests/
+docs/
+docker-compose.yml
+**/appsettings.Development.json

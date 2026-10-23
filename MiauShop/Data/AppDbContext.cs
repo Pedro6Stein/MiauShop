@@ -1,13 +1,18 @@
 using MiauShop.Models.Entities;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace MiauShop.Data;
 
 // IdentityDbContext<Usuario> já inclui as tabelas de login (AspNetUsers, AspNetRoles...).
+// IDataProtectionKeyContext: guarda no banco as chaves que protegem o cookie de login e o
+// token antifalsificação, para elas sobreviverem aos reinícios do servidor (o disco do Render é apagado).
 public class AppDbContext(DbContextOptions<AppDbContext> options)
-    : IdentityDbContext<Usuario>(options)
+    : IdentityDbContext<Usuario>(options), IDataProtectionKeyContext
 {
+    public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
+
     public DbSet<Categoria> Categorias => Set<Categoria>();
     public DbSet<Fornecedor> Fornecedores => Set<Fornecedor>();
     public DbSet<Produto> Produtos => Set<Produto>();

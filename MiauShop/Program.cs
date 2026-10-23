@@ -5,6 +5,7 @@ using MiauShop.Repositories.Interfaces;
 using MiauShop.Services;
 using MiauShop.Services.Interfaces;
 using MiauShop.Services.Seguranca;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,29 @@ builder.Services.AddControllersWithViews();
 // Banco de dados: a string de conexão vem do appsettings (local) ou de variável de ambiente (produção).
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("MiauShop")));
+
+// ---------- Hospedagem (Render) ----------
+
+// Chaves do cookie de login e do token antifalsificação ficam no banco: o disco do Render é apagado
+// a cada reinício, e sem isso todo mundo seria deslogado e formulários abertos dariam erro.
+builder.Services.AddDataProtection()
+    .PersistKeysToDbContext<AppDbContext>()
+    .SetApplicationName("MiauShop");
+
+// O Render recebe o HTTPS e repassa ao site em HTTP, avisando nos cabeçalhos X-Forwarded-*.
+// Confiar nesses cabeçalhos faz o site saber que a conexão original é HTTPS (cookie seguro,
+// redirecionamentos) e enxergar o IP real do visitante (usado pelo limite de tentativas).
+builder.Services.Configure<Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>(opcoes =>
+{
+    opcoes.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor
+                            | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+    // O proxy do Render não tem IP fixo conhecido; o site só é acessível através dele.
+    opcoes.KnownIPNetworks.Clear();
+    opcoes.KnownProxies.Clear();
+});
+
+// Rota /saude: o Render consulta para saber se o site subiu.
+builder.Services.AddHealthChecks();
 
 // ---------- Login do painel (ASP.NET Core Identity) ----------
 // Senhas: o Identity grava só o HASH (PBKDF2 com HMAC-SHA512, 100 mil iterações, salt aleatório por usuário).
@@ -138,6 +162,9 @@ using (var escopo = app.Services.CreateScope())
         app.Logger);
 }
 
+// Primeiro de tudo: entender os cabeçalhos do proxy do Render (HTTPS e IP real do visitante).
+app.UseForwardedHeaders();
+
 // Cabeçalhos de segurança em todas as respostas.
 app.Use(async (contexto, proximo) =>
 {
@@ -183,6 +210,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+app.MapHealthChecks("/saude");
 
 // Painel: /Admin/{controller}/{action} (área "Admin").
 app.MapControllerRoute(
