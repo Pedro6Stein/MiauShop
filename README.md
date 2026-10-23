@@ -153,11 +153,4 @@ No Render, as mesmas chaves viram variáveis de ambiente com `__` (ex.: `Connect
 
 ---
 
-## Equipe
-
-- Lucas Antonio Policene
-- Murilo Grigoletto de Oliveira
-- Pedro William Stein Hermes Brito
-- Wilson Tucci Neto
-
 <sub>Imagens dos produtos geradas com IA (Gemini). Marcas, produtos, clientes e pedidos exibidos são fictícios.</sub>
