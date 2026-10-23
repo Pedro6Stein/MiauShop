@@ -1,0 +1,85 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h1 class="h2 mb-4">Dashboard</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+        <div class="ms-metrica"><span>Pedidos</span><strong>@Model.TotalPedidos</strong></div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="ms-metrica"><span>Faturamento (simulado)</span><strong>@Model.Faturamento.ToString("C")</strong></div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="ms-metrica"><span>Ticket médio</span><strong>@Model.TicketMedio.ToString("C")</strong></div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="ms-metrica"><span>Pedidos válidos</span><strong>@Model.PedidosValidos</strong><small>sem cancelados</small></div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <section class="ms-form-bloco h-100">
+            <h2 class="h5 mb-3">Pedidos por status</h2>
+            @* Largura de cada barra calculada no servidor (DashboardViewModel). *@
+            @foreach (var barra in Model.PorStatus)
+            {
+                <div class="ms-barra-linha">
+                    <span>@barra.Nome</span>
+                    <div class="ms-barra-trilho"><div class="ms-barra-status-@barra.Status" style="width: @barra.Percentual%"></div></div>
+                    <strong>@barra.Quantidade</strong>
+                </div>
+            }
+        </section>
+    </div>
+    <div class="col-lg-6">
+        <section class="ms-form-bloco h-100">
+            <h2 class="h5 mb-3">Mais vendidos</h2>
+            @if (Model.MaisVendidos.Count == 0)
+            {
+                <p class="text-body-secondary mb-0">Ainda não há vendas.</p>
+            }
+            @foreach (var produto in Model.MaisVendidos)
+            {
+                <div class="ms-barra-linha">
+                    <span class="text-truncate">@produto.Nome</span>
+                    <div class="ms-barra-trilho"><div style="width: @produto.Percentual%"></div></div>
+                    <strong>@produto.Quantidade un.</strong>
+                </div>
+            }
+        </section>
+    </div>
+</div>
+
+<section class="ms-form-bloco">
+    <h2 class="h5 mb-3">Últimos pedidos</h2>
+    @if (Model.Ultimos.Count == 0)
+    {
+        <p class="text-body-secondary mb-0">Nenhum pedido ainda.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr><th>Pedido</th><th>Cliente</th><th>Data</th><th>Status</th><th class="text-end">Total</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var pedido in Model.Ultimos)
+                    {
+                        <tr>
+                            <td class="fw-bold">#@pedido.Id</td>
+                            <td>@pedido.ClienteNome</td>
+                            <td>@MiauShop.Services.LinhaDoTempo.ParaBrasilia(pedido.CriadoEm).ToString("dd/MM/yyyy HH:mm")</td>
+                            <td><span class="ms-pilula">@pedido.Status.NomeExibicao()</span></td>
+                            <td class="text-end fw-bold">@pedido.Total.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

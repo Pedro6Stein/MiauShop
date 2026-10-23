@@ -112,7 +112,7 @@
 
             <label class="ms-ordenar">
                 <span>Ordenar por</span>
-                <select onchange="location = this.value" aria-label="Ordenar produtos">
+                <select data-navegar aria-label="Ordenar produtos">
                     @foreach (var ordem in Enum.GetValues<OrdenacaoProdutos>())
                     {
                         <option value="@Link(f => f.Ordem = ordem)" selected="@(filtro.Ordem == ordem)">@ordem.NomeExibicao()</option>

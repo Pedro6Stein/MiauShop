@@ -932,6 +932,92 @@ button.ms-botao-mais { border: 0; }
     .ms-linha-tempo li + li::before { top: -1.25rem; left: 19px; right: auto; width: 4px; height: 1.25rem; }
 }
 
+/* ---------- Painel administrativo ---------- */
+
+.ms-separador { display: flex; align-items: center; gap: .75rem; margin: 1.5rem 0; color: var(--ms-cinza-rosado); font-size: .85rem; }
+.ms-separador::before, .ms-separador::after { content: ""; flex: 1; height: 1px; background: var(--ms-borda); }
+
+.ms-admin { display: flex; min-height: 100vh; background: var(--ms-creme); }
+
+.ms-admin-menu {
+    width: 240px;
+    flex-shrink: 0;
+    background: #fff;
+    border-right: 1px solid var(--ms-borda);
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+
+.ms-admin-subtitulo { color: var(--ms-cinza-rosado); padding-left: .2rem; }
+
+.ms-admin-link {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .6rem .8rem;
+    border-radius: 12px;
+    color: var(--ms-ameixa);
+    font-weight: 700;
+}
+
+.ms-admin-link:hover { background: var(--ms-algodao); color: var(--ms-ameixa); }
+.ms-admin-link.ativo { background: var(--ms-framboesa); color: #fff; }
+
+.ms-admin-conteudo { flex: 1; min-width: 0; }
+
+.ms-admin-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--ms-borda);
+    background: #fff;
+}
+
+.ms-admin-pagina { padding: 2rem; }
+
+.ms-metrica {
+    background: #fff;
+    border: 1px solid var(--ms-borda);
+    border-radius: 20px;
+    padding: 1.1rem 1.25rem;
+    height: 100%;
+}
+
+.ms-metrica span { display: block; font-size: .85rem; color: var(--ms-cinza-rosado); font-weight: 600; }
+.ms-metrica strong { font-family: var(--ms-fonte-titulo); font-size: 1.7rem; font-weight: 600; }
+.ms-metrica small { display: block; font-size: .75rem; color: var(--ms-cinza-rosado); }
+
+.ms-barra-linha {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr) 60px;
+    align-items: center;
+    gap: .75rem;
+    margin-bottom: .6rem;
+    font-size: .9rem;
+}
+
+.ms-barra-linha strong { text-align: right; }
+.ms-barra-trilho { height: 12px; border-radius: 999px; background: var(--ms-algodao); overflow: hidden; }
+.ms-barra-trilho > div { height: 100%; border-radius: 999px; background: var(--ms-framboesa); }
+.ms-barra-trilho > .ms-barra-status-Entregue { background: var(--ms-menta); }
+.ms-barra-trilho > .ms-barra-status-Cancelado { background: var(--ms-cinza-rosado); }
+
+@media (max-width: 991.98px) {
+    .ms-admin { flex-direction: column; }
+    .ms-admin-menu { width: auto; height: auto; position: static; flex-direction: row; flex-wrap: wrap; align-items: center; gap: .5rem; padding: 1rem; }
+    .ms-admin-menu nav { display: flex !important; margin-top: 0 !important; }
+    .ms-admin-subtitulo { display: none; }
+    .ms-admin-menu .mt-auto { margin-top: 0 !important; margin-left: auto; }
+    .ms-admin-topo, .ms-admin-pagina { padding: 1rem; }
+    .ms-barra-linha { grid-template-columns: 110px minmax(0, 1fr) 50px; }
+}
+
 /* ---------- Aviso "Adicionado ao carrinho" ---------- */
 
 .ms-aviso {

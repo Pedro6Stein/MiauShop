@@ -34,7 +34,7 @@
 | RA06 | Ativar/desativar produto (nunca apagar produto que já foi vendido) |
 | RA07 | Listar pedidos com filtro por status e ver detalhes |
 | RA08 | Alterar status do pedido manualmente (fica registrado no histórico como "Admin") |
-| RA09 | Conta **demo só leitura** para visitantes do portfólio: vê todo o painel, mas nenhuma alteração é salva (papel `Demo` no Identity; o papel `Admin` tem acesso completo) |
+| RA09 | Permissões por **papéis do Identity** (relação Usuario N:N Papel): `Administrador` vê e altera tudo; `Visualizador` só consulta, e o servidor recusa qualquer alteração. Para o portfólio, o botão "Entrar como visitante" usa um usuário Visualizador sem senha, ligado/desligado pela configuração `Administrador:DemoHabilitada` |
 
 ### 1.3 Requisitos não funcionais
 
@@ -176,6 +176,13 @@ classDiagram
     class Usuario {
         <<IdentityUser>>
         +string Nome
+        +DateTime? UltimoAcessoEm
+    }
+
+    class Papel {
+        <<IdentityRole>>
+        Administrador
+        Visualizador
     }
 
     EntidadeBase <|-- Categoria
@@ -196,6 +203,7 @@ classDiagram
     Pedido *-- Endereco
     ItemPedido "*" --> "1" ProdutoVariacao
     Usuario "0..1" --> "*" Pedido
+    Usuario "*" -- "*" Papel : AspNetUserRoles
 ```
 
 ### Enums
@@ -427,6 +435,6 @@ Tempos sugeridos para a demonstração: **Pagamento aprovado** após 1 min, **En
 | `Pedidos` | `Numero` único; índice em `ClienteEmail`, `Status`; colunas do `Endereco` embutidas |
 | `ItensPedido` | FK `PedidoId`, FK `ProdutoVariacaoId` (restrict: não apaga variação vendida) |
 | `HistoricoStatusPedidos` | FK `PedidoId` |
-| `AspNetUsers`, `AspNetRoles`, ... | Criadas pelo Identity (login do admin) |
+| `AspNetUsers`, `AspNetRoles`, `AspNetUserRoles`, ... | Criadas pelo Identity: usuários (com `Nome` e `UltimoAcessoEm`), papéis e a ligação N:N entre eles |
 
 Valores em dinheiro: `numeric(10,2)`.

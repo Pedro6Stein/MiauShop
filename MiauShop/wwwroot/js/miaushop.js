@@ -31,6 +31,11 @@ if (window.gsap && !reduzirMovimento) {
 // Regra deste arquivo: o JavaScript NÃO calcula preço nem guarda regra de negócio.
 // Ele só pede ao servidor um pedaço de HTML já pronto e coloca na tela.
 
+// Menus que levam a outra página (ex.: "Ordenar por"): cada opção já traz a URL montada pelo servidor.
+document.addEventListener('change', evento => {
+    if (evento.target.matches('select[data-navegar]')) window.location.href = evento.target.value;
+});
+
 // ---------- Página do produto ----------
 
 // Botões − e +: usam o min/max que o servidor escreveu no campo (stepDown/stepUp respeitam esses limites).

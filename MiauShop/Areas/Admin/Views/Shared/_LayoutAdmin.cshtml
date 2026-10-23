@@ -1,0 +1,66 @@
+@{
+    var podeAlterar = ViewData["PodeAlterar"] is true;
+    var papel = podeAlterar ? Papeis.Administrador : Papeis.Visualizador;
+    var controllerAtual = ViewContext.RouteData.Values["controller"]?.ToString();
+    string Ativo(string controller) => controllerAtual == controller ? "ativo" : "";
+}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>@ViewData["Title"] | Painel MiauShop</title>
+    <link rel="icon" href="~/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700&display=swap" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/miaushop.css" asp-append-version="true" />
+</head>
+<body class="ms-admin">
+    <aside class="ms-admin-menu">
+        <a class="ms-logo" href="/Admin"><i class="bi bi-heart-fill" aria-hidden="true"></i><b class="fw-semibold">Miau<span>Shop</span></b></a>
+        <small class="ms-admin-subtitulo">Painel administrativo</small>
+        <nav class="d-grid gap-1 mt-4" aria-label="Menu do painel">
+            <a class="ms-admin-link @Ativo("Dashboard")" href="/Admin"><i class="bi bi-speedometer2" aria-hidden="true"></i>Dashboard</a>
+        </nav>
+        <a class="ms-admin-link mt-auto" href="/" target="_blank" rel="noopener"><i class="bi bi-shop" aria-hidden="true"></i>Ver a loja</a>
+    </aside>
+
+    <div class="ms-admin-conteudo">
+        <header class="ms-admin-topo">
+            <span>
+                <strong>@User.Identity?.Name</strong>
+                <span class="ms-pilula ms-2">@papel</span>
+            </span>
+            <form method="post" action="/Admin/Conta/Sair">
+                @Html.AntiForgeryToken()
+                <button class="ms-botao ms-botao-claro ms-botao-pequeno" type="submit"><i class="bi bi-box-arrow-right" aria-hidden="true"></i>Sair</button>
+            </form>
+        </header>
+
+        <main class="ms-admin-pagina">
+            @if (!podeAlterar)
+            {
+                <div class="ms-aviso-demo" role="status">
+                    <i class="bi bi-eye" aria-hidden="true"></i>
+                    <span>@AdminControllerBase.MensagemSomenteLeitura</span>
+                </div>
+            }
+            @if (TempData["Aviso"] is string aviso && podeAlterar)
+            {
+                <div class="alert alert-info" role="status">@aviso</div>
+            }
+            @if (TempData["Sucesso"] is string sucesso)
+            {
+                <div class="alert alert-success" role="status">@sucesso</div>
+            }
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
