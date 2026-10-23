@@ -10,5 +10,6 @@ public interface IRepositorio<T> where T : EntidadeBase
     Task<List<T>> ListarAsync();
     void Adicionar(T entidade);
     void Atualizar(T entidade);
+    void Remover(T entidade);
     Task SalvarAsync();
 }

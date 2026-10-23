@@ -15,4 +15,19 @@ public interface IProdutoRepositorio : IRepositorio<Produto>
 
     // Variações ativas com o produto e as imagens carregados (usado pelo carrinho e pelo checkout).
     Task<List<ProdutoVariacao>> ObterVariacoesAsync(IEnumerable<int> variacaoIds);
+
+    // ---------- Painel (inclui produtos e variações inativos) ----------
+
+    Task<(List<Produto> Itens, int Total)> ListarParaPainelAsync(string? busca, int? categoriaId, bool? ativo, int pagina, int itensPorPagina);
+
+    // Produto com todas as variações e imagens, rastreado pelo EF para ser editado.
+    Task<Produto?> ObterParaEdicaoAsync(int id);
+
+    Task<List<string>> ListarSlugsAsync();
+    Task<Dictionary<int, int>> ContarPorCategoriaAsync();
+    Task<Dictionary<int, int>> ContarPorFornecedorAsync();
+    Task<int> ContarAtivosDoFornecedorAsync(int fornecedorId);
+
+    // Controle de concorrência: versão que o administrador tinha na tela.
+    void DefinirVersaoOriginal(Produto produto, uint versao);
 }

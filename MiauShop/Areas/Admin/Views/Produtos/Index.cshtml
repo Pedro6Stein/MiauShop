@@ -1,0 +1,92 @@
+@model ProdutosListaAdminViewModel
+@{
+    ViewData["Title"] = "Produtos";
+    var podeAlterar = ViewData["PodeAlterar"] is true;
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+    <h1 class="h2 mb-0">Produtos</h1>
+    @if (podeAlterar)
+    {
+        <a class="ms-botao ms-botao-pequeno" asp-action="Novo"><i class="bi bi-plus-lg" aria-hidden="true"></i>Novo produto</a>
+    }
+</div>
+
+<form method="get" action="/Admin/Produtos" class="ms-form-bloco ms-form row g-2 align-items-end">
+    <div class="col-md-5">
+        <label class="form-label" for="busca">Buscar</label>
+        <input class="form-control" id="busca" name="busca" value="@Model.Busca" placeholder="Nome do produto" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label" for="categoriaId">Categoria</label>
+        <select class="form-select" id="categoriaId" name="categoriaId">
+            <option value="">Todas</option>
+            @foreach (var categoria in Model.Categorias)
+            {
+                <option value="@categoria.Id" selected="@(Model.CategoriaId == categoria.Id)">@categoria.Nome</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label" for="ativo">Situação</label>
+        <select class="form-select" id="ativo" name="ativo">
+            <option value="">Todos</option>
+            <option value="true" selected="@(Model.Ativo == true)">Ativos</option>
+            <option value="false" selected="@(Model.Ativo == false)">Inativos</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button class="ms-botao w-100 justify-content-center" type="submit">Filtrar</button>
+    </div>
+</form>
+
+<section class="ms-form-bloco">
+    <p class="ms-dica mt-0">@Model.Total produto(s)</p>
+    <div class="table-responsive">
+        <table class="table align-middle mb-0 ms-tabela">
+            <thead><tr><th></th><th>Produto</th><th>Categoria</th><th class="text-end">Preço</th><th class="text-center">Variações</th><th>Situação</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var produto in Model.Produtos)
+                {
+                    <tr>
+                        <td><img class="ms-miniatura" src="@produto.ImagemPrincipalUrl()" alt="" width="48" height="48" /></td>
+                        <td>
+                            <span class="d-block fw-bold">@produto.Nome</span>
+                            @if (produto.Destaque)
+                            {
+                                <small class="text-body-secondary"><i class="bi bi-star-fill text-warning" aria-hidden="true"></i> Destaque</small>
+                            }
+                        </td>
+                        <td>@produto.Categoria.Nome</td>
+                        <td class="text-end text-nowrap">
+                            @if (produto.EmPromocao())
+                            {
+                                <small class="ms-preco-antigo d-block">@produto.Preco.ToString("C")</small>
+                                <strong class="text-danger">@produto.PrecoAtual().ToString("C")</strong>
+                            }
+                            else
+                            {
+                                <strong>@produto.Preco.ToString("C")</strong>
+                            }
+                        </td>
+                        <td class="text-center">@produto.Variacoes.Count(v => v.Ativa) / @produto.Variacoes.Count</td>
+                        <td><span class="ms-status @(produto.Ativo ? "ms-status-Entregue" : "ms-status-Cancelado")">@(produto.Ativo ? "Ativo" : "Inativo")</span></td>
+                        <td class="text-end"><a class="btn btn-sm btn-outline-secondary" asp-action="Editar" asp-route-id="@produto.Id">@(podeAlterar ? "Editar" : "Ver")</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+@if (Model.TotalPaginas > 1)
+{
+    <nav class="mt-4" aria-label="Páginas">
+        <ul class="ms-paginacao">
+            @for (var pagina = 1; pagina <= Model.TotalPaginas; pagina++)
+            {
+                <li><a class="@(pagina == Model.Pagina ? "ativo" : "")" href="@Model.Url(pagina)">@pagina</a></li>
+            }
+        </ul>
+    </nav>
+}

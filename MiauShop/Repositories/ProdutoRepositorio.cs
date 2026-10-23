@@ -80,6 +80,56 @@ public class ProdutoRepositorio(AppDbContext contexto) : Repositorio<Produto>(co
             .Include(p => p.Fornecedor)
             .FirstOrDefaultAsync(p => p.Slug == slug);
 
+    public async Task<(List<Produto> Itens, int Total)> ListarParaPainelAsync(
+        string? busca, int? categoriaId, bool? ativo, int pagina, int itensPorPagina)
+    {
+        var consulta = Conjunto.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(busca))
+            consulta = consulta.Where(p => EF.Functions.ILike(p.Nome, $"%{busca.Trim()}%"));
+        if (categoriaId is int categoria)
+            consulta = consulta.Where(p => p.CategoriaId == categoria);
+        if (ativo is bool situacao)
+            consulta = consulta.Where(p => p.Ativo == situacao);
+
+        var total = await consulta.CountAsync();
+        var itens = await consulta
+            .Include(p => p.Categoria)
+            .Include(p => p.Imagens)
+            .Include(p => p.Variacoes)
+            .OrderBy(p => p.Nome)
+            .Skip((pagina - 1) * itensPorPagina)
+            .Take(itensPorPagina)
+            .AsSplitQuery()
+            .ToListAsync();
+
+        return (itens, total);
+    }
+
+    public Task<Produto?> ObterParaEdicaoAsync(int id) =>
+        Conjunto
+            .Include(p => p.Variacoes.OrderBy(v => v.Ordem))
+            .Include(p => p.Imagens)
+            .AsSplitQuery()
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+    public Task<List<string>> ListarSlugsAsync() =>
+        Conjunto.Select(p => p.Slug).ToListAsync();
+
+    public Task<Dictionary<int, int>> ContarPorCategoriaAsync() =>
+        Conjunto.GroupBy(p => p.CategoriaId).Select(g => new { g.Key, Total = g.Count() })
+            .ToDictionaryAsync(x => x.Key, x => x.Total);
+
+    public Task<Dictionary<int, int>> ContarPorFornecedorAsync() =>
+        Conjunto.GroupBy(p => p.FornecedorId).Select(g => new { g.Key, Total = g.Count() })
+            .ToDictionaryAsync(x => x.Key, x => x.Total);
+
+    public Task<int> ContarAtivosDoFornecedorAsync(int fornecedorId) =>
+        Conjunto.CountAsync(p => p.FornecedorId == fornecedorId && p.Ativo);
+
+    public void DefinirVersaoOriginal(Produto produto, uint versao) =>
+        Contexto.Entry(produto).Property(p => p.Versao).OriginalValue = versao;
+
     public Task<List<ProdutoVariacao>> ObterVariacoesAsync(IEnumerable<int> variacaoIds) =>
         Contexto.ProdutoVariacoes.AsNoTracking()
             .Where(v => variacaoIds.Contains(v.Id) && v.Ativa && v.Produto.Ativo)

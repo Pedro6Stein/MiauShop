@@ -23,5 +23,7 @@ public class Repositorio<T>(AppDbContext contexto) : IRepositorio<T> where T : E
 
     public void Atualizar(T entidade) => Conjunto.Update(entidade);
 
+    public void Remover(T entidade) => Conjunto.Remove(entidade);
+
     public Task SalvarAsync() => Contexto.SaveChangesAsync();
 }

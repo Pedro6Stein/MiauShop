@@ -10,6 +10,9 @@ public class ProdutoConfiguration : IEntityTypeConfiguration<Produto>
     {
         builder.ToTable("Produtos");
 
+        // uint + IsRowVersion = coluna de sistema "xmin" do PostgreSQL (controle de concorrência).
+        builder.Property(p => p.Versao).IsRowVersion();
+
         builder.Property(p => p.Nome).HasMaxLength(120).IsRequired();
         builder.Property(p => p.Slug).HasMaxLength(140).IsRequired();
         builder.Property(p => p.DescricaoCurta).HasMaxLength(200).IsRequired();

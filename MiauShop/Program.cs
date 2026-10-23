@@ -75,6 +75,7 @@ builder.Services.AddScoped<ICarrinhoService, CarrinhoService>();
 builder.Services.AddScoped<ICheckoutService, CheckoutService>();
 builder.Services.AddScoped<IPedidoService, PedidoService>();
 builder.Services.AddScoped<IAdminPedidoService, AdminPedidoService>();
+builder.Services.AddScoped<IAdminCatalogoService, AdminCatalogoService>();
 
 // Avanço automático de status (demonstração; desligável na configuração).
 builder.Services.Configure<OpcoesAvancoAutomatico>(builder.Configuration.GetSection(OpcoesAvancoAutomatico.Secao));

@@ -1,0 +1,156 @@
+@model ProdutoEdicaoViewModel
+@{
+    var formulario = Model.Formulario;
+    var podeAlterar = ViewData["PodeAlterar"] is true;
+    ViewData["Title"] = Model.Novo ? "Novo produto" : formulario.Nome;
+}
+
+<a class="small fw-bold" asp-action="Index"><i class="bi bi-arrow-left" aria-hidden="true"></i> Produtos</a>
+<div class="d-flex flex-wrap align-items-center gap-3 mt-2 mb-4">
+    <h1 class="h2 mb-0">@(Model.Novo ? "Novo produto" : formulario.Nome)</h1>
+    @if (Model.Slug is not null)
+    {
+        <a class="small" href="/Produtos/@Model.Slug" target="_blank" rel="noopener">Ver na loja <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+    }
+</div>
+
+@* Preços: campos de texto no formato brasileiro (19,90); quem valida é o servidor. *@
+<form method="post" asp-action="Salvar" class="ms-form">
+    <div asp-validation-summary="All" class="alert alert-warning"></div>
+    <input type="hidden" name="Formulario.Id" value="@formulario.Id" />
+    <input type="hidden" name="Formulario.Versao" value="@formulario.Versao" />
+
+    <fieldset disabled="@(!podeAlterar)">
+        <div class="row g-4">
+            <div class="col-xl-8">
+                <section class="ms-form-bloco">
+                    <h2 class="h5">Dados do produto</h2>
+                    <div class="mb-3">
+                        <label asp-for="Formulario.Nome" class="form-label"></label>
+                        <input asp-for="Formulario.Nome" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Formulario.DescricaoCurta" class="form-label"></label>
+                        <input asp-for="Formulario.DescricaoCurta" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Formulario.Descricao" class="form-label"></label>
+                        <textarea asp-for="Formulario.Descricao" class="form-control" rows="5"></textarea>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="Formulario.CategoriaId" class="form-label"></label>
+                            <select asp-for="Formulario.CategoriaId" class="form-select">
+                                <option value="">Escolha...</option>
+                                @foreach (var categoria in Model.Categorias)
+                                {
+                                    <option value="@categoria.Id">@categoria.Nome@(categoria.Ativa ? "" : " (inativa)")</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Formulario.FornecedorId" class="form-label"></label>
+                            <select asp-for="Formulario.FornecedorId" class="form-select">
+                                <option value="">Escolha...</option>
+                                @foreach (var fornecedor in Model.Fornecedores)
+                                {
+                                    <option value="@fornecedor.Id">@fornecedor.Nome (@fornecedor.PrazoEnvioDias dias)@(fornecedor.Ativo ? "" : " (inativo)")</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Formulario.Animal" class="form-label"></label>
+                            <select asp-for="Formulario.Animal" class="form-select" asp-items="Html.GetEnumSelectList<MiauShop.Models.Enums.Animal>()"></select>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="ms-form-bloco">
+                    <h2 class="h5">Imagem</h2>
+                    <div class="d-flex gap-3 align-items-start">
+                        <img class="ms-preview-imagem" src="@formulario.ImagemUrl" alt="" width="120" height="120" data-preview-imagem />
+                        <div class="flex-grow-1">
+                            <div class="mb-3">
+                                <label asp-for="Formulario.ImagemUrl" class="form-label"></label>
+                                <input asp-for="Formulario.ImagemUrl" class="form-control" placeholder="/img/produtos/nome.webp ou https://..." data-preview-origem />
+                            </div>
+                            <div>
+                                <label asp-for="Formulario.ImagemTexto" class="form-label"></label>
+                                <input asp-for="Formulario.ImagemTexto" class="form-control" placeholder="Ex.: Gato laranja usando bandana xadrez" />
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="col-xl-4">
+                <section class="ms-form-bloco">
+                    <h2 class="h5">Preço e vitrine</h2>
+                    <div class="mb-3">
+                        <label class="form-label" for="preco">Preço (R$)</label>
+                        <input class="form-control" id="preco" name="Formulario.Preco" inputmode="decimal" placeholder="0,00"
+                               value="@formulario.Preco?.ToString("N2")" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="preco-promocional">Preço promocional (R$, opcional)</label>
+                        <input class="form-control" id="preco-promocional" name="Formulario.PrecoPromocional" inputmode="decimal" placeholder="Deixe vazio se não houver"
+                               value="@formulario.PrecoPromocional?.ToString("N2")" />
+                    </div>
+                    <div class="form-check form-switch mb-2">
+                        <input asp-for="Formulario.Destaque" class="form-check-input" role="switch" />
+                        <label asp-for="Formulario.Destaque" class="form-check-label"></label>
+                    </div>
+                    <div class="form-check form-switch mb-4">
+                        <input asp-for="Formulario.Ativo" class="form-check-input" role="switch" />
+                        <label asp-for="Formulario.Ativo" class="form-check-label"></label>
+                    </div>
+                    <button class="ms-botao w-100 justify-content-center" type="submit">@(Model.Novo ? "Criar produto" : "Salvar alterações")</button>
+                    @if (Model.Novo)
+                    {
+                        <p class="ms-dica mb-0">O produto nasce com a variação "Único". Depois de criar, você adiciona tamanhos.</p>
+                    }
+                </section>
+            </div>
+        </div>
+    </fieldset>
+</form>
+
+@if (!Model.Novo)
+{
+    <section class="ms-form-bloco" aria-labelledby="titulo-variacoes">
+        <h2 class="h5" id="titulo-variacoes">Variações (tamanhos)</h2>
+        <p class="ms-dica mt-0">O preço final de cada variação é o preço do produto (ou o promocional) mais o ajuste. Desativar tira a variação da loja e dos carrinhos.</p>
+
+        <div class="ms-variacoes-cabecalho"><span>Nome</span><span>Ajuste (R$)</span><span>SKU</span><span>Ativa</span><span></span></div>
+
+        @foreach (var variacao in Model.Variacoes)
+        {
+            <form class="ms-variacao-linha ms-form" method="post" asp-action="SalvarVariacao" asp-route-id="@formulario.Id">
+                <fieldset disabled="@(!podeAlterar)" class="contents">
+                    <input type="hidden" name="Variacao.Id" value="@variacao.Id" />
+                    <input class="form-control form-control-sm" name="Variacao.Nome" value="@variacao.Nome" aria-label="Nome da variação" maxlength="60" />
+                    <input class="form-control form-control-sm" name="Variacao.AjustePreco" value="@variacao.AjustePreco.ToString("N2")" inputmode="decimal" aria-label="Ajuste de preço" />
+                    <code>@variacao.Sku</code>
+                    <span class="form-check form-switch m-0">
+                        <input class="form-check-input" type="checkbox" role="switch" name="Variacao.Ativa" value="true" checked="@variacao.Ativa" aria-label="Variação ativa" />
+                        <input type="hidden" name="Variacao.Ativa" value="false" />
+                    </span>
+                    <button class="btn btn-sm btn-outline-secondary" type="submit">Salvar</button>
+                </fieldset>
+            </form>
+        }
+
+        @if (podeAlterar)
+        {
+            <form class="ms-variacao-linha ms-variacao-nova ms-form" method="post" asp-action="SalvarVariacao" asp-route-id="@formulario.Id">
+                <input type="hidden" name="Variacao.Id" value="0" />
+                <input class="form-control form-control-sm" name="Variacao.Nome" placeholder="Nova variação (ex.: GG)" aria-label="Nome da nova variação" maxlength="60" required />
+                <input class="form-control form-control-sm" name="Variacao.AjustePreco" value="0,00" inputmode="decimal" aria-label="Ajuste de preço da nova variação" />
+                <small class="text-body-secondary">gerado ao salvar</small>
+                <input type="hidden" name="Variacao.Ativa" value="true" />
+                <span></span>
+                <button class="btn btn-sm btn-outline-danger" type="submit"><i class="bi bi-plus-lg" aria-hidden="true"></i> Adicionar</button>
+            </form>
+        }
+    </section>
+}

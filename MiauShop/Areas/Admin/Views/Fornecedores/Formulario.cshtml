@@ -1,0 +1,36 @@
+@model FornecedorFormulario
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Novo fornecedor" : "Editar fornecedor";
+    var podeAlterar = ViewData["PodeAlterar"] is true;
+}
+
+<a class="small fw-bold" asp-action="Index"><i class="bi bi-arrow-left" aria-hidden="true"></i> Fornecedores</a>
+<h1 class="h2 mt-2 mb-4">@ViewData["Title"]</h1>
+
+<form method="post" asp-action="Salvar" class="ms-form ms-form-bloco ms-form-estreito">
+    <div asp-validation-summary="ModelOnly" class="alert alert-warning"></div>
+    <input type="hidden" asp-for="Id" />
+    <fieldset disabled="@(!podeAlterar)">
+        <div class="mb-3">
+            <label asp-for="Nome" class="form-label"></label>
+            <input asp-for="Nome" class="form-control" />
+            <span asp-validation-for="Nome" class="ms-erro"></span>
+        </div>
+        <div class="row g-3 mb-3">
+            <div class="col-sm-5">
+                <label asp-for="PrazoEnvioDias" class="form-label"></label>
+                <input asp-for="PrazoEnvioDias" class="form-control" type="number" min="1" max="60" />
+                <span asp-validation-for="PrazoEnvioDias" class="ms-erro"></span>
+            </div>
+            <div class="col-sm-7">
+                <label asp-for="Contato" class="form-label"></label>
+                <input asp-for="Contato" class="form-control" placeholder="E-mail ou telefone" />
+            </div>
+        </div>
+        <div class="form-check form-switch mb-4">
+            <input asp-for="Ativo" class="form-check-input" role="switch" />
+            <label asp-for="Ativo" class="form-check-label"></label>
+        </div>
+        <button class="ms-botao" type="submit">Salvar fornecedor</button>
+    </fieldset>
+</form>

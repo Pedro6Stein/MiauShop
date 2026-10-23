@@ -1045,6 +1045,32 @@ button.ms-botao-mais { border: 0; }
 .ms-status-Entregue { background: #DDF3EE; color: #0F6B59; }
 .ms-status-Cancelado { background: #EEE8EA; color: #6B5960; }
 
+.ms-form-estreito { max-width: 720px; }
+
+/* Resumo de validação sem erros: não mostra a caixa vazia. */
+.validation-summary-valid { display: none; }
+.ms-miniatura { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; background: var(--ms-rosa); }
+.ms-preview-imagem { width: 120px; height: 120px; border-radius: 18px; object-fit: cover; background: var(--ms-rosa); flex-shrink: 0; }
+.contents { display: contents; }
+
+.ms-variacoes-cabecalho,
+.ms-variacao-linha {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1.4fr) 60px 110px;
+    gap: .6rem;
+    align-items: center;
+}
+
+.ms-variacoes-cabecalho { font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; color: var(--ms-cinza-rosado); font-weight: 700; padding-bottom: .4rem; }
+.ms-variacao-linha { padding: .5rem 0; border-top: 1px solid var(--ms-borda); }
+.ms-variacao-nova { background: var(--ms-algodao); border-radius: 12px; padding: .6rem; margin-top: .5rem; border-top: 0; }
+.ms-variacao-linha code { font-size: .78rem; overflow: hidden; text-overflow: ellipsis; }
+
+@media (max-width: 767.98px) {
+    .ms-variacoes-cabecalho { display: none; }
+    .ms-variacao-linha { grid-template-columns: 1fr 1fr; }
+}
+
 .ms-totais > div { display: flex; justify-content: space-between; padding: .35rem 0; }
 .ms-totais dd { margin: 0; font-weight: 700; }
 

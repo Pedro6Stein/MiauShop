@@ -24,6 +24,9 @@
         <nav class="d-grid gap-1 mt-4" aria-label="Menu do painel">
             <a class="ms-admin-link @Ativo("Dashboard")" href="/Admin"><i class="bi bi-speedometer2" aria-hidden="true"></i>Dashboard</a>
             <a class="ms-admin-link @Ativo("Pedidos")" href="/Admin/Pedidos"><i class="bi bi-receipt" aria-hidden="true"></i>Pedidos</a>
+            <a class="ms-admin-link @Ativo("Produtos")" href="/Admin/Produtos"><i class="bi bi-box-seam" aria-hidden="true"></i>Produtos</a>
+            <a class="ms-admin-link @Ativo("Categorias")" href="/Admin/Categorias"><i class="bi bi-tags" aria-hidden="true"></i>Categorias</a>
+            <a class="ms-admin-link @Ativo("Fornecedores")" href="/Admin/Fornecedores"><i class="bi bi-truck" aria-hidden="true"></i>Fornecedores</a>
         </nav>
         <a class="ms-admin-link mt-auto" href="/" target="_blank" rel="noopener"><i class="bi bi-shop" aria-hidden="true"></i>Ver a loja</a>
     </aside>
@@ -66,6 +69,7 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/admin.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

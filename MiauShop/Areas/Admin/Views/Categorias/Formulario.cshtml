@@ -1,0 +1,51 @@
+@model CategoriaFormulario
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Nova categoria" : "Editar categoria";
+    var podeAlterar = ViewData["PodeAlterar"] is true;
+}
+
+<a class="small fw-bold" asp-action="Index"><i class="bi bi-arrow-left" aria-hidden="true"></i> Categorias</a>
+<h1 class="h2 mt-2 mb-4">@ViewData["Title"]</h1>
+
+<form method="post" asp-action="Salvar" class="ms-form ms-form-bloco ms-form-estreito">
+    <div asp-validation-summary="ModelOnly" class="alert alert-warning"></div>
+    <input type="hidden" asp-for="Id" />
+    <fieldset disabled="@(!podeAlterar)">
+        <div class="mb-3">
+            <label asp-for="Nome" class="form-label"></label>
+            <input asp-for="Nome" class="form-control" />
+            <span asp-validation-for="Nome" class="ms-erro"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Descricao" class="form-label"></label>
+            <textarea asp-for="Descricao" class="form-control" rows="2"></textarea>
+        </div>
+        <fieldset class="mb-3">
+            <legend class="form-label fs-6 fw-bold">Ícone</legend>
+            <div class="d-flex flex-wrap gap-2">
+                @foreach (var icone in CategoriaFormulario.IconesDisponiveis)
+                {
+                    <input class="btn-check" type="radio" name="Icone" id="icone-@icone.Classe" value="@icone.Classe" checked="@(Model.Icone == icone.Classe)" />
+                    <label class="ms-variacao" for="icone-@icone.Classe" title="@icone.Nome">
+                        <i class="bi @icone.Classe" aria-hidden="true"></i><small>@icone.Nome</small>
+                    </label>
+                }
+            </div>
+            <span asp-validation-for="Icone" class="ms-erro"></span>
+        </fieldset>
+        <div class="row g-3 mb-3">
+            <div class="col-sm-4">
+                <label asp-for="Ordem" class="form-label"></label>
+                <input asp-for="Ordem" class="form-control" type="number" min="0" max="99" />
+                <span asp-validation-for="Ordem" class="ms-erro"></span>
+            </div>
+            <div class="col-sm-8 d-flex align-items-end">
+                <div class="form-check form-switch">
+                    <input asp-for="Ativa" class="form-check-input" role="switch" />
+                    <label asp-for="Ativa" class="form-check-label"></label>
+                </div>
+            </div>
+        </div>
+        <button class="ms-botao" type="submit">Salvar categoria</button>
+    </fieldset>
+</form>

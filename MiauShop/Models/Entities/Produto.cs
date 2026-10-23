@@ -45,4 +45,50 @@ public class Produto : EntidadeBase
     // Ex.: de R$ 50 por R$ 39 -> 22 (%)
     public int PercentualDesconto() =>
         EmPromocao() ? (int)Math.Round((1 - PrecoAtual() / Preco) * 100) : 0;
+
+    // Controle de concorrência (coluna de sistema "xmin" do PostgreSQL), igual ao do Pedido.
+    public uint Versao { get; private set; }
+
+    // Regras que o cadastro precisa respeitar para o produto poder ser salvo.
+    public IEnumerable<string> ValidarRegras()
+    {
+        if (Preco <= 0)
+            yield return "O preço precisa ser maior que zero.";
+
+        if (PrecoPromocional is decimal promocional && (promocional <= 0 || promocional >= Preco))
+            yield return "O preço promocional precisa ser maior que zero e menor que o preço normal.";
+
+        if (Ativo && !Variacoes.Any(v => v.Ativa))
+            yield return "Um produto ativo precisa de pelo menos uma variação ativa.";
+    }
+
+    // Nova variação com SKU gerado a partir do slug (ex.: "moletom-pet-inverno-4").
+    public ProdutoVariacao AdicionarVariacao(string nome, decimal ajustePreco)
+    {
+        var variacao = new ProdutoVariacao
+        {
+            Produto = this,
+            Nome = nome.Trim(),
+            AjustePreco = ajustePreco,
+            Sku = $"{Slug}-{Variacoes.Count + 1}",
+            Ordem = Variacoes.Count
+        };
+
+        Variacoes.Add(variacao);
+        return variacao;
+    }
+
+    // Atualiza (ou cria) a imagem principal, usada no card e no detalhe.
+    public void DefinirImagemPrincipal(string url, string textoAlternativo)
+    {
+        var principal = Imagens.FirstOrDefault(i => i.Principal);
+
+        if (principal is null)
+            Imagens.Add(new ProdutoImagem { Url = url, TextoAlternativo = textoAlternativo, Principal = true });
+        else
+        {
+            principal.Url = url;
+            principal.TextoAlternativo = textoAlternativo;
+        }
+    }
 }

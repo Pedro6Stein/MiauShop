@@ -369,6 +369,12 @@ namespace MiauShop.Data.Migrations
                         .HasMaxLength(140)
                         .HasColumnType("character varying(140)");
 
+                    b.Property<uint>("Versao")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CategoriaId");

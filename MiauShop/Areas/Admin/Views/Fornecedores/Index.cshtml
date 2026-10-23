@@ -1,0 +1,44 @@
+@model List<FornecedorLinha>
+@{
+    ViewData["Title"] = "Fornecedores";
+    var podeAlterar = ViewData["PodeAlterar"] is true;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h2 mb-0">Fornecedores</h1>
+    @if (podeAlterar)
+    {
+        <a class="ms-botao ms-botao-pequeno" asp-action="Novo"><i class="bi bi-plus-lg" aria-hidden="true"></i>Novo fornecedor</a>
+    }
+</div>
+
+<section class="ms-form-bloco">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0 ms-tabela">
+            <thead><tr><th>Fornecedor</th><th>Prazo de envio</th><th>Contato</th><th class="text-center">Produtos</th><th>Situação</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var linha in Model)
+                {
+                    var fornecedor = linha.Fornecedor;
+                    <tr>
+                        <td class="fw-bold">@fornecedor.Nome</td>
+                        <td>@fornecedor.PrazoEnvioDias dias úteis</td>
+                        <td>@(fornecedor.Contato ?? "—")</td>
+                        <td class="text-center">@linha.QuantidadeProdutos</td>
+                        <td><span class="ms-status @(fornecedor.Ativo ? "ms-status-Entregue" : "ms-status-Cancelado")">@(fornecedor.Ativo ? "Ativo" : "Inativo")</span></td>
+                        <td class="text-end text-nowrap">
+                            <a class="btn btn-sm btn-outline-secondary" asp-action="Editar" asp-route-id="@fornecedor.Id">@(podeAlterar ? "Editar" : "Ver")</a>
+                            @if (podeAlterar && linha.QuantidadeProdutos == 0)
+                            {
+                                <form class="d-inline" method="post" asp-action="Excluir" asp-route-id="@fornecedor.Id">
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Excluir</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p class="ms-dica mb-0 mt-2">Fornecedor com produtos ativos não pode ser desativado, e com produtos não pode ser excluído.</p>
+</section>
