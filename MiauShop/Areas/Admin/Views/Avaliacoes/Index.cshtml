@@ -1,0 +1,66 @@
+@model AvaliacoesViewModel
+@{
+    ViewData["Title"] = "Avaliações";
+    var podeAlterar = ViewData["PodeAlterar"] is true;
+    var filtros = new (string Valor, string Nome, int? Quantidade)[]
+    {
+        (AvaliacoesViewModel.Pendentes, "Pendentes", Model.QuantidadePendentes),
+        (AvaliacoesViewModel.Aprovadas, "Aprovadas", null),
+        (AvaliacoesViewModel.Todas, "Todas", null)
+    };
+}
+
+<h1 class="h2 mb-3">Avaliações</h1>
+
+<nav class="ms-abas mb-3" aria-label="Filtrar avaliações">
+    @foreach (var filtro in filtros)
+    {
+        var ativo = Model.Situacao == filtro.Valor;
+        <a class="@(ativo ? "ativo" : "")" href="/Admin/Avaliacoes?situacao=@filtro.Valor" aria-current="@(ativo ? "page" : null)">
+            @filtro.Nome @if (filtro.Quantidade is int quantidade) { <span>@quantidade</span> }
+        </a>
+    }
+</nav>
+
+<section class="ms-form-bloco">
+    <p class="ms-dica mt-0">Avaliações enviadas pelos clientes só aparecem na página do produto depois de aprovadas aqui.</p>
+
+    @if (Model.Avaliacoes.Count == 0)
+    {
+        <p class="mb-0 text-body-secondary"><i class="bi bi-inbox" aria-hidden="true"></i> Nenhuma avaliação @(Model.Situacao == AvaliacoesViewModel.Todas ? "" : Model.Situacao) no momento.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle mb-0 ms-tabela ms-tabela-cartoes">
+                <thead><tr><th>Data</th><th>Produto</th><th>Nota</th><th>Cliente e comentário</th><th>Situação</th><th></th></tr></thead>
+                <tbody>
+                    @foreach (var avaliacao in Model.Avaliacoes)
+                    {
+                        <tr>
+                            <td data-label="Data" class="text-nowrap">@MiauShop.Services.LinhaDoTempo.ParaBrasilia(avaliacao.CriadoEm).ToString("g")</td>
+                            <td data-label="Produto"><a href="/Produtos/@avaliacao.Produto.Slug#avaliacoes" target="_blank" rel="noopener">@avaliacao.Produto.Nome</a></td>
+                            <td data-label="Nota" class="text-nowrap"><partial name="/Views/Shared/_Estrelas.cshtml" model="(double)avaliacao.Nota" /></td>
+                            <td data-label="Comentário"><strong>@avaliacao.Nome</strong><br /><span class="small">@avaliacao.Comentario</span></td>
+                            <td data-label="Situação"><span class="ms-status @(avaliacao.Aprovada ? "ms-status-Entregue" : "ms-status-Recebido")">@(avaliacao.Aprovada ? "Aprovada" : "Pendente")</span></td>
+                            <td class="text-end text-nowrap">
+                                @if (podeAlterar)
+                                {
+                                    @if (!avaliacao.Aprovada)
+                                    {
+                                        <form class="d-inline" method="post" asp-action="Aprovar" asp-route-id="@avaliacao.Id" asp-route-situacao="@Model.Situacao">
+                                            <button class="btn btn-sm btn-outline-success" type="submit"><i class="bi bi-check-lg" aria-hidden="true"></i> Aprovar</button>
+                                        </form>
+                                    }
+                                    <form class="d-inline" method="post" asp-action="Remover" asp-route-id="@avaliacao.Id" asp-route-situacao="@Model.Situacao">
+                                        <button class="btn btn-sm btn-outline-danger" type="submit">Remover</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
