@@ -1,0 +1,9 @@
+@model double
+@* Estrelas de 0 a 5, com meia estrela (ex.: 4,5). O número vem pronto do servidor. *@
+<span class="ms-estrelas" role="img" aria-label="Nota @Model.ToString("0.#") de 5">
+    @for (var i = 1; i <= 5; i++)
+    {
+        var icone = Model >= i ? "bi-star-fill" : Model >= i - 0.5 ? "bi-star-half" : "bi-star";
+        <i class="bi @icone" aria-hidden="true"></i>
+    }
+</span>

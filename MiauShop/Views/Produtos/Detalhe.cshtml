@@ -4,6 +4,9 @@
 @{
     var produto = Model.Produto;
     var primeira = Model.Variacoes.First();
+    var avaliacoes = Model.Avaliacoes;
+    var caracteristicas = produto.ListaCaracteristicas();
+    var abrirFormulario = ViewData["AbrirFormularioAvaliacao"] is true;
     ViewData["Title"] = produto.Nome;
 }
 
@@ -31,6 +34,17 @@
         <div data-anima="hero" data-escopo-produto>
             <p class="ms-card-categoria mb-1">@produto.Categoria.Nome · @produto.Animal.NomeExibicao()</p>
             <h1 class="ms-detalhe-nome">@produto.Nome</h1>
+            <a class="ms-detalhe-nota" href="#avaliacoes">
+                @if (avaliacoes.Total > 0)
+                {
+                    <partial name="_Estrelas" model="avaliacoes.MediaEmMeiaEstrela" />
+                    <span><strong>@avaliacoes.Media.ToString("0.0")</strong> · @avaliacoes.Total @(avaliacoes.Total == 1 ? "avaliação" : "avaliações")</span>
+                }
+                else
+                {
+                    <i class="bi bi-star" aria-hidden="true"></i><span>Seja o primeiro a avaliar</span>
+                }
+            </a>
             <p class="ms-detalhe-resumo">@produto.DescricaoCurta</p>
 
             @* Bloco de preço renderizado pelo servidor. Ao trocar o tamanho, o JavaScript
@@ -77,9 +91,151 @@
     </div>
 </div>
 
-<section class="ms-detalhe-descricao mb-5" aria-labelledby="titulo-descricao">
-    <h2 class="h4" id="titulo-descricao">Sobre o produto</h2>
-    <p class="mb-0">@produto.Descricao</p>
+<div class="row g-4 mb-5">
+    <div class="col-lg-7">
+        <section class="ms-detalhe-descricao h-100" aria-labelledby="titulo-descricao">
+            <h2 class="h4" id="titulo-descricao">Sobre o produto</h2>
+            <p class="mb-0">@produto.Descricao</p>
+
+            @if (caracteristicas.Count > 0)
+            {
+                <h3 class="h6 mt-4">Diferenciais</h3>
+                <ul class="ms-diferenciais">
+                    @foreach (var item in caracteristicas)
+                    {
+                        <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>@item</li>
+                    }
+                </ul>
+            }
+        </section>
+    </div>
+
+    @* Ficha técnica: o que já se sabe de qualquer produto (categoria, envio, tamanhos)
+       mais material, medidas e garantia quando cadastrados no painel. *@
+    <div class="col-lg-5">
+        <section class="ms-ficha h-100" aria-labelledby="titulo-ficha">
+            <h2 class="h4" id="titulo-ficha">Ficha técnica</h2>
+            <dl class="mb-0">
+                @if (!string.IsNullOrWhiteSpace(produto.Material))
+                {
+                    <div><dt><i class="bi bi-palette" aria-hidden="true"></i>Material</dt><dd>@produto.Material</dd></div>
+                }
+                @if (!string.IsNullOrWhiteSpace(produto.Medidas))
+                {
+                    <div><dt><i class="bi bi-rulers" aria-hidden="true"></i>Medidas</dt><dd>@produto.Medidas</dd></div>
+                }
+                @if (Model.TemEscolhaDeVariacao)
+                {
+                    <div><dt><i class="bi bi-arrows-angle-expand" aria-hidden="true"></i>Opções</dt><dd>@string.Join(" · ", Model.Variacoes.Select(v => v.Nome))</dd></div>
+                }
+                <div><dt><i class="bi bi-heart" aria-hidden="true"></i>Indicado para</dt><dd>@produto.Animal.NomeExibicao()</dd></div>
+                <div><dt><i class="bi bi-tag" aria-hidden="true"></i>Categoria</dt><dd>@produto.Categoria.Nome</dd></div>
+                @if (!string.IsNullOrWhiteSpace(produto.Garantia))
+                {
+                    <div><dt><i class="bi bi-shield-check" aria-hidden="true"></i>Garantia</dt><dd>@produto.Garantia</dd></div>
+                }
+                <div><dt><i class="bi bi-truck" aria-hidden="true"></i>Envio</dt><dd>@produto.Fornecedor.Nome, em até @produto.Fornecedor.PrazoEnvioDias dias úteis</dd></div>
+            </dl>
+        </section>
+    </div>
+</div>
+
+<section id="avaliacoes" class="ms-avaliacoes mb-5" aria-labelledby="titulo-avaliacoes">
+    <h2 class="h4" id="titulo-avaliacoes">Avaliações de clientes</h2>
+
+    @if (TempData["AvaliacaoEnviada"] is string enviada)
+    {
+        <div class="alert alert-success" role="status"><i class="bi bi-check-circle" aria-hidden="true"></i> @enviada</div>
+    }
+    @if (ViewData["AvaliacaoAviso"] is string aviso)
+    {
+        <div class="alert alert-warning" role="alert">@aviso</div>
+    }
+
+    <div class="row g-4">
+        <div class="col-md-5 col-lg-4">
+            <div class="ms-avaliacoes-resumo">
+                @if (avaliacoes.Total > 0)
+                {
+                    <div class="ms-avaliacoes-media">@avaliacoes.Media.ToString("0.0")</div>
+                    <partial name="_Estrelas" model="avaliacoes.MediaEmMeiaEstrela" />
+                    <p class="ms-dica mb-3">@avaliacoes.Total @(avaliacoes.Total == 1 ? "avaliação" : "avaliações")</p>
+                    <ul class="ms-avaliacoes-barras" aria-label="Quantidade de avaliações por nota">
+                        @for (var nota = 5; nota >= 1; nota--)
+                        {
+                            <li>
+                                <span>@nota <i class="bi bi-star-fill" aria-hidden="true"></i></span>
+                                <span class="ms-avaliacoes-trilho"><span class="ms-avaliacoes-barra" style="width: @avaliacoes.Percentual(nota)%"></span></span>
+                                <span class="ms-avaliacoes-qtd">@avaliacoes.PorNota[nota - 1]</span>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="mb-0"><i class="bi bi-chat-heart ms-avaliacoes-vazio" aria-hidden="true"></i><br />Este produto ainda não tem avaliações. Conte para a gente o que achou!</p>
+                }
+            </div>
+
+            <details class="ms-acesso-admin mt-3" open="@abrirFormulario">
+                <summary><i class="bi bi-pencil-square" aria-hidden="true"></i><span>Escrever uma avaliação</span></summary>
+                <form method="post" action="/Produtos/@produto.Slug/avaliar" class="ms-form mt-3" novalidate>
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-warning"></div>
+
+                    <fieldset class="mb-3">
+                        <legend class="form-label fs-6">Nota</legend>
+                        @* Estrelas em ordem inversa no HTML (5 → 1) para o CSS pintar "esta e as anteriores". *@
+                        <div class="ms-estrelas-escolha">
+                            @for (var nota = 5; nota >= 1; nota--)
+                            {
+                                <input type="radio" class="visually-hidden" id="nota-@nota" name="NovaAvaliacao.Nota" value="@nota" checked="@(Model.NovaAvaliacao.Nota == nota)" />
+                                <label for="nota-@nota" title="@nota @(nota == 1 ? "estrela" : "estrelas")"><i class="bi bi-star-fill" aria-hidden="true"></i><span class="visually-hidden">@nota @(nota == 1 ? "estrela" : "estrelas")</span></label>
+                            }
+                        </div>
+                        <span asp-validation-for="NovaAvaliacao.Nota" class="ms-erro"></span>
+                    </fieldset>
+                    <div class="mb-3">
+                        <label asp-for="NovaAvaliacao.Nome" class="form-label"></label>
+                        <input asp-for="NovaAvaliacao.Nome" class="form-control" autocomplete="given-name" />
+                        <span class="ms-dica">Na loja aparece só o primeiro nome e a inicial do sobrenome.</span>
+                        <span asp-validation-for="NovaAvaliacao.Nome" class="ms-erro"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="NovaAvaliacao.Comentario" class="form-label"></label>
+                        <textarea asp-for="NovaAvaliacao.Comentario" class="form-control" rows="4" maxlength="600"></textarea>
+                        <span asp-validation-for="NovaAvaliacao.Comentario" class="ms-erro"></span>
+                    </div>
+                    @* Campo escondido contra robôs (pessoas não veem; se vier preenchido, a avaliação é descartada). *@
+                    <div class="ms-pote" aria-hidden="true">
+                        <label for="NovaAvaliacao_Site">Deixe este campo em branco</label>
+                        <input id="NovaAvaliacao_Site" name="NovaAvaliacao.Site" tabindex="-1" autocomplete="off" />
+                    </div>
+                    <button class="ms-botao w-100 justify-content-center" type="submit"><i class="bi bi-send" aria-hidden="true"></i>Enviar avaliação</button>
+                    <p class="ms-dica text-center mb-0 mt-2">As avaliações passam por aprovação antes de aparecer.</p>
+                </form>
+            </details>
+        </div>
+
+        <div class="col-md-7 col-lg-8">
+            @if (avaliacoes.Recentes.Count > 0)
+            {
+                <ul class="ms-avaliacoes-lista">
+                    @foreach (var avaliacao in avaliacoes.Recentes)
+                    {
+                        <li>
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                <partial name="_Estrelas" model="(double)avaliacao.Nota" />
+                                <small class="text-body-secondary">@MiauShop.Services.LinhaDoTempo.ParaBrasilia(avaliacao.CriadoEm).ToString("d")</small>
+                            </div>
+                            <p class="my-2">@avaliacao.Comentario</p>
+                            <small class="fw-bold">@avaliacao.NomeExibicao()</small>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
 </section>
 
 @if (Model.Relacionados.Count > 0)

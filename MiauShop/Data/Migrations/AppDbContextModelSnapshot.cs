@@ -23,6 +23,49 @@ namespace MiauShop.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("MiauShop.Models.Entities.AvaliacaoProduto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Aprovada")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("AtualizadoEm")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Comentario")
+                        .IsRequired()
+                        .HasMaxLength(600)
+                        .HasColumnType("character varying(600)");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)");
+
+                    b.Property<int>("Nota")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ProdutoId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProdutoId", "Aprovada");
+
+                    b.ToTable("AvaliacoesProduto", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_AvaliacoesProduto_Nota", "\"Nota\" BETWEEN 1 AND 5");
+                        });
+                });
+
             modelBuilder.Entity("MiauShop.Models.Entities.Categoria", b =>
                 {
                     b.Property<int>("Id")
@@ -329,6 +372,10 @@ namespace MiauShop.Data.Migrations
                     b.Property<DateTime>("AtualizadoEm")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Caracteristicas")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
                     b.Property<int>("CategoriaId")
                         .HasColumnType("integer");
 
@@ -350,6 +397,18 @@ namespace MiauShop.Data.Migrations
 
                     b.Property<int>("FornecedorId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Garantia")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Material")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Medidas")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -703,6 +762,17 @@ namespace MiauShop.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("MiauShop.Models.Entities.AvaliacaoProduto", b =>
+                {
+                    b.HasOne("MiauShop.Models.Entities.Produto", "Produto")
+                        .WithMany("Avaliacoes")
+                        .HasForeignKey("ProdutoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Produto");
+                });
+
             modelBuilder.Entity("MiauShop.Models.Entities.HistoricoStatusPedido", b =>
                 {
                     b.HasOne("MiauShop.Models.Entities.Pedido", "Pedido")
@@ -854,6 +924,8 @@ namespace MiauShop.Data.Migrations
 
             modelBuilder.Entity("MiauShop.Models.Entities.Produto", b =>
                 {
+                    b.Navigation("Avaliacoes");
+
                     b.Navigation("Imagens");
 
                     b.Navigation("Variacoes");

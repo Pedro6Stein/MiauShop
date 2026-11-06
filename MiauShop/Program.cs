@@ -97,6 +97,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped(typeof(IRepositorio<>), typeof(Repositorio<>));
 builder.Services.AddScoped<IProdutoRepositorio, ProdutoRepositorio>();
 builder.Services.AddScoped<IPedidoRepositorio, PedidoRepositorio>();
+builder.Services.AddScoped<IAvaliacaoRepositorio, AvaliacaoRepositorio>();
 
 // Serviços
 builder.Services.Configure<OpcoesFrete>(builder.Configuration.GetSection(OpcoesFrete.Secao));
@@ -107,6 +108,7 @@ builder.Services.AddScoped<ICheckoutService, CheckoutService>();
 builder.Services.AddScoped<IPedidoService, PedidoService>();
 builder.Services.AddScoped<IAdminPedidoService, AdminPedidoService>();
 builder.Services.AddScoped<IAdminCatalogoService, AdminCatalogoService>();
+builder.Services.AddScoped<IAvaliacaoService, AvaliacaoService>();
 
 // Avanço automático de status (demonstração; desligável na configuração).
 builder.Services.Configure<OpcoesAvancoAutomatico>(builder.Configuration.GetSection(OpcoesAvancoAutomatico.Secao));
@@ -153,11 +155,25 @@ builder.Services.AddRateLimiter(opcoes =>
                 Window = TimeSpan.FromMinutes(1)
             }));
 
+    // Avaliações de produto: 3 a cada 10 minutos por IP (evita enxurrada de spam na fila de moderação).
+    opcoes.AddPolicy(MiauShop.Controllers.ProdutosController.PoliticaAvaliacao, contexto =>
+        System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+            contexto.Connection.RemoteIpAddress?.ToString() ?? "desconhecido",
+            _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 3,
+                Window = TimeSpan.FromMinutes(10)
+            }));
+
     opcoes.OnRejected = (contexto, _) =>
     {
-        var destino = contexto.HttpContext.Request.Path.StartsWithSegments("/Admin")
+        var http = contexto.HttpContext;
+        var destino = http.Request.Path.StartsWithSegments("/Admin")
             ? "/Admin/Conta/Entrar?bloqueado=true"
-            : "/Pedido/Acompanhar?bloqueado=true";
+            : http.GetRouteValue("slug") is string slug
+                // Avaliação de produto: volta para a página do produto, com o aviso.
+                ? $"/Produtos/{Uri.EscapeDataString(slug)}?bloqueado=true#avaliacoes"
+                : "/Pedido/Acompanhar?bloqueado=true";
         contexto.HttpContext.Response.Redirect(destino);
         return ValueTask.CompletedTask;
     };
@@ -170,6 +186,7 @@ using (var escopo = app.Services.CreateScope())
 {
     var contexto = escopo.ServiceProvider.GetRequiredService<AppDbContext>();
     await SeedData.InicializarAsync(contexto);
+    await SeedDetalhesProdutos.InicializarAsync(contexto);
 
     // Papéis do painel e usuários iniciais (administrador da configuração e, se ligado, o de demonstração).
     await SeedUsuarios.InicializarAsync(

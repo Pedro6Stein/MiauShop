@@ -17,6 +17,10 @@ public class ProdutoConfiguration : IEntityTypeConfiguration<Produto>
         builder.Property(p => p.Slug).HasMaxLength(140).IsRequired();
         builder.Property(p => p.DescricaoCurta).HasMaxLength(200).IsRequired();
         builder.Property(p => p.Descricao).HasMaxLength(4000).IsRequired();
+        builder.Property(p => p.Material).HasMaxLength(200);
+        builder.Property(p => p.Medidas).HasMaxLength(300);
+        builder.Property(p => p.Garantia).HasMaxLength(200);
+        builder.Property(p => p.Caracteristicas).HasMaxLength(1000);
 
         builder.HasIndex(p => p.Slug).IsUnique();
         builder.HasIndex(p => new { p.Ativo, p.Animal });

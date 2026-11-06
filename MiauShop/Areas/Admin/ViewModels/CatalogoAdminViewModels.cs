@@ -111,6 +111,24 @@ public class ProdutoFormulario
     [StringLength(4000)]
     public string Descricao { get; set; } = string.Empty;
 
+    // ----- Ficha técnica (opcional) -----
+
+    [Display(Name = "Material")]
+    [StringLength(200)]
+    public string? Material { get; set; }
+
+    [Display(Name = "Medidas")]
+    [StringLength(300)]
+    public string? Medidas { get; set; }
+
+    [Display(Name = "Garantia")]
+    [StringLength(200)]
+    public string? Garantia { get; set; }
+
+    [Display(Name = "Diferenciais (um por linha)")]
+    [StringLength(1000)]
+    public string? Caracteristicas { get; set; }
+
     [Display(Name = "Categoria")]
     [Required(ErrorMessage = "Escolha a categoria.")]
     public int? CategoriaId { get; set; }

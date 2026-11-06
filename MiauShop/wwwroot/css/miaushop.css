@@ -1411,3 +1411,90 @@ button.ms-botao-mais { border: 0; }
     .ms-nav-painel { padding: .3rem .6rem; }
     .ms-cartao-visitante { padding: 1.25rem; }
 }
+
+/* ---------- Página do produto: ficha técnica e avaliações ---------- */
+
+.ms-estrelas { display: inline-flex; gap: .1rem; color: #E8A317; line-height: 1; }
+
+.ms-detalhe-nota {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    color: var(--ms-ameixa-suave);
+    font-size: .92rem;
+    margin-bottom: .75rem;
+}
+
+.ms-detalhe-nota:hover span { text-decoration: underline; }
+.ms-detalhe-nota > .bi-star { color: #E8A317; }
+
+/* Em coluna, a descrição ocupa a largura toda. */
+.row .ms-detalhe-descricao { max-width: none; }
+
+.ms-diferenciais { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; }
+.ms-diferenciais li { display: flex; gap: .6rem; align-items: flex-start; }
+.ms-diferenciais i { color: var(--ms-menta); margin-top: .1rem; }
+
+.ms-ficha {
+    background: var(--ms-algodao);
+    border-radius: 24px;
+    padding: 2rem;
+}
+
+.ms-ficha dl > div {
+    display: grid;
+    grid-template-columns: minmax(0, 9.5rem) minmax(0, 1fr);
+    gap: .75rem;
+    padding: .65rem 0;
+    border-bottom: 1px dashed var(--ms-rosa);
+}
+
+.ms-ficha dl > div:last-child { border-bottom: 0; }
+.ms-ficha dt { font-weight: 700; display: flex; gap: .5rem; align-items: center; }
+.ms-ficha dt i { color: var(--ms-framboesa); }
+.ms-ficha dd { margin: 0; color: var(--ms-ameixa-suave); }
+
+.ms-avaliacoes-resumo {
+    background: #fff;
+    border: 1px solid var(--ms-borda);
+    border-radius: 24px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.ms-avaliacoes-media { font-family: var(--ms-fonte-titulo); font-size: 3rem; font-weight: 600; line-height: 1; }
+.ms-avaliacoes-resumo .ms-estrelas { font-size: 1.2rem; margin: .4rem 0; }
+.ms-avaliacoes-vazio { font-size: 2.2rem; color: var(--ms-framboesa); }
+
+.ms-avaliacoes-barras { list-style: none; padding: 0; margin: 0; display: grid; gap: .35rem; font-size: .85rem; }
+.ms-avaliacoes-barras li { display: grid; grid-template-columns: 2.4rem minmax(0, 1fr) 1.8rem; align-items: center; gap: .5rem; }
+.ms-avaliacoes-barras .bi { color: #E8A317; font-size: .75rem; }
+.ms-avaliacoes-trilho { height: 8px; border-radius: 999px; background: var(--ms-algodao); overflow: hidden; }
+.ms-avaliacoes-barra { display: block; height: 100%; border-radius: 999px; background: #E8A317; }
+.ms-avaliacoes-qtd { text-align: right; color: var(--ms-cinza-rosado); }
+
+.ms-avaliacoes-lista { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; }
+
+.ms-avaliacoes-lista li {
+    background: #fff;
+    border: 1px solid var(--ms-borda);
+    border-radius: 20px;
+    padding: 1.15rem 1.35rem;
+}
+
+/* Escolha da nota: o HTML vem de 5 para 1 e o row-reverse mostra 1 → 5.
+   "~" pinta a estrela escolhida e as anteriores (que vêm depois no HTML). */
+.ms-estrelas-escolha { display: inline-flex; flex-direction: row-reverse; gap: .2rem; }
+.ms-estrelas-escolha label { font-size: 1.75rem; color: var(--ms-borda); cursor: pointer; transition: color var(--ms-transicao), transform var(--ms-transicao); }
+.ms-estrelas-escolha label:hover,
+.ms-estrelas-escolha label:hover ~ label,
+.ms-estrelas-escolha input:checked ~ label { color: #E8A317; }
+.ms-estrelas-escolha label:hover { transform: scale(1.12); }
+.ms-estrelas-escolha input:focus-visible + label { outline: 3px solid var(--ms-framboesa); outline-offset: 2px; border-radius: 6px; }
+
+.ms-pote { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+@media (max-width: 575.98px) {
+    .ms-ficha { padding: 1.5rem; }
+    .ms-ficha dl > div { grid-template-columns: 1fr; gap: .15rem; }
+}
