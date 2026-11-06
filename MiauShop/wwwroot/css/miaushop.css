@@ -1498,3 +1498,16 @@ button.ms-botao-mais { border: 0; }
     .ms-ficha { padding: 1.5rem; }
     .ms-ficha dl > div { grid-template-columns: 1fr; gap: .15rem; }
 }
+
+/* Celulares estreitos: o botão "Painel" do topo mostra só o ícone (o texto continua para leitores de tela). */
+@media (max-width: 419.98px) {
+    .ms-nav-painel { padding: .3rem .55rem; }
+    .ms-nav-painel > span:first-of-type {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+    }
+}
