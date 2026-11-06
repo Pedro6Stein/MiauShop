@@ -10,6 +10,13 @@ public class Carrinho
     public decimal Frete { get; set; }
     public decimal FaltaParaFreteGratis { get; set; }
 
+    // CEP informado pelo cliente (no carrinho, no checkout ou no assistente) e o frete calculado para ele.
+    public string? CepFrete { get; set; }
+    public CotacaoFrete? Cotacao { get; set; }
+
+    // false = ainda não dá para saber o frete (falta o CEP e a compra não tem frete grátis).
+    public bool FreteDefinido { get; set; }
+
     // true quando algum item da sessão foi desativado e saiu do carrinho.
     public bool ItensForamRemovidos { get; set; }
 
@@ -21,6 +28,11 @@ public class Carrinho
     // Quanto da barra de frete grátis já está cheio (0 a 100).
     public int PercentualFreteGratis =>
         FaltaParaFreteGratis <= 0 ? 100 : (int)(Subtotal / (Subtotal + FaltaParaFreteGratis) * 100);
+
+    // Prazo de entrega = o fornecedor mais demorado do carrinho + os dias de transporte até o CEP.
+    public int? PrazoEntregaDias => Cotacao is null || Vazio
+        ? null
+        : Linhas.Max(l => l.Variacao.Produto.Fornecedor?.PrazoEnvioDias ?? 0) + Cotacao.DiasTransporte;
 }
 
 public record LinhaCarrinho(ProdutoVariacao Variacao, int Quantidade)

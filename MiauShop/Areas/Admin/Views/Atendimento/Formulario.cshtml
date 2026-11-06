@@ -1,0 +1,53 @@
+@model PerguntaFormulario
+@{
+    var podeAlterar = ViewData["PodeAlterar"] is true;
+    var nova = Model.Id == 0;
+    ViewData["Title"] = nova ? "Nova resposta" : "Editar resposta";
+}
+
+<a class="small fw-bold" asp-action="Index"><i class="bi bi-arrow-left" aria-hidden="true"></i> Assistente</a>
+<h1 class="h2 mt-2 mb-4">@ViewData["Title"]</h1>
+
+<form method="post" asp-action="Salvar" class="ms-form ms-form-estreito">
+    <div asp-validation-summary="All" class="alert alert-warning"></div>
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="SemRespostaId" />
+
+    <fieldset disabled="@(!podeAlterar)">
+        <section class="ms-form-bloco">
+            @if (Model.SemRespostaId is not null)
+            {
+                <div class="ms-aviso-demo" role="status">
+                    <i class="bi bi-chat-left-dots" aria-hidden="true"></i>
+                    <span>Esta pergunta veio de um cliente. Ajuste o texto se quiser; ao salvar, ela sai da lista de dúvidas sem resposta.</span>
+                </div>
+            }
+            <div class="mb-3">
+                <label asp-for="Pergunta" class="form-label"></label>
+                <input asp-for="Pergunta" class="form-control" placeholder="Ex.: Vocês entregam no mesmo dia?" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Resposta" class="form-label"></label>
+                <textarea asp-for="Resposta" class="form-control" rows="5"></textarea>
+            </div>
+            <div class="mb-3">
+                <label asp-for="PalavrasChave" class="form-label"></label>
+                <input asp-for="PalavrasChave" class="form-control" placeholder="Ex.: mesmo dia, hoje, urgente, rapido" />
+                <span class="ms-dica">Escreva sem se preocupar com acentos ou maiúsculas. "troca" também reconhece "trocar".</span>
+            </div>
+            <div class="row g-3 align-items-end mb-4">
+                <div class="col-sm-4">
+                    <label asp-for="Ordem" class="form-label"></label>
+                    <input asp-for="Ordem" class="form-control" />
+                </div>
+                <div class="col-sm-8">
+                    <div class="form-check form-switch mb-2">
+                        <input asp-for="Ativa" class="form-check-input" role="switch" />
+                        <label asp-for="Ativa" class="form-check-label"></label>
+                    </div>
+                </div>
+            </div>
+            <button class="ms-botao" type="submit"><i class="bi bi-check-lg" aria-hidden="true"></i>Salvar resposta</button>
+        </section>
+    </fieldset>
+</form>

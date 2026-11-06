@@ -9,6 +9,14 @@ public class Produto : EntidadeBase
     public string DescricaoCurta { get; set; } = string.Empty;
     public string Descricao { get; set; } = string.Empty;
 
+    // Ficha técnica (opcional): aparece na página do produto quando preenchida.
+    public string? Material { get; set; }
+    public string? Medidas { get; set; }
+    public string? Garantia { get; set; }
+
+    // Diferenciais do produto, um por linha (ex.: "Lavável na máquina").
+    public string? Caracteristicas { get; set; }
+
     public decimal Preco { get; set; }
     public decimal? PrecoPromocional { get; set; }
 
@@ -29,6 +37,18 @@ public class Produto : EntidadeBase
     // Todo produto tem pelo menos uma variação ("Único" quando não tem tamanho/cor).
     public ICollection<ProdutoVariacao> Variacoes { get; set; } = new List<ProdutoVariacao>();
     public ICollection<ProdutoImagem> Imagens { get; set; } = new List<ProdutoImagem>();
+    public ICollection<AvaliacaoProduto> Avaliacoes { get; set; } = new List<AvaliacaoProduto>();
+
+    // Características em lista, sem linhas vazias.
+    public List<string> ListaCaracteristicas() =>
+        (Caracteristicas ?? string.Empty)
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(linha => linha.TrimStart('-', '•', '*', ' '))
+            .Where(linha => linha.Length > 0)
+            .ToList();
+
+    public bool TemFichaTecnica() =>
+        !string.IsNullOrWhiteSpace(Material) || !string.IsNullOrWhiteSpace(Medidas) || !string.IsNullOrWhiteSpace(Garantia);
 
     // Promoção só vale se o preço promocional for realmente menor.
     public bool EmPromocao() =>

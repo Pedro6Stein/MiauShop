@@ -10,10 +10,12 @@ namespace MiauShop.Services;
 public class CarrinhoService(
     IHttpContextAccessor httpContextAccessor,
     IProdutoRepositorio produtoRepositorio,
-    ICalculadoraFrete calculadoraFrete) : ICarrinhoService
+    ICalculadoraFrete calculadoraFrete,
+    IFreteService freteService) : ICarrinhoService
 {
     public const int QuantidadeMaxima = 10;
     private const string ChaveSessao = "Carrinho";
+    private const string ChaveCep = "CarrinhoCep";
 
     private record ItemSessao(int VariacaoId, int Quantidade);
 
@@ -72,12 +74,29 @@ public class CarrinhoService(
 
         if (!carrinho.Vazio)
         {
-            var frete = calculadoraFrete.Calcular(carrinho.Subtotal);
-            carrinho.Frete = frete.Valor;
-            carrinho.FaltaParaFreteGratis = frete.FaltaParaFreteGratis;
+            // Frete grátis pelo valor da compra vale com ou sem CEP; abaixo disso, o valor depende da distância.
+            var regra = calculadoraFrete.Calcular(carrinho.Subtotal);
+            carrinho.FaltaParaFreteGratis = regra.FaltaParaFreteGratis;
+
+            carrinho.CepFrete = Sessao.GetString(ChaveCep);
+            if (carrinho.CepFrete is not null)
+                carrinho.Cotacao = await freteService.CotarAsync(carrinho.CepFrete, carrinho.Subtotal);
+
+            carrinho.FreteDefinido = carrinho.Cotacao is not null || regra.Gratis;
+            carrinho.Frete = carrinho.Cotacao?.Valor ?? 0;
         }
 
         return carrinho;
+    }
+
+    public void DefinirCep(string? cep)
+    {
+        var digitos = new string((cep ?? string.Empty).Where(char.IsDigit).ToArray());
+
+        if (digitos.Length == 8)
+            Sessao.SetString(ChaveCep, $"{digitos[..5]}-{digitos[5..]}");
+        else
+            Sessao.Remove(ChaveCep);
     }
 
     // Atualiza a quantidade no mesmo lugar da lista (ou adiciona no fim), respeitando 1 a 10.

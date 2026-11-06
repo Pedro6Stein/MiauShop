@@ -20,8 +20,8 @@
 </head>
 <body>
     <div class="ms-faixa-demo">
-        <i class="bi bi-info-circle" aria-hidden="true"></i>
-        Projeto demonstrativo: nenhuma compra ou pagamento é real.
+        <span><i class="bi bi-info-circle" aria-hidden="true"></i> Projeto demonstrativo: nenhuma compra ou pagamento é real.</span>
+        <partial name="_BotaoVisitante" model='new BotaoVisitante("Conheça o painel administrativo (sem senha)", "ms-faixa-demo-link", "bi-arrow-right-circle")' />
     </div>
 
     <header class="ms-header">
@@ -39,6 +39,7 @@
                 <a class="ms-nav-link" href="/Produtos?animal=Cao">Cães</a>
                 <a class="ms-nav-link" href="/Produtos?animal=Gato">Gatos</a>
                 <a class="ms-nav-link d-none d-sm-inline" href="/Pedido/Acompanhar">Meu pedido</a>
+                <partial name="_BotaoVisitante" model='new BotaoVisitante("Painel", "ms-nav-painel", Complemento: "administrativo, entrar como visitante sem senha")' />
             </nav>
 
             <a class="ms-carrinho ms-2" href="/Carrinho" aria-label="Carrinho, @itensNoCarrinho itens">
@@ -61,6 +62,32 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content ms-modal" data-modal-conteudo></div>
         </div>
+    </div>
+
+    @* Assistente "Ajuda": menu numerado + respostas cadastradas no painel. As respostas vêm prontas do servidor. *@
+    <div class="ms-assistente" data-assistente>
+        <section class="ms-assistente-painel" id="ms-assistente-painel" role="dialog" aria-labelledby="ms-assistente-titulo" hidden data-assistente-painel>
+            <header class="ms-assistente-topo">
+                <span class="ms-assistente-avatar" aria-hidden="true"><i class="bi bi-heart-fill"></i></span>
+                <span class="flex-grow-1">
+                    <strong id="ms-assistente-titulo">Miau, assistente da loja</strong>
+                    <small>Respostas automáticas</small>
+                </span>
+                <button class="btn-close btn-close-white" type="button" aria-label="Fechar o assistente" data-assistente-fechar></button>
+            </header>
+            <div class="ms-assistente-mensagens" aria-live="polite" data-assistente-mensagens></div>
+            <form class="ms-assistente-form" method="post" action="/Assistente/Mensagem" data-assistente-form>
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="etapa" value="inicio" />
+                <input type="hidden" name="contexto" value="" />
+                <label class="visually-hidden" for="ms-assistente-texto">Mensagem para o assistente</label>
+                <input id="ms-assistente-texto" name="texto" autocomplete="off" maxlength="200" placeholder="Digite o número da opção ou sua dúvida" />
+                <button type="submit" aria-label="Enviar mensagem"><i class="bi bi-send-fill" aria-hidden="true"></i></button>
+            </form>
+        </section>
+        <button class="ms-assistente-botao" type="button" aria-expanded="false" aria-controls="ms-assistente-painel" data-assistente-abrir>
+            <i class="bi bi-chat-heart-fill" aria-hidden="true"></i><span>Ajuda</span>
+        </button>
     </div>
 
     @* Aviso rápido usado pelo "Adicionar ao carrinho". *@
@@ -93,7 +120,7 @@
                 <div class="col-6 col-md-4">
                     <h3 class="h6">Sobre o projeto</h3>
                     <p class="mb-2">Loja fictícia criada para fins acadêmicos e de portfólio. Produtos, preços e pedidos são apenas demonstrativos.</p>
-                    <a href="/Admin"><i class="bi bi-speedometer2" aria-hidden="true"></i> Ver o painel administrativo</a>
+                    <partial name="_BotaoVisitante" model='new BotaoVisitante("Ver o painel administrativo (visitante, sem senha)", "ms-link-rodape")' />
                 </div>
             </div>
             <hr class="border-secondary my-4" />

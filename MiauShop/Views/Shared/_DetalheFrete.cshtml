@@ -1,0 +1,15 @@
+@model MiauShop.Models.Carrinho
+@* Para onde vai, a distância até a loja e o prazo de entrega (fornecedor + transporte), calculados no servidor. *@
+@if (Model.Cotacao is { } cotacao)
+{
+    var distancia = cotacao.DistanciaKm > 0
+        ? $" · {(cotacao.Aproximado ? "cerca de " : "")}{cotacao.DistanciaKm} km de {cotacao.CidadeOrigem}"
+        : "";
+    <p class="ms-frete-detalhe">
+        <span><i class="bi bi-geo-alt" aria-hidden="true"></i> Para @cotacao.Cidade/@cotacao.Uf@distancia</span>
+        @if (Model.PrazoEntregaDias is int prazo)
+        {
+            <span><i class="bi bi-calendar-check" aria-hidden="true"></i> Entrega em até @prazo dias úteis</span>
+        }
+    </p>
+}

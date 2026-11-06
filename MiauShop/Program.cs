@@ -15,8 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Banco de dados: a string de conexão vem do appsettings (local) ou de variável de ambiente (produção).
+// EnableRetryOnFailure: o Neon gratuito "dorme" o banco após alguns minutos parado e a primeira
+// conexão pode falhar enquanto ele acorda; o EF tenta de novo sozinho em vez de mostrar erro.
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("MiauShop")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("MiauShop"),
+        npgsql => npgsql.EnableRetryOnFailure(maxRetryCount: 3)));
 
 // ---------- Hospedagem (Render) ----------
 
@@ -63,7 +66,11 @@ builder.Services.ConfigureApplicationCookie(opcoes =>
 {
     opcoes.Cookie.Name = "MiauShop.Admin";
     opcoes.Cookie.HttpOnly = true;                       // JavaScript não lê o cookie
-    opcoes.Cookie.SameSite = SameSiteMode.Strict;        // não é enviado a partir de outros sites
+    // Lax (padrão do Identity): o cookie vai junto quando a pessoa chega por um link de outro site
+    // (README do GitHub, WhatsApp...). Com Strict, quem já estava logado e chegava por link recebia o
+    // formulário gerado como "anônimo" e o envio quebrava com erro 400 do token antifalsificação.
+    // POSTs vindos de outros sites continuam bloqueados (Lax não envia o cookie neles + token antifalsificação).
+    opcoes.Cookie.SameSite = SameSiteMode.Lax;
     opcoes.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
         ? CookieSecurePolicy.SameAsRequest
         : CookieSecurePolicy.Always;                     // em produção, só por HTTPS
@@ -90,6 +97,8 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped(typeof(IRepositorio<>), typeof(Repositorio<>));
 builder.Services.AddScoped<IProdutoRepositorio, ProdutoRepositorio>();
 builder.Services.AddScoped<IPedidoRepositorio, PedidoRepositorio>();
+builder.Services.AddScoped<IAvaliacaoRepositorio, AvaliacaoRepositorio>();
+builder.Services.AddScoped<IPerguntaSemRespostaRepositorio, PerguntaSemRespostaRepositorio>();
 
 // Serviços
 builder.Services.Configure<OpcoesFrete>(builder.Configuration.GetSection(OpcoesFrete.Secao));
@@ -100,6 +109,8 @@ builder.Services.AddScoped<ICheckoutService, CheckoutService>();
 builder.Services.AddScoped<IPedidoService, PedidoService>();
 builder.Services.AddScoped<IAdminPedidoService, AdminPedidoService>();
 builder.Services.AddScoped<IAdminCatalogoService, AdminCatalogoService>();
+builder.Services.AddScoped<IAvaliacaoService, AvaliacaoService>();
+builder.Services.AddScoped<IAssistenteService, AssistenteService>();
 
 // Avanço automático de status (demonstração; desligável na configuração).
 builder.Services.Configure<OpcoesAvancoAutomatico>(builder.Configuration.GetSection(OpcoesAvancoAutomatico.Secao));
@@ -112,6 +123,15 @@ builder.Services.AddHttpClient<IConsultaCep, ViaCepService>(cliente =>
     cliente.BaseAddress = new Uri("https://viacep.com.br/ws/");
     cliente.Timeout = TimeSpan.FromSeconds(5);
 });
+
+// Frete por distância: coordenada do CEP pela AwesomeAPI (gratuita, sem chave), guardada 24 h em memória.
+builder.Services.AddMemoryCache();
+builder.Services.AddHttpClient<ILocalizacaoCep, LocalizacaoCepService>(cliente =>
+{
+    cliente.BaseAddress = new Uri("https://cep.awesomeapi.com.br/json/");
+    cliente.Timeout = TimeSpan.FromSeconds(4);
+});
+builder.Services.AddScoped<IFreteService, FreteService>();
 
 // Limitador de tentativas (recurso nativo do ASP.NET Core): busca de pedido aceita
 // no máximo 10 tentativas por minuto por IP; passou disso, volta para a tela com aviso.
@@ -136,11 +156,53 @@ builder.Services.AddRateLimiter(opcoes =>
                 Window = TimeSpan.FromMinutes(1)
             }));
 
+    // Botão "Entrar como visitante": limite separado e mais folgado (turma inteira na mesma rede).
+    opcoes.AddPolicy(MiauShop.Areas.Admin.Controllers.ContaController.PoliticaVisitante, contexto =>
+        System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+            contexto.Connection.RemoteIpAddress?.ToString() ?? "desconhecido",
+            _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 30,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+
+    // Avaliações de produto: 3 a cada 10 minutos por IP (evita enxurrada de spam na fila de moderação).
+    opcoes.AddPolicy(MiauShop.Controllers.ProdutosController.PoliticaAvaliacao, contexto =>
+        System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+            contexto.Connection.RemoteIpAddress?.ToString() ?? "desconhecido",
+            _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 3,
+                Window = TimeSpan.FromMinutes(10)
+            }));
+
+    // Assistente da loja: 20 mensagens por minuto por IP (conversa normal fica bem abaixo disso).
+    opcoes.AddPolicy(MiauShop.Controllers.AssistenteController.Politica, contexto =>
+        System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+            contexto.Connection.RemoteIpAddress?.ToString() ?? "desconhecido",
+            _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 20,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+
     opcoes.OnRejected = (contexto, _) =>
     {
-        var destino = contexto.HttpContext.Request.Path.StartsWithSegments("/Admin")
+        var http = contexto.HttpContext;
+
+        // O chat chama pelo JavaScript: responde 429 (o chat mostra "aguarde um minuto") em vez de redirecionar.
+        if (http.Request.Path.StartsWithSegments("/Assistente"))
+        {
+            http.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+            return ValueTask.CompletedTask;
+        }
+
+        var destino = http.Request.Path.StartsWithSegments("/Admin")
             ? "/Admin/Conta/Entrar?bloqueado=true"
-            : "/Pedido/Acompanhar?bloqueado=true";
+            : http.GetRouteValue("slug") is string slug
+                // Avaliação de produto: volta para a página do produto, com o aviso.
+                ? $"/Produtos/{Uri.EscapeDataString(slug)}?bloqueado=true#avaliacoes"
+                : "/Pedido/Acompanhar?bloqueado=true";
         contexto.HttpContext.Response.Redirect(destino);
         return ValueTask.CompletedTask;
     };
@@ -153,6 +215,8 @@ using (var escopo = app.Services.CreateScope())
 {
     var contexto = escopo.ServiceProvider.GetRequiredService<AppDbContext>();
     await SeedData.InicializarAsync(contexto);
+    await SeedDetalhesProdutos.InicializarAsync(contexto);
+    await SeedAssistente.InicializarAsync(contexto);
 
     // Papéis do painel e usuários iniciais (administrador da configuração e, se ligado, o de demonstração).
     await SeedUsuarios.InicializarAsync(

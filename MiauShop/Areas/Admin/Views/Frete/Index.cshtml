@@ -1,0 +1,78 @@
+@model FreteViewModel
+@{
+    ViewData["Title"] = "Frete";
+    var podeAlterar = ViewData["PodeAlterar"] is true;
+    var formulario = Model.Formulario;
+}
+
+<h1 class="h2 mb-1">Frete por distância</h1>
+<p class="text-body-secondary mb-4">
+    Frete = valor base + (km por estrada × valor por km), até o valor máximo.
+    Compras a partir de @Model.MinimoParaFreteGratis.ToString("C0") continuam com frete grátis.
+</p>
+
+<div class="row g-4">
+    <div class="col-xl-7">
+        <form method="post" asp-action="Salvar" class="ms-form">
+            <section class="ms-form-bloco">
+                <h2 class="h5">Tabela</h2>
+                <div asp-validation-summary="All" class="alert alert-warning"></div>
+                <fieldset disabled="@(!podeAlterar)">
+                    <div class="mb-3">
+                        <label class="form-label" for="CepOrigem">CEP de origem (de onde os pedidos saem)</label>
+                        <input class="form-control" id="CepOrigem" name="CepOrigem" value="@formulario.CepOrigem" inputmode="numeric" maxlength="9" placeholder="00000-000" />
+                        <span class="ms-dica">Hoje: <strong>@Model.CidadeOrigem/@Model.UfOrigem</strong>. Ao salvar, a cidade é confirmada pelo CEP.</span>
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label" for="ValorBase">Valor base (R$)</label>
+                            <input class="form-control" id="ValorBase" name="ValorBase" inputmode="decimal" value="@formulario.ValorBase?.ToString("N2")" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="ValorPorKm">Valor por km (R$)</label>
+                            <input class="form-control" id="ValorPorKm" name="ValorPorKm" inputmode="decimal" value="@formulario.ValorPorKm?.ToString("N3")" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="ValorMaximo">Valor máximo (R$)</label>
+                            <input class="form-control" id="ValorMaximo" name="ValorMaximo" inputmode="decimal" value="@formulario.ValorMaximo?.ToString("N2")" />
+                        </div>
+                    </div>
+                    <button class="ms-botao" type="submit"><i class="bi bi-check-lg" aria-hidden="true"></i>Salvar tabela</button>
+                </fieldset>
+            </section>
+        </form>
+    </div>
+
+    <div class="col-xl-5">
+        <section class="ms-form-bloco">
+            <h2 class="h5">Simular frete</h2>
+            <form method="get" asp-action="Index" class="ms-form d-flex gap-2 mb-3">
+                <label class="visually-hidden" for="simular">CEP de destino</label>
+                <input class="form-control" id="simular" name="simular" value="@Model.CepSimulado" inputmode="numeric" maxlength="9" placeholder="CEP de destino" />
+                <button class="ms-botao ms-botao-claro ms-botao-pequeno" type="submit">Simular</button>
+            </form>
+
+            @if (Model.CepSimulado is not null && Model.Simulacao is null)
+            {
+                <p class="ms-erro mb-0">CEP não encontrado.</p>
+            }
+            else if (Model.Simulacao is { } simulacao)
+            {
+                <dl class="ms-simulacao mb-0">
+                    <div><dt>Destino</dt><dd>@simulacao.Cidade/@simulacao.Uf</dd></div>
+                    <div><dt>Distância por estrada</dt><dd>@(simulacao.Aproximado ? "≈ " : "")@simulacao.DistanciaKm km</dd></div>
+                    <div><dt>Frete (sem frete grátis)</dt><dd>@simulacao.ValorPelaDistancia.ToString("C")</dd></div>
+                    <div><dt>Transporte</dt><dd>@simulacao.DiasTransporte @(simulacao.DiasTransporte == 1 ? "dia útil" : "dias úteis") + prazo do fornecedor</dd></div>
+                </dl>
+                @if (simulacao.Aproximado)
+                {
+                    <p class="ms-dica mb-0 mt-2">Distância aproximada: o serviço de coordenadas não respondeu e foi usada a capital do estado.</p>
+                }
+            }
+            else
+            {
+                <p class="ms-dica mb-0">Digite um CEP para ver a distância, o valor e o prazo de transporte.</p>
+            }
+        </section>
+    </div>
+</div>

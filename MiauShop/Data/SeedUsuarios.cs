@@ -20,10 +20,11 @@ public static class SeedUsuarios
 
         // Administrador: só se e-mail e senha estiverem configurados no servidor.
         // A senha passa pelas regras de força do Identity e é gravada como hash (PBKDF2 + salt).
+        // Espaços nas pontas (comuns ao colar no painel do Render) são removidos.
         if (opcoes.AdministradorConfigurado)
-            await GarantirUsuarioAsync(userManager, opcoes.Email!, opcoes.Nome, opcoes.Senha, Papeis.Administrador, logger);
+            await GarantirUsuarioAsync(userManager, opcoes.Email!.Trim(), opcoes.Nome, opcoes.Senha!.Trim(), Papeis.Administrador, logger);
         else
-            logger.LogInformation("Administrador não configurado (Administrador:Email / Administrador:Senha).");
+            logger.LogWarning("Administrador não configurado: defina Administrador__Email e Administrador__Senha no servidor.");
 
         // Demonstração do portfólio: usuário Visualizador SEM senha. Não dá para entrar nele pelo
         // formulário de e-mail e senha; só pelo botão "Entrar como visitante", que existe se DemoHabilitada = true.
@@ -45,13 +46,56 @@ public static class SeedUsuarios
 
             if (!criacao.Succeeded)
             {
-                logger.LogError("Não foi possível criar o usuário {Email}: {Erros}", email,
-                    string.Join("; ", criacao.Errors.Select(e => e.Description)));
+                // Causa comum: senha fora das regras (mín. 10 caracteres, maiúscula, minúscula, número e símbolo).
+                logger.LogError("Não foi possível criar o usuário {Email}: {Erros}", email, Erros(criacao.Errors));
                 return;
             }
+        }
+        else if (senha is not null)
+        {
+            await SincronizarSenhaAsync(userManager, usuario, senha, logger);
         }
 
         if (!await userManager.IsInRoleAsync(usuario, papel))
             await userManager.AddToRoleAsync(usuario, papel);
     }
+
+    // A senha do administrador vem da configuração do servidor (Render). Antes, ela só era usada
+    // na PRIMEIRA criação do usuário: trocar a variável depois não mudava nada no banco e o login
+    // com a senha nova dava "E-mail ou senha incorretos". Agora a configuração manda.
+    private static async Task SincronizarSenhaAsync(UserManager<Usuario> userManager, Usuario usuario, string senha, ILogger logger)
+    {
+        if (await userManager.CheckPasswordAsync(usuario, senha))
+            return;
+
+        // Valida ANTES de remover a senha antiga, para nunca deixar o usuário sem senha.
+        var erros = new List<IdentityError>();
+        foreach (var validador in userManager.PasswordValidators)
+        {
+            var validacao = await validador.ValidateAsync(userManager, usuario, senha);
+            erros.AddRange(validacao.Errors);
+        }
+
+        if (erros.Count > 0)
+        {
+            logger.LogError("A senha configurada para {Email} não atende às regras e foi ignorada: {Erros}", usuario.Email, Erros(erros));
+            return;
+        }
+
+        await userManager.RemovePasswordAsync(usuario);
+        var troca = await userManager.AddPasswordAsync(usuario, senha);
+        if (!troca.Succeeded)
+        {
+            logger.LogError("Não foi possível atualizar a senha de {Email}: {Erros}", usuario.Email, Erros(troca.Errors));
+            return;
+        }
+
+        // Senha nova: zera tentativas erradas e desbloqueia (a pessoa pode ter errado tentando a senha nova).
+        await userManager.ResetAccessFailedCountAsync(usuario);
+        await userManager.SetLockoutEndDateAsync(usuario, null);
+        logger.LogInformation("Senha de {Email} atualizada a partir da configuração do servidor.", usuario.Email);
+    }
+
+    private static string Erros(IEnumerable<IdentityError> erros) =>
+        string.Join("; ", erros.Select(e => e.Description));
 }

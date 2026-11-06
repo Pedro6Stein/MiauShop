@@ -1247,3 +1247,465 @@ button.ms-botao-mais { border: 0; }
     }
     .ms-promo-texto { margin: 1rem; }
 }
+
+/* ---------- Acesso de visitante ao painel ---------- */
+
+/* O botão de visitante é um formulário (POST); fica em linha como um link. */
+.ms-form-visitante { display: inline; margin: 0; }
+
+.ms-faixa-demo {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: .25rem .75rem;
+}
+
+.ms-faixa-demo-link {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: #fff;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+}
+
+.ms-faixa-demo-link:hover { color: var(--ms-rosa); }
+
+.ms-nav-painel {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    border: 2px solid var(--ms-framboesa);
+    background: #fff;
+    color: var(--ms-framboesa);
+    font-weight: 700;
+    padding: .3rem .85rem;
+    border-radius: 999px;
+    transition: background var(--ms-transicao), color var(--ms-transicao);
+}
+
+.ms-nav-painel:hover { background: var(--ms-framboesa); color: #fff; }
+
+.ms-link-rodape {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: #fff;
+    font-weight: 700;
+    text-align: left;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+}
+
+.ms-link-rodape:hover { color: var(--ms-rosa); text-decoration: underline; }
+
+/* Convite da página inicial */
+.ms-painel-convite {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: center;
+    background: #fff;
+    border: 1px solid var(--ms-borda);
+    border-radius: 28px;
+    padding: 2rem 2.25rem;
+}
+
+.ms-painel-convite .ms-etiqueta { background: var(--ms-algodao); }
+.ms-painel-convite-texto p { color: var(--ms-ameixa-suave); }
+
+.ms-painel-convite-lista,
+.ms-cartao-visitante-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    display: grid;
+    gap: .5rem;
+}
+
+.ms-painel-convite-lista li,
+.ms-cartao-visitante-lista li { display: flex; gap: .6rem; align-items: flex-start; }
+
+.ms-painel-convite-lista i,
+.ms-cartao-visitante-lista i { color: var(--ms-framboesa); }
+
+.ms-mini-painel {
+    background: var(--ms-algodao);
+    border-radius: 20px;
+    padding: 1rem;
+    box-shadow: 0 18px 40px -24px rgba(46, 26, 36, .45);
+    transform: rotate(2deg);
+}
+
+.ms-mini-painel-topo { display: flex; gap: .35rem; margin-bottom: .85rem; }
+.ms-mini-painel-topo span { width: 10px; height: 10px; border-radius: 999px; background: var(--ms-rosa); }
+
+.ms-mini-painel-numeros { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin-bottom: .85rem; }
+.ms-mini-painel-numeros div { background: #fff; border-radius: 14px; padding: .7rem; display: grid; gap: .45rem; }
+.ms-mini-painel-numeros i { color: var(--ms-framboesa); font-size: 1.15rem; }
+.ms-mini-painel-numeros span { height: 10px; border-radius: 999px; background: var(--ms-rosa); width: 75%; }
+
+.ms-mini-painel-barras {
+    background: #fff;
+    border-radius: 14px;
+    height: 130px;
+    padding: .9rem;
+    display: flex;
+    align-items: flex-end;
+    gap: .6rem;
+}
+
+.ms-mini-painel-barras span { flex: 1; border-radius: 8px 8px 4px 4px; background: var(--ms-framboesa); opacity: .85; }
+.ms-mini-painel-barras span:nth-child(1) { height: 45%; }
+.ms-mini-painel-barras span:nth-child(2) { height: 70%; }
+.ms-mini-painel-barras span:nth-child(3) { height: 55%; background: var(--ms-menta); }
+.ms-mini-painel-barras span:nth-child(4) { height: 90%; }
+.ms-mini-painel-barras span:nth-child(5) { height: 65%; background: var(--ms-menta); }
+.ms-mini-painel-barras span:nth-child(6) { height: 80%; }
+
+/* Tela de entrada do painel */
+.ms-cartao-visitante {
+    background: var(--ms-algodao);
+    border: 2px solid var(--ms-rosa);
+    border-radius: 24px;
+    padding: 1.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.ms-cartao-visitante .ms-etiqueta { background: #fff; margin-bottom: 0; }
+
+.ms-acesso-admin {
+    background: #fff;
+    border: 1px solid var(--ms-borda);
+    border-radius: 24px;
+    padding: 1rem 1.5rem;
+}
+
+.ms-acesso-admin summary {
+    cursor: pointer;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    list-style: none;
+    padding: .25rem 0;
+}
+
+.ms-acesso-admin summary::-webkit-details-marker { display: none; }
+.ms-acesso-admin summary::after { content: "\F282"; font-family: "bootstrap-icons"; margin-left: auto; transition: transform var(--ms-transicao); }
+.ms-acesso-admin[open] summary::after { transform: rotate(180deg); }
+.ms-acesso-admin summary small { color: var(--ms-cinza-rosado); font-weight: 600; }
+.ms-acesso-admin summary i { color: var(--ms-cinza-rosado); }
+
+@media (max-width: 767.98px) {
+    .ms-painel-convite { grid-template-columns: 1fr; padding: 1.5rem; }
+    .ms-painel-convite-ilustracao { order: -1; }
+    .ms-mini-painel { transform: none; }
+    .ms-mini-painel-barras { height: 90px; }
+    .ms-nav-painel { padding: .3rem .6rem; }
+    .ms-cartao-visitante { padding: 1.25rem; }
+}
+
+/* ---------- Página do produto: ficha técnica e avaliações ---------- */
+
+.ms-estrelas { display: inline-flex; gap: .1rem; color: #E8A317; line-height: 1; }
+
+.ms-detalhe-nota {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    color: var(--ms-ameixa-suave);
+    font-size: .92rem;
+    margin-bottom: .75rem;
+}
+
+.ms-detalhe-nota:hover span { text-decoration: underline; }
+.ms-detalhe-nota > .bi-star { color: #E8A317; }
+
+/* Em coluna, a descrição ocupa a largura toda. */
+.row .ms-detalhe-descricao { max-width: none; }
+
+.ms-diferenciais { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; }
+.ms-diferenciais li { display: flex; gap: .6rem; align-items: flex-start; }
+.ms-diferenciais i { color: var(--ms-menta); margin-top: .1rem; }
+
+.ms-ficha {
+    background: var(--ms-algodao);
+    border-radius: 24px;
+    padding: 2rem;
+}
+
+.ms-ficha dl > div {
+    display: grid;
+    grid-template-columns: minmax(0, 9.5rem) minmax(0, 1fr);
+    gap: .75rem;
+    padding: .65rem 0;
+    border-bottom: 1px dashed var(--ms-rosa);
+}
+
+.ms-ficha dl > div:last-child { border-bottom: 0; }
+.ms-ficha dt { font-weight: 700; display: flex; gap: .5rem; align-items: center; }
+.ms-ficha dt i { color: var(--ms-framboesa); }
+.ms-ficha dd { margin: 0; color: var(--ms-ameixa-suave); }
+
+.ms-avaliacoes-resumo {
+    background: #fff;
+    border: 1px solid var(--ms-borda);
+    border-radius: 24px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.ms-avaliacoes-media { font-family: var(--ms-fonte-titulo); font-size: 3rem; font-weight: 600; line-height: 1; }
+.ms-avaliacoes-resumo .ms-estrelas { font-size: 1.2rem; margin: .4rem 0; }
+.ms-avaliacoes-vazio { font-size: 2.2rem; color: var(--ms-framboesa); }
+
+.ms-avaliacoes-barras { list-style: none; padding: 0; margin: 0; display: grid; gap: .35rem; font-size: .85rem; }
+.ms-avaliacoes-barras li { display: grid; grid-template-columns: 2.4rem minmax(0, 1fr) 1.8rem; align-items: center; gap: .5rem; }
+.ms-avaliacoes-barras .bi { color: #E8A317; font-size: .75rem; }
+.ms-avaliacoes-trilho { height: 8px; border-radius: 999px; background: var(--ms-algodao); overflow: hidden; }
+.ms-avaliacoes-barra { display: block; height: 100%; border-radius: 999px; background: #E8A317; }
+.ms-avaliacoes-qtd { text-align: right; color: var(--ms-cinza-rosado); }
+
+.ms-avaliacoes-lista { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; }
+
+.ms-avaliacoes-lista li {
+    background: #fff;
+    border: 1px solid var(--ms-borda);
+    border-radius: 20px;
+    padding: 1.15rem 1.35rem;
+}
+
+/* Escolha da nota: o HTML vem de 5 para 1 e o row-reverse mostra 1 → 5.
+   "~" pinta a estrela escolhida e as anteriores (que vêm depois no HTML). */
+.ms-estrelas-escolha { display: inline-flex; flex-direction: row-reverse; gap: .2rem; }
+.ms-estrelas-escolha label { font-size: 1.75rem; color: var(--ms-borda); cursor: pointer; transition: color var(--ms-transicao), transform var(--ms-transicao); }
+.ms-estrelas-escolha label:hover,
+.ms-estrelas-escolha label:hover ~ label,
+.ms-estrelas-escolha input:checked ~ label { color: #E8A317; }
+.ms-estrelas-escolha label:hover { transform: scale(1.12); }
+.ms-estrelas-escolha input:focus-visible + label { outline: 3px solid var(--ms-framboesa); outline-offset: 2px; border-radius: 6px; }
+
+.ms-pote { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+@media (max-width: 575.98px) {
+    .ms-ficha { padding: 1.5rem; }
+    .ms-ficha dl > div { grid-template-columns: 1fr; gap: .15rem; }
+}
+
+/* Celulares estreitos: o botão "Painel" do topo mostra só o ícone (o texto continua para leitores de tela). */
+@media (max-width: 419.98px) {
+    .ms-nav-painel { padding: .3rem .55rem; }
+    .ms-nav-painel > span:first-of-type {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+    }
+}
+
+/* ---------- Frete por distância ---------- */
+
+.ms-frete-pendente { color: var(--ms-cinza-rosado); font-weight: 600; }
+
+.ms-frete-detalhe {
+    display: grid;
+    gap: .2rem;
+    font-size: .85rem;
+    color: var(--ms-ameixa-suave);
+    background: var(--ms-algodao);
+    border-radius: 14px;
+    padding: .65rem .85rem;
+    margin: -.5rem 0 1.25rem;
+}
+
+.ms-frete-detalhe i { color: var(--ms-framboesa); }
+
+.ms-calcular-frete { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px dashed var(--ms-borda); }
+.ms-calcular-frete .form-label { font-size: .85rem; }
+
+.ms-simulacao > div { display: flex; justify-content: space-between; gap: 1rem; padding: .45rem 0; border-bottom: 1px dashed var(--ms-borda); }
+.ms-simulacao > div:last-child { border-bottom: 0; }
+.ms-simulacao dt { font-weight: 600; }
+.ms-simulacao dd { margin: 0; font-weight: 700; text-align: right; }
+
+/* ---------- Assistente "Ajuda" ---------- */
+
+.ms-assistente {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 1045; /* acima do cabeçalho, abaixo das janelas (modais) do Bootstrap */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: .75rem;
+}
+
+.ms-assistente-botao {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    border: 0;
+    border-radius: 999px;
+    padding: .75rem 1.2rem;
+    background: var(--ms-ameixa);
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 12px 30px -12px rgba(46, 26, 36, .6);
+    transition: transform var(--ms-transicao), background var(--ms-transicao);
+}
+
+.ms-assistente-botao i { color: var(--ms-rosa); font-size: 1.2rem; }
+.ms-assistente-botao:hover { background: var(--ms-framboesa); transform: translateY(-2px); }
+.ms-assistente.aberto .ms-assistente-botao { display: none; }
+
+.ms-assistente-painel {
+    width: min(380px, calc(100vw - 2rem));
+    height: min(560px, calc(100vh - 6rem));
+    background: var(--ms-creme);
+    border: 1px solid var(--ms-borda);
+    border-radius: 24px;
+    box-shadow: 0 24px 60px -20px rgba(46, 26, 36, .45);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.ms-assistente-painel[hidden] { display: none; }
+
+.ms-assistente-topo {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    background: var(--ms-ameixa);
+    color: #fff;
+    padding: .85rem 1rem;
+}
+
+.ms-assistente-topo small { display: block; color: var(--ms-rosa); font-size: .75rem; }
+
+.ms-assistente-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    background: var(--ms-framboesa);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ms-assistente-mensagens {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.ms-chat-resposta { display: flex; flex-direction: column; gap: .5rem; align-items: flex-start; }
+
+.ms-chat-msg {
+    max-width: 88%;
+    margin: 0;
+    padding: .6rem .85rem;
+    border-radius: 16px;
+    font-size: .92rem;
+    line-height: 1.4;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.ms-chat-loja { background: #fff; border: 1px solid var(--ms-borda); border-bottom-left-radius: 4px; }
+.ms-chat-cliente { align-self: flex-end; background: var(--ms-framboesa); color: #fff; border-bottom-right-radius: 4px; }
+.ms-chat-erro { border-color: #F2C94C; background: #FFF8E1; }
+
+.ms-chat-opcoes { display: flex; flex-direction: column; gap: .35rem; width: 100%; }
+
+.ms-chat-opcoes button {
+    text-align: left;
+    border: 1px solid var(--ms-rosa);
+    background: var(--ms-algodao);
+    color: var(--ms-ameixa);
+    border-radius: 12px;
+    padding: .45rem .75rem;
+    font-size: .88rem;
+    font-weight: 600;
+    transition: background var(--ms-transicao);
+}
+
+.ms-chat-opcoes button b { color: var(--ms-framboesa); margin-right: .35rem; }
+.ms-chat-opcoes button:hover:not(:disabled) { background: var(--ms-rosa); }
+.ms-chat-opcoes button:disabled { opacity: .5; cursor: default; }
+
+.ms-chat-produtos { list-style: none; padding: 0; margin: 0; width: 100%; display: grid; gap: .4rem; }
+
+.ms-chat-produtos a {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: .6rem;
+    background: #fff;
+    border: 1px solid var(--ms-borda);
+    border-radius: 14px;
+    padding: .4rem .6rem .4rem .4rem;
+    color: var(--ms-ameixa);
+    font-size: .85rem;
+    font-weight: 600;
+}
+
+.ms-chat-produtos img { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; background: var(--ms-rosa); }
+.ms-chat-produtos strong { color: var(--ms-framboesa); white-space: nowrap; }
+.ms-chat-produtos a:hover { border-color: var(--ms-rosa); }
+
+.ms-chat-link { font-size: .88rem; font-weight: 700; }
+
+.ms-assistente-form {
+    display: flex;
+    gap: .5rem;
+    padding: .75rem;
+    border-top: 1px solid var(--ms-borda);
+    background: #fff;
+}
+
+.ms-assistente-form input[name="texto"] {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid var(--ms-borda);
+    border-radius: 999px;
+    padding: .55rem .9rem;
+    font-size: .92rem;
+}
+
+.ms-assistente-form input[name="texto"]:focus { outline: none; border-color: var(--ms-framboesa); box-shadow: 0 0 0 3px rgba(201, 45, 99, .12); }
+
+.ms-assistente-form button {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 999px;
+    background: var(--ms-framboesa);
+    color: #fff;
+}
+
+/* O aviso "Adicionado ao carrinho" sobe um pouco para não cobrir o botão "Ajuda". */
+.toast-container { margin-bottom: 4rem; }
+
+@media (max-width: 575.98px) {
+    .ms-assistente { right: .75rem; bottom: .75rem; }
+    .ms-assistente-botao span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .ms-assistente-botao { padding: .85rem; }
+    .ms-assistente-painel { height: calc(100vh - 1.5rem); width: calc(100vw - 1.5rem); }
+}
+
+@media print { .ms-assistente { display: none; } }

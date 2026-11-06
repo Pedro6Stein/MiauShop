@@ -66,6 +66,29 @@
                 </section>
 
                 <section class="ms-form-bloco">
+                    <h2 class="h5">Ficha técnica</h2>
+                    <p class="ms-dica mt-0">Opcional. Só o que for preenchido aparece na página do produto.</p>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="Formulario.Material" class="form-label"></label>
+                            <input asp-for="Formulario.Material" class="form-control" placeholder="Ex.: Algodão 100%" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Formulario.Garantia" class="form-label"></label>
+                            <input asp-for="Formulario.Garantia" class="form-control" placeholder="Ex.: 90 dias contra defeitos de fabricação" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Formulario.Medidas" class="form-label"></label>
+                            <input asp-for="Formulario.Medidas" class="form-control" placeholder="Ex.: P: 25 cm · M: 32 cm · G: 40 cm" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Formulario.Caracteristicas" class="form-label"></label>
+                            <textarea asp-for="Formulario.Caracteristicas" class="form-control" rows="3" placeholder="Lavável na máquina&#10;Não solta pelos"></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="ms-form-bloco">
                     <h2 class="h5">Imagem</h2>
                     <div class="d-flex gap-3 align-items-start">
                         <img class="ms-preview-imagem" src="@formulario.ImagemUrl" alt="" width="120" height="120" data-preview-imagem />

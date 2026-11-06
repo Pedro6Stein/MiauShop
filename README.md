@@ -8,7 +8,7 @@ Projeto acadêmico de **Negócios Eletrônicos** (Fatec Bragança Paulista), con
 [![ASP.NET Core MVC](https://img.shields.io/badge/ASP.NET%20Core-MVC-512BD4)](https://learn.microsoft.com/aspnet/core/mvc/overview)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-4169E1?logo=postgresql&logoColor=white)](https://neon.tech/)
 [![Render](https://img.shields.io/badge/deploy-Render-46E3B7?logo=render&logoColor=white)](https://miaushop.onrender.com)
-[![Testes](https://img.shields.io/badge/testes-32%20passando-1F9E86)](MiauShop.Tests)
+[![Testes](https://img.shields.io/badge/testes-88%20passando-1F9E86)](MiauShop.Tests)
 
 ### 🔗 [miaushop.onrender.com](https://miaushop.onrender.com)
 
@@ -18,6 +18,7 @@ Projeto acadêmico de **Negócios Eletrônicos** (Fatec Bragança Paulista), con
 
 > ⚠️ **Projeto demonstrativo.** Nenhuma compra é real e nenhum pagamento é processado: na hora de pagar, o sistema bloqueia e avisa.
 > No plano gratuito do Render o site "dorme" após 15 minutos sem visitas — o primeiro acesso pode levar até 1 minuto.
+> Para evitar isso, uma [GitHub Action](.github/workflows/manter-acordado.yml) acessa o site a cada 10 minutos das 8h às 22h.
 
 ---
 
@@ -56,7 +57,10 @@ Projeto acadêmico de **Negócios Eletrônicos** (Fatec Bragança Paulista), con
 ### Loja
 - Vitrine com destaques e promoções, catálogo com **filtros** (cães/gatos, categoria, faixa de preço, promoção), **busca** e **6 ordenações**
 - Produtos com **variações** (tamanhos) que podem ter preço diferente; preço promocional com selo de desconto
+- Página do produto com **ficha técnica** (material, medidas, garantia), **diferenciais** e **avaliações de clientes** (estrelas, média e distribuição por nota)
 - **Carrinho sem login** (sessão), com barra de **frete grátis** acima de R$ 150
+- **Frete por distância**: o cliente digita o CEP e o servidor calcula a distância até a loja (Bragança Paulista por padrão), o valor e o prazo de entrega
+- **Assistente "Ajuda"** (chat): menu numerado com dúvidas frequentes, busca de produtos, cálculo de frete e status do pedido — sem IA, respostas cadastradas no painel
 - **Checkout em duas etapas**: dados com **endereço preenchido pelo CEP** (ViaCEP, validado no servidor) → pagamento simulado e bloqueado
 - **Acompanhamento do pedido** por número + e-mail, com linha do tempo e limite de tentativas
 
@@ -64,7 +68,10 @@ Projeto acadêmico de **Negócios Eletrônicos** (Fatec Bragança Paulista), con
 - **Dashboard**: pedidos, faturamento, ticket médio, pedidos por status e mais vendidos
 - **Pedidos**: filtro por status, busca, detalhe, mudança de status (só transições válidas) e **cancelamento com motivo obrigatório**
 - **Produtos** com variações e imagem, **categorias** e **fornecedores**
-- Perfis **Administrador** (altera tudo) e **Visualizador** (somente leitura) — o acesso "visitante" do portfólio usa o Visualizador
+- **Avaliações**: as enviadas pelos clientes entram pendentes e só aparecem na loja depois de aprovadas
+- **Frete**: CEP de origem e tabela (valor base, valor por km, máximo) editáveis, com simulador por CEP
+- **Assistente**: perguntas e respostas com palavras-chave e a lista de dúvidas que ele não soube responder (vira resposta com um clique)
+- Perfis **Administrador** (altera tudo) e **Visualizador** (somente leitura) — o acesso "visitante" do portfólio usa o Visualizador, com botão **"Painel"** no topo da loja (um clique, sem senha)
 
 ---
 
@@ -86,8 +93,9 @@ A modelagem completa (requisitos, diagramas de classes e fluxos) está em [`docs
 ## Segurança
 
 - Senhas guardadas só como **hash** (PBKDF2 + HMAC-SHA512, 100 mil iterações, salt por usuário — padrão do Identity)
-- **Bloqueio** da conta após 5 senhas erradas e **limite de tentativas por IP** no login e na busca de pedidos
-- Cookie de login `HttpOnly`, `Secure` e `SameSite=Strict`; **token antifalsificação** em todo formulário
+- **Bloqueio** da conta após 5 senhas erradas e **limite de tentativas por IP** no login, na busca de pedidos e no envio de avaliações
+- Cookie de login `HttpOnly`, `Secure` e `SameSite=Lax`; **token antifalsificação** em todo formulário
+- Avaliações com **moderação** e campo "pote de mel" contra robôs
 - Leitura/escrita no banco só pelo Entity Framework (consultas parametrizadas — sem SQL concatenado)
 - Cabeçalhos de segurança: **CSP**, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, HSTS
 - Nenhum segredo no repositório: conexão do banco e senha do administrador em **variáveis de ambiente** (Render) e **user secrets** (local)
@@ -118,7 +126,7 @@ MiauShop.Tests/       # testes xUnit das regras de negócio
 **Back-end:** C# · ASP.NET Core MVC (.NET 10 LTS) · Entity Framework Core 10 · ASP.NET Core Identity · xUnit
 **Banco:** PostgreSQL 18 (Neon na nuvem · Docker no desenvolvimento)
 **Front-end:** Razor · Bootstrap 5 com identidade visual própria · Bootstrap Icons · GSAP
-**Integrações:** ViaCEP (endereço pelo CEP) · Mercado Pago Payment Brick (preparado, ligado por configuração)
+**Integrações:** ViaCEP (endereço pelo CEP) · AwesomeAPI (coordenadas do CEP para o frete) · Mercado Pago Payment Brick (preparado, ligado por configuração)
 **Deploy:** Docker · Render · Neon
 
 ## Como rodar localmente
@@ -144,12 +152,18 @@ dotnet test
 
 | Chave | Para quê |
 |---|---|
-| `Frete:ValorFixo` / `Frete:MinimoParaFreteGratis` | Regras do frete |
+| `Frete:MinimoParaFreteGratis` | Valor de compra a partir do qual o frete é grátis |
+| `Frete:ValorFixo` | Frete usado só se os serviços de CEP estiverem fora do ar (a tabela por distância fica no painel) |
 | `AvancoAutomatico:Habilitado` | Status do pedido avança sozinho (demonstração) — `false` para uso real |
 | `Administrador:DemoHabilitada` | Botão "Entrar como visitante" — `false` para uso real |
 | `MercadoPago:PublicKey` | Liga o Payment Brick do Mercado Pago (modo teste) |
 
 No Render, as mesmas chaves viram variáveis de ambiente com `__` (ex.: `ConnectionStrings__MiauShop`, `Administrador__Senha`).
+A senha do administrador segue a configuração: trocar `Administrador__Senha` no Render e reiniciar atualiza a senha no banco (ela precisa ter 10+ caracteres, maiúscula, minúscula, número e símbolo — se não tiver, o log do Render avisa o motivo).
+
+## Próximas etapas
+
+- **Agente de IA no atendimento (opcional)**: o assistente atual é por regras para manter o projeto gratuito, mas já usa os serviços da loja como "ferramentas" — trocar o roteiro por um modelo de linguagem é o próximo passo natural. Detalhes em [`docs/proxima-etapa-assistente-ia.md`](docs/proxima-etapa-assistente-ia.md).
 
 ---
 

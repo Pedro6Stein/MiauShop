@@ -180,6 +180,10 @@ public class AdminCatalogoService(
                 Nome = produto.Nome,
                 DescricaoCurta = produto.DescricaoCurta,
                 Descricao = produto.Descricao,
+                Material = produto.Material,
+                Medidas = produto.Medidas,
+                Garantia = produto.Garantia,
+                Caracteristicas = produto.Caracteristicas,
                 CategoriaId = produto.CategoriaId,
                 FornecedorId = produto.FornecedorId,
                 Animal = produto.Animal,
@@ -231,6 +235,10 @@ public class AdminCatalogoService(
         produto.Nome = formulario.Nome.Trim();
         produto.DescricaoCurta = formulario.DescricaoCurta.Trim();
         produto.Descricao = formulario.Descricao.Trim();
+        produto.Material = TextoOpcional(formulario.Material);
+        produto.Medidas = TextoOpcional(formulario.Medidas);
+        produto.Garantia = TextoOpcional(formulario.Garantia);
+        produto.Caracteristicas = TextoOpcional(formulario.Caracteristicas);
         produto.CategoriaId = categoria.Id;
         produto.FornecedorId = fornecedor.Id;
         produto.Animal = formulario.Animal;
@@ -288,4 +296,8 @@ public class AdminCatalogoService(
         await produtoRepositorio.SalvarAsync();
         return [];
     }
+
+    // Campo opcional: vazio vira null (a loja só mostra o que foi preenchido).
+    private static string? TextoOpcional(string? texto) =>
+        string.IsNullOrWhiteSpace(texto) ? null : texto.Trim();
 }

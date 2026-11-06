@@ -44,6 +44,7 @@ public class CheckoutController(
             return View(new CheckoutViewModel { Dados = dados, Carrinho = carrinho });
 
         HttpContext.Session.SetString(ChaveDados, JsonSerializer.Serialize(dados));
+        carrinhoService.DefinirCep(dados.Cep); // frete por distância até o CEP de entrega
         return RedirectToAction(nameof(Pagamento));
     }
 
@@ -85,6 +86,9 @@ public class CheckoutController(
 
         try
         {
+            // Garante que o frete do pedido é o do CEP de entrega (o cliente pode ter calculado outro CEP no carrinho).
+            carrinhoService.DefinirCep(dados.Cep);
+
             var pedidoId = await checkoutService.FinalizarAsync(
                 dados.Nome.Trim(), dados.Email, dados.Telefone.Trim(), dados.ParaEndereco(), forma.Value);
 

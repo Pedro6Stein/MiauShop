@@ -134,5 +134,6 @@ public class ProdutoRepositorio(AppDbContext contexto) : Repositorio<Produto>(co
         Contexto.ProdutoVariacoes.AsNoTracking()
             .Where(v => variacaoIds.Contains(v.Id) && v.Ativa && v.Produto.Ativo)
             .Include(v => v.Produto).ThenInclude(p => p.Imagens)
+            .Include(v => v.Produto).ThenInclude(p => p.Fornecedor) // prazo de envio (prazo de entrega no carrinho)
             .ToListAsync();
 }

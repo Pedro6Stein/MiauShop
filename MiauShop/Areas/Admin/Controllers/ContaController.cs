@@ -26,6 +26,7 @@ public class LoginAdmin
 [Area("Admin")]
 [AllowAnonymous]
 [AutoValidateAntiforgeryToken]
+[FormularioDesatualizado]
 public class ContaController(
     SignInManager<Usuario> signInManager,
     UserManager<Usuario> userManager,
@@ -33,14 +34,16 @@ public class ContaController(
     ILogger<ContaController> logger) : Controller
 {
     public const string PoliticaLogin = "login-admin";
+    public const string PoliticaVisitante = "login-visitante";
     private const string MensagemLoginInvalido = "E-mail ou senha incorretos.";
 
     // GET /Admin/Conta/Entrar
     [HttpGet]
-    public IActionResult Entrar(bool bloqueado = false)
+    public IActionResult Entrar(bool bloqueado = false, bool desatualizado = false)
     {
         ViewData["Bloqueado"] = bloqueado;
-        ViewData["DemoHabilitada"] = opcoes.Value.DemoHabilitada;
+        ViewData["Desatualizado"] = desatualizado;
+        PrepararTela();
         return View(new LoginAdmin());
     }
 
@@ -49,7 +52,11 @@ public class ContaController(
     [EnableRateLimiting(PoliticaLogin)]
     public async Task<IActionResult> Entrar(LoginAdmin login)
     {
-        ViewData["DemoHabilitada"] = opcoes.Value.DemoHabilitada;
+        PrepararTela();
+        ViewData["MostrarFormularioAdmin"] = true;
+
+        // Espaços colados sem querer no e-mail não podem impedir o login.
+        login.Email = login.Email?.Trim() ?? string.Empty;
 
         if (!ModelState.IsValid)
             return View(login);
@@ -85,8 +92,10 @@ public class ContaController(
 
     // POST /Admin/Conta/EntrarComoVisitante — acesso de demonstração (papel Visualizador, sem senha).
     // Só funciona se Administrador:DemoHabilitada = true na configuração.
+    // Limite próprio, mais folgado: uma turma inteira na mesma rede (mesmo IP) consegue entrar
+    // sem gastar as tentativas do login com senha.
     [HttpPost]
-    [EnableRateLimiting(PoliticaLogin)]
+    [EnableRateLimiting(PoliticaVisitante)]
     public async Task<IActionResult> EntrarComoVisitante()
     {
         if (!opcoes.Value.DemoHabilitada)
@@ -109,15 +118,35 @@ public class ContaController(
         return Redirect("/");
     }
 
+    private void PrepararTela()
+    {
+        ViewData["DemoHabilitada"] = opcoes.Value.DemoHabilitada;
+
+        // Já conectado (ex.: entrou como visitante antes): mostra atalho para o painel.
+        if (User.Identity?.IsAuthenticated == true && Papeis.Todos.Any(User.IsInRole))
+            ViewData["ConectadoComo"] = User.Identity.Name;
+    }
+
     private async Task<bool> TemAcessoAoPainelAsync(Usuario usuario)
     {
         var papeis = await userManager.GetRolesAsync(usuario);
         return papeis.Any(Papeis.Todos.Contains);
     }
 
+    // "Último acesso" é só informativo: se não der para gravar, o login segue normalmente.
     private async Task RegistrarAcessoAsync(Usuario usuario)
     {
-        usuario.RegistrarAcesso();
-        await userManager.UpdateAsync(usuario);
+        try
+        {
+            usuario.RegistrarAcesso();
+            var resultado = await userManager.UpdateAsync(usuario);
+            if (!resultado.Succeeded)
+                logger.LogWarning("Não foi possível registrar o último acesso de {Email}: {Erros}", usuario.Email,
+                    string.Join("; ", resultado.Errors.Select(e => e.Description)));
+        }
+        catch (Exception erro)
+        {
+            logger.LogWarning(erro, "Não foi possível registrar o último acesso de {Email}", usuario.Email);
+        }
     }
 }
