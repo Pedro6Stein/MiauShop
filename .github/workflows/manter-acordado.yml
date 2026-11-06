@@ -1,0 +1,22 @@
+# Mantém o site acordado no plano gratuito do Render.
+# O Render "dorme" o site após 15 minutos sem visitas e o próximo acesso mostra uma tela de
+# carregamento por até 1 minuto. Este agendamento acessa a rota /saude a cada 10 minutos.
+#
+# - /saude não consulta o banco: o Neon continua dormindo quando ninguém usa a loja.
+# - Só das 8h às 22h (horário de Brasília) para não gastar as 750 horas grátis do Render
+#   à toa (essas horas são divididas entre todos os serviços gratuitos da conta).
+# - Agendamentos do GitHub só rodam na branch principal e podem atrasar alguns minutos.
+name: Manter o site acordado
+
+on:
+  schedule:
+    - cron: "*/10 11-23,0 * * *"   # UTC: 11h–00h50 = 8h–21h50 em Brasília
+  workflow_dispatch:                # botão "Run workflow" para testar na mão
+
+jobs:
+  acessar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Acessar a rota de saúde
+        run: curl --silent --show-error --fail --max-time 120 --retry 2 --retry-delay 10 -o /dev/null -w "HTTP %{http_code} em %{time_total}s\n" https://miaushop.onrender.com/saude
