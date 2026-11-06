@@ -15,8 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Banco de dados: a string de conexão vem do appsettings (local) ou de variável de ambiente (produção).
+// EnableRetryOnFailure: o Neon gratuito "dorme" o banco após alguns minutos parado e a primeira
+// conexão pode falhar enquanto ele acorda; o EF tenta de novo sozinho em vez de mostrar erro.
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("MiauShop")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("MiauShop"),
+        npgsql => npgsql.EnableRetryOnFailure(maxRetryCount: 3)));
 
 // ---------- Hospedagem (Render) ----------
 
@@ -63,7 +66,11 @@ builder.Services.ConfigureApplicationCookie(opcoes =>
 {
     opcoes.Cookie.Name = "MiauShop.Admin";
     opcoes.Cookie.HttpOnly = true;                       // JavaScript não lê o cookie
-    opcoes.Cookie.SameSite = SameSiteMode.Strict;        // não é enviado a partir de outros sites
+    // Lax (padrão do Identity): o cookie vai junto quando a pessoa chega por um link de outro site
+    // (README do GitHub, WhatsApp...). Com Strict, quem já estava logado e chegava por link recebia o
+    // formulário gerado como "anônimo" e o envio quebrava com erro 400 do token antifalsificação.
+    // POSTs vindos de outros sites continuam bloqueados (Lax não envia o cookie neles + token antifalsificação).
+    opcoes.Cookie.SameSite = SameSiteMode.Lax;
     opcoes.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
         ? CookieSecurePolicy.SameAsRequest
         : CookieSecurePolicy.Always;                     // em produção, só por HTTPS
@@ -133,6 +140,16 @@ builder.Services.AddRateLimiter(opcoes =>
             _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
             {
                 PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+
+    // Botão "Entrar como visitante": limite separado e mais folgado (turma inteira na mesma rede).
+    opcoes.AddPolicy(MiauShop.Areas.Admin.Controllers.ContaController.PoliticaVisitante, contexto =>
+        System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+            contexto.Connection.RemoteIpAddress?.ToString() ?? "desconhecido",
+            _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 30,
                 Window = TimeSpan.FromMinutes(1)
             }));
 

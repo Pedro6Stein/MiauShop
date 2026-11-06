@@ -8,11 +8,13 @@ namespace MiauShop.Areas.Admin.Controllers;
 // Base de TODOS os controllers do painel:
 // - [Authorize(Roles)]: só usuários com papel Administrador ou Visualizador entram em /Admin.
 // - [AutoValidateAntiforgeryToken]: todo POST exige o token antifalsificação.
+// - [FormularioDesatualizado]: token que não confere vira aviso na tela em vez de página em branco (400).
 // - OnActionExecuting: qualquer requisição que altera dados (POST/PUT/DELETE) exige o papel Administrador.
 //   É aqui que o Visualizador vira "somente leitura" de verdade, no servidor.
 [Area("Admin")]
 [Authorize(Roles = Papeis.AcessoAoPainel)]
 [AutoValidateAntiforgeryToken]
+[FormularioDesatualizado]
 public abstract class AdminControllerBase : Controller
 {
     public const string MensagemSomenteLeitura =
