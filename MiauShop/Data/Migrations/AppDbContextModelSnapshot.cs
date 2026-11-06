@@ -399,6 +399,81 @@ namespace MiauShop.Data.Migrations
                     b.ToTable("Pedidos", (string)null);
                 });
 
+            modelBuilder.Entity("MiauShop.Models.Entities.PerguntaFrequente", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Ativa")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("AtualizadoEm")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Ordem")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PalavrasChave")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Pergunta")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("Resposta")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PerguntasFrequentes", (string)null);
+                });
+
+            modelBuilder.Entity("MiauShop.Models.Entities.PerguntaSemResposta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AtualizadoEm")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Texto")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("TextoNormalizado")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("Vezes")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TextoNormalizado")
+                        .IsUnique();
+
+                    b.ToTable("PerguntasSemResposta", (string)null);
+                });
+
             modelBuilder.Entity("MiauShop.Models.Entities.Produto", b =>
                 {
                     b.Property<int>("Id")

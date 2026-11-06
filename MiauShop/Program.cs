@@ -98,6 +98,7 @@ builder.Services.AddScoped(typeof(IRepositorio<>), typeof(Repositorio<>));
 builder.Services.AddScoped<IProdutoRepositorio, ProdutoRepositorio>();
 builder.Services.AddScoped<IPedidoRepositorio, PedidoRepositorio>();
 builder.Services.AddScoped<IAvaliacaoRepositorio, AvaliacaoRepositorio>();
+builder.Services.AddScoped<IPerguntaSemRespostaRepositorio, PerguntaSemRespostaRepositorio>();
 
 // Serviços
 builder.Services.Configure<OpcoesFrete>(builder.Configuration.GetSection(OpcoesFrete.Secao));
@@ -109,6 +110,7 @@ builder.Services.AddScoped<IPedidoService, PedidoService>();
 builder.Services.AddScoped<IAdminPedidoService, AdminPedidoService>();
 builder.Services.AddScoped<IAdminCatalogoService, AdminCatalogoService>();
 builder.Services.AddScoped<IAvaliacaoService, AvaliacaoService>();
+builder.Services.AddScoped<IAssistenteService, AssistenteService>();
 
 // Avanço automático de status (demonstração; desligável na configuração).
 builder.Services.Configure<OpcoesAvancoAutomatico>(builder.Configuration.GetSection(OpcoesAvancoAutomatico.Secao));
@@ -174,9 +176,27 @@ builder.Services.AddRateLimiter(opcoes =>
                 Window = TimeSpan.FromMinutes(10)
             }));
 
+    // Assistente da loja: 20 mensagens por minuto por IP (conversa normal fica bem abaixo disso).
+    opcoes.AddPolicy(MiauShop.Controllers.AssistenteController.Politica, contexto =>
+        System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+            contexto.Connection.RemoteIpAddress?.ToString() ?? "desconhecido",
+            _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 20,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+
     opcoes.OnRejected = (contexto, _) =>
     {
         var http = contexto.HttpContext;
+
+        // O chat chama pelo JavaScript: responde 429 (o chat mostra "aguarde um minuto") em vez de redirecionar.
+        if (http.Request.Path.StartsWithSegments("/Assistente"))
+        {
+            http.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+            return ValueTask.CompletedTask;
+        }
+
         var destino = http.Request.Path.StartsWithSegments("/Admin")
             ? "/Admin/Conta/Entrar?bloqueado=true"
             : http.GetRouteValue("slug") is string slug
@@ -196,6 +216,7 @@ using (var escopo = app.Services.CreateScope())
     var contexto = escopo.ServiceProvider.GetRequiredService<AppDbContext>();
     await SeedData.InicializarAsync(contexto);
     await SeedDetalhesProdutos.InicializarAsync(contexto);
+    await SeedAssistente.InicializarAsync(contexto);
 
     // Papéis do painel e usuários iniciais (administrador da configuração e, se ligado, o de demonstração).
     await SeedUsuarios.InicializarAsync(

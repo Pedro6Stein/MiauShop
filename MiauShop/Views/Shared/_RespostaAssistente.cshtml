@@ -1,0 +1,41 @@
+@model RespostaAssistente
+@* Uma resposta do assistente. data-etapa / data-contexto / data-dica: o JavaScript guarda e devolve na próxima mensagem. *@
+<div class="ms-chat-resposta" data-resposta data-etapa="@Model.Etapa" data-contexto="@Model.Contexto" data-dica="@Model.Dica">
+    @foreach (var mensagem in Model.Mensagens)
+    {
+        <p class="ms-chat-msg ms-chat-loja">@mensagem</p>
+    }
+
+    @if (Model.Produtos.Count > 0)
+    {
+        <ul class="ms-chat-produtos">
+            @foreach (var produto in Model.Produtos)
+            {
+                <li>
+                    <a href="@produto.Url">
+                        <img src="@produto.ImagemUrl" alt="" width="48" height="48" loading="lazy" />
+                        <span>@produto.Nome</span>
+                        <strong>@produto.Preco.ToString("C")</strong>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+
+    @foreach (var link in Model.Links)
+    {
+        <a class="ms-chat-link" href="@link.Url">@link.Texto <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+    }
+
+    @if (Model.Opcoes.Count > 0)
+    {
+        <div class="ms-chat-opcoes" role="group" aria-label="Opções">
+            @foreach (var opcao in Model.Opcoes)
+            {
+                <button type="button" data-assistente-opcao="@opcao.Valor" data-rotulo="@opcao.Texto">
+                    <b>@opcao.Valor</b> @opcao.Texto
+                </button>
+            }
+        </div>
+    }
+</div>

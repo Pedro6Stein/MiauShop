@@ -224,3 +224,100 @@ window.miauAtualizarCarrinho = quantidade => {
         icone.classList.add('ms-pulando');
     }
 };
+
+// ---------- Assistente "Ajuda" ----------
+// O roteiro da conversa fica no servidor (AssistenteService). Aqui só: abrir/fechar, mostrar a mensagem
+// do cliente, enviar e colocar na tela o HTML que o servidor devolve (com a próxima etapa da conversa).
+const assistente = document.querySelector('[data-assistente]');
+
+if (assistente) {
+    const painel = assistente.querySelector('[data-assistente-painel]');
+    const botaoAbrir = assistente.querySelector('[data-assistente-abrir]');
+    const lista = assistente.querySelector('[data-assistente-mensagens]');
+    const form = assistente.querySelector('[data-assistente-form]');
+    const campo = form.querySelector('[name="texto"]');
+    let iniciado = false;
+
+    const rolarParaOFim = () => { lista.scrollTop = lista.scrollHeight; };
+
+    const mostrarAviso = texto => {
+        const aviso = document.createElement('p');
+        aviso.className = 'ms-chat-msg ms-chat-loja ms-chat-erro';
+        aviso.textContent = texto;
+        lista.append(aviso);
+        rolarParaOFim();
+    };
+
+    const receber = html => {
+        // Botões de respostas anteriores deixam de valer (a conversa já mudou de etapa).
+        lista.querySelectorAll('[data-assistente-opcao]').forEach(botao => { botao.disabled = true; });
+        lista.insertAdjacentHTML('beforeend', html);
+
+        const resposta = [...lista.querySelectorAll('[data-resposta]')].pop();
+        if (resposta) {
+            form.elements.etapa.value = resposta.dataset.etapa;
+            form.elements.contexto.value = resposta.dataset.contexto ?? '';
+            campo.placeholder = resposta.dataset.dica;
+        }
+        rolarParaOFim();
+    };
+
+    const enviar = async (valor, rotulo) => {
+        const balao = document.createElement('p');
+        balao.className = 'ms-chat-msg ms-chat-cliente';
+        balao.textContent = rotulo ?? valor; // textContent: o texto do cliente nunca vira HTML
+        lista.append(balao);
+        rolarParaOFim();
+
+        const dados = new FormData(form);
+        dados.set('texto', valor);
+        campo.value = '';
+        form.classList.add('ms-carregando');
+
+        try {
+            const resposta = await fetch(form.action, { method: 'POST', body: dados });
+            if (resposta.status === 429) throw new Error('Muitas mensagens seguidas. Aguarde um minuto e tente de novo.');
+            if (!resposta.ok) throw new Error('Não consegui responder agora. Tente de novo.');
+            receber(await resposta.text());
+        } catch (erro) {
+            mostrarAviso(erro.message);
+        } finally {
+            form.classList.remove('ms-carregando');
+            campo.focus();
+        }
+    };
+
+    const alternar = aberto => {
+        painel.hidden = !aberto;
+        botaoAbrir.setAttribute('aria-expanded', String(aberto));
+        assistente.classList.toggle('aberto', aberto);
+
+        if (!aberto) { botaoAbrir.focus(); return; }
+
+        if (!iniciado) {
+            iniciado = true;
+            fetch('/Assistente/Inicio')
+                .then(resposta => resposta.ok ? resposta.text() : Promise.reject())
+                .then(receber)
+                .catch(() => mostrarAviso('Não consegui carregar o assistente. Tente de novo em instantes.'));
+        }
+        campo.focus();
+    };
+
+    botaoAbrir.addEventListener('click', () => alternar(painel.hidden));
+    assistente.querySelector('[data-assistente-fechar]').addEventListener('click', () => alternar(false));
+    assistente.addEventListener('keydown', evento => { if (evento.key === 'Escape' && !painel.hidden) alternar(false); });
+
+    form.addEventListener('submit', evento => {
+        evento.preventDefault();
+        const texto = campo.value.trim();
+        if (texto && !form.classList.contains('ms-carregando')) enviar(texto);
+    });
+
+    // Botões de opção ("1 Dúvidas frequentes"...): enviam o número, o balão mostra o texto.
+    lista.addEventListener('click', evento => {
+        const opcao = evento.target.closest('[data-assistente-opcao]');
+        if (opcao && !opcao.disabled && !form.classList.contains('ms-carregando'))
+            enviar(opcao.dataset.assistenteOpcao, opcao.dataset.rotulo);
+    });
+}

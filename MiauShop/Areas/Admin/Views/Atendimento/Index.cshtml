@@ -1,0 +1,82 @@
+@model AssistentePainelViewModel
+@{
+    ViewData["Title"] = "Assistente";
+    var podeAlterar = ViewData["PodeAlterar"] is true;
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1">
+    <h1 class="h2 mb-0">Assistente da loja</h1>
+    @if (podeAlterar)
+    {
+        <a class="ms-botao ms-botao-pequeno" asp-action="Nova"><i class="bi bi-plus-lg" aria-hidden="true"></i>Nova resposta</a>
+    }
+</div>
+<p class="text-body-secondary mb-4">
+    O chat "Ajuda" da loja funciona por menu numerado e por estas respostas: quando a mensagem do cliente tem
+    as palavras-chave (ou palavras da pergunta), a resposta aparece. Frete, produtos e status de pedido o assistente
+    consulta sozinho, com as regras da loja. Não usa IA, para o projeto continuar gratuito.
+</p>
+
+<section class="ms-form-bloco">
+    <h2 class="h5">Dúvidas que o assistente não soube responder</h2>
+    @if (Model.SemResposta.Count == 0)
+    {
+        <p class="ms-dica mb-0">Nenhuma por enquanto. Quando um cliente perguntar algo sem resposta, aparece aqui.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle mb-0 ms-tabela ms-tabela-cartoes">
+                <thead><tr><th>Mensagem do cliente</th><th class="text-center">Vezes</th><th>Última vez</th><th></th></tr></thead>
+                <tbody>
+                    @foreach (var duvida in Model.SemResposta)
+                    {
+                        <tr>
+                            <td class="fw-bold">@duvida.Texto</td>
+                            <td data-label="Vezes" class="text-center">@duvida.Vezes</td>
+                            <td data-label="Última vez" class="text-nowrap">@MiauShop.Services.LinhaDoTempo.ParaBrasilia(duvida.AtualizadoEm).ToString("g")</td>
+                            <td class="text-end text-nowrap">
+                                @if (podeAlterar)
+                                {
+                                    <a class="btn btn-sm btn-outline-success" asp-action="Nova" asp-route-semResposta="@duvida.Id">Criar resposta</a>
+                                    <form class="d-inline" method="post" asp-action="DescartarDuvida" asp-route-id="@duvida.Id">
+                                        <button class="btn btn-sm btn-outline-secondary" type="submit">Descartar</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
+
+<section class="ms-form-bloco">
+    <h2 class="h5">Perguntas e respostas</h2>
+    <div class="table-responsive">
+        <table class="table align-middle mb-0 ms-tabela ms-tabela-cartoes">
+            <thead><tr><th>Ordem</th><th>Pergunta</th><th>Palavras-chave</th><th>Situação</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var pergunta in Model.Perguntas)
+                {
+                    <tr>
+                        <td data-label="Ordem">@pergunta.Ordem</td>
+                        <td class="fw-bold">@pergunta.Pergunta</td>
+                        <td data-label="Palavras-chave" class="small">@pergunta.PalavrasChave</td>
+                        <td data-label="Situação"><span class="ms-status @(pergunta.Ativa ? "ms-status-Entregue" : "ms-status-Cancelado")">@(pergunta.Ativa ? "Ativa" : "Inativa")</span></td>
+                        <td class="text-end text-nowrap">
+                            <a class="btn btn-sm btn-outline-secondary" asp-action="Editar" asp-route-id="@pergunta.Id">@(podeAlterar ? "Editar" : "Ver")</a>
+                            @if (podeAlterar)
+                            {
+                                <form class="d-inline" method="post" asp-action="Excluir" asp-route-id="@pergunta.Id">
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Excluir</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

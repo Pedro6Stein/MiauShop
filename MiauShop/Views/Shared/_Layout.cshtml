@@ -64,6 +64,32 @@
         </div>
     </div>
 
+    @* Assistente "Ajuda": menu numerado + respostas cadastradas no painel. As respostas vêm prontas do servidor. *@
+    <div class="ms-assistente" data-assistente>
+        <section class="ms-assistente-painel" id="ms-assistente-painel" role="dialog" aria-labelledby="ms-assistente-titulo" hidden data-assistente-painel>
+            <header class="ms-assistente-topo">
+                <span class="ms-assistente-avatar" aria-hidden="true"><i class="bi bi-heart-fill"></i></span>
+                <span class="flex-grow-1">
+                    <strong id="ms-assistente-titulo">Miau, assistente da loja</strong>
+                    <small>Respostas automáticas</small>
+                </span>
+                <button class="btn-close btn-close-white" type="button" aria-label="Fechar o assistente" data-assistente-fechar></button>
+            </header>
+            <div class="ms-assistente-mensagens" aria-live="polite" data-assistente-mensagens></div>
+            <form class="ms-assistente-form" method="post" action="/Assistente/Mensagem" data-assistente-form>
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="etapa" value="inicio" />
+                <input type="hidden" name="contexto" value="" />
+                <label class="visually-hidden" for="ms-assistente-texto">Mensagem para o assistente</label>
+                <input id="ms-assistente-texto" name="texto" autocomplete="off" maxlength="200" placeholder="Digite o número da opção ou sua dúvida" />
+                <button type="submit" aria-label="Enviar mensagem"><i class="bi bi-send-fill" aria-hidden="true"></i></button>
+            </form>
+        </section>
+        <button class="ms-assistente-botao" type="button" aria-expanded="false" aria-controls="ms-assistente-painel" data-assistente-abrir>
+            <i class="bi bi-chat-heart-fill" aria-hidden="true"></i><span>Ajuda</span>
+        </button>
+    </div>
+
     @* Aviso rápido usado pelo "Adicionar ao carrinho". *@
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="ms-aviso" class="toast ms-aviso" role="status" aria-live="polite" aria-atomic="true">
