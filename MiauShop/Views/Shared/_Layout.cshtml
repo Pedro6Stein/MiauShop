@@ -20,8 +20,8 @@
 </head>
 <body>
     <div class="ms-faixa-demo">
-        <i class="bi bi-info-circle" aria-hidden="true"></i>
-        Projeto demonstrativo: nenhuma compra ou pagamento é real.
+        <span><i class="bi bi-info-circle" aria-hidden="true"></i> Projeto demonstrativo: nenhuma compra ou pagamento é real.</span>
+        <partial name="_BotaoVisitante" model='new BotaoVisitante("Conheça o painel administrativo (sem senha)", "ms-faixa-demo-link", "bi-arrow-right-circle")' />
     </div>
 
     <header class="ms-header">
@@ -39,6 +39,7 @@
                 <a class="ms-nav-link" href="/Produtos?animal=Cao">Cães</a>
                 <a class="ms-nav-link" href="/Produtos?animal=Gato">Gatos</a>
                 <a class="ms-nav-link d-none d-sm-inline" href="/Pedido/Acompanhar">Meu pedido</a>
+                <partial name="_BotaoVisitante" model='new BotaoVisitante("Painel", "ms-nav-painel", Complemento: "administrativo, entrar como visitante sem senha")' />
             </nav>
 
             <a class="ms-carrinho ms-2" href="/Carrinho" aria-label="Carrinho, @itensNoCarrinho itens">
@@ -93,7 +94,7 @@
                 <div class="col-6 col-md-4">
                     <h3 class="h6">Sobre o projeto</h3>
                     <p class="mb-2">Loja fictícia criada para fins acadêmicos e de portfólio. Produtos, preços e pedidos são apenas demonstrativos.</p>
-                    <a href="/Admin"><i class="bi bi-speedometer2" aria-hidden="true"></i> Ver o painel administrativo</a>
+                    <partial name="_BotaoVisitante" model='new BotaoVisitante("Ver o painel administrativo (visitante, sem senha)", "ms-link-rodape")' />
                 </div>
             </div>
             <hr class="border-secondary my-4" />

@@ -66,6 +66,34 @@
     </div>
 </section>
 
+@* Para quem está avaliando o projeto: o painel é a outra metade do sistema. *@
+<section class="ms-painel-convite mb-5" data-anima="surgir" aria-labelledby="titulo-painel">
+    <div class="ms-painel-convite-texto">
+        <span class="ms-etiqueta"><i class="bi bi-eye" aria-hidden="true"></i> Acesso de visitante liberado</span>
+        <h2 id="titulo-painel" class="h3">Veja a loja por trás do balcão</h2>
+        <p>Entre no painel administrativo sem senha e veja como a MiauShop é gerenciada. Você pode navegar por tudo, mas nenhuma alteração é salva.</p>
+        <ul class="ms-painel-convite-lista">
+            <li><i class="bi bi-speedometer2" aria-hidden="true"></i>Dashboard com faturamento, ticket médio e mais vendidos</li>
+            <li><i class="bi bi-receipt" aria-hidden="true"></i>Pedidos com status, histórico e cancelamento</li>
+            <li><i class="bi bi-box-seam" aria-hidden="true"></i>Produtos, tamanhos, categorias e fornecedores</li>
+        </ul>
+        <partial name="_BotaoVisitante" model='new BotaoVisitante("Entrar no painel como visitante", "ms-botao ms-botao-grande", "bi-box-arrow-in-right")' />
+    </div>
+    <div class="ms-painel-convite-ilustracao" aria-hidden="true">
+        <div class="ms-mini-painel">
+            <div class="ms-mini-painel-topo"><span></span><span></span><span></span></div>
+            <div class="ms-mini-painel-numeros">
+                <div><i class="bi bi-receipt"></i><span></span></div>
+                <div><i class="bi bi-cash-coin"></i><span></span></div>
+                <div><i class="bi bi-graph-up-arrow"></i><span></span></div>
+            </div>
+            <div class="ms-mini-painel-barras">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section class="ms-promo" data-anima="surgir" aria-labelledby="titulo-promo">
     <div class="ms-promo-texto">
         <h2 id="titulo-promo" class="h3">Hora de brincar!</h2>

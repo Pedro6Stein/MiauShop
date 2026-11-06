@@ -2,34 +2,66 @@
 @{
     Layout = "/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Painel administrativo";
+
+    var demoHabilitada = ViewData["DemoHabilitada"] is true;
+    var conectadoComo = ViewData["ConectadoComo"] as string;
+
+    // O formulário de e-mail e senha fica recolhido para não confundir quem só quer conhecer o painel.
+    // Abre sozinho se não há acesso de visitante ou se a pessoa já tentou entrar com senha.
+    var formularioAberto = !demoHabilitada || ViewData["MostrarFormularioAdmin"] is true;
 }
 
 <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="ms-form-bloco text-center">
+    <div class="col-md-9 col-lg-7 col-xl-6">
+        <div class="text-center mb-4">
             <div class="ms-modal-icone"><i class="bi bi-speedometer2" aria-hidden="true"></i></div>
             <h1 class="h3">Painel administrativo</h1>
-            <p class="text-body-secondary">Pedidos, produtos, categorias e fornecedores da MiauShop.</p>
+            <p class="text-body-secondary mb-0">Pedidos, produtos, categorias e fornecedores da MiauShop.</p>
+        </div>
 
-            @if (ViewData["Bloqueado"] is true)
-            {
-                <div class="alert alert-warning text-start" role="alert">Muitas tentativas seguidas. Aguarde um minuto.</div>
-            }
+        @if (ViewData["Bloqueado"] is true)
+        {
+            <div class="alert alert-warning" role="alert">Muitas tentativas seguidas. Aguarde um minuto.</div>
+        }
+        @if (ViewData["Desatualizado"] is true)
+        {
+            <div class="alert alert-info" role="status">@MiauShop.Services.Seguranca.FormularioDesatualizadoAttribute.Mensagem</div>
+        }
+        @if (conectadoComo is not null)
+        {
+            <div class="ms-aviso-demo" role="status">
+                <i class="bi bi-person-check" aria-hidden="true"></i>
+                <span>Você já está conectado como <strong>@conectadoComo</strong>. <a class="fw-bold" href="/Admin">Ir para o painel</a></span>
+            </div>
+        }
 
-            @* Acesso de demonstração do portfólio (papel Visualizador). Some quando DemoHabilitada = false. *@
-            @if (ViewData["DemoHabilitada"] is true)
-            {
+        @* Acesso de demonstração do portfólio (papel Visualizador). Some quando DemoHabilitada = false. *@
+        @if (demoHabilitada)
+        {
+            <section class="ms-cartao-visitante" aria-labelledby="titulo-visitante">
+                <span class="ms-etiqueta"><i class="bi bi-stars" aria-hidden="true"></i> Recomendado para quem está conhecendo o projeto</span>
+                <h2 id="titulo-visitante" class="h4 mt-2">Entre como visitante</h2>
+                <p class="mb-3">Não precisa de cadastro nem de senha. É só clicar no botão abaixo.</p>
+                <ul class="ms-cartao-visitante-lista">
+                    <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Veja o dashboard, os pedidos, os produtos e os cadastros</li>
+                    <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i>Abra qualquer tela e formulário do painel</li>
+                    <li><i class="bi bi-shield-lock-fill" aria-hidden="true"></i>Somente leitura: nada que você fizer é salvo</li>
+                </ul>
                 <form method="post" asp-action="EntrarComoVisitante">
-                    <button class="ms-botao ms-botao-grande w-100 justify-content-center" type="submit">
-                        <i class="bi bi-eye" aria-hidden="true"></i>Entrar como visitante
+                    <button class="ms-botao ms-botao-grande w-100" type="submit">
+                        <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>Entrar como visitante
                     </button>
                 </form>
-                <p class="ms-dica mt-2">Sem senha. Você vê o painel inteiro, mas nada é alterado.</p>
+            </section>
+        }
 
-                <div class="ms-separador"><span>ou, se você administra a loja</span></div>
-            }
+        <details class="ms-acesso-admin" open="@formularioAberto">
+            <summary>
+                <i class="bi bi-lock" aria-hidden="true"></i>
+                <span>Sou administrador da loja <small>(e-mail e senha)</small></span>
+            </summary>
 
-            <form method="post" asp-action="Entrar" class="ms-form text-start" novalidate>
+            <form method="post" asp-action="Entrar" class="ms-form text-start mt-3" novalidate>
                 <div asp-validation-summary="ModelOnly" class="alert alert-warning"></div>
                 <div class="mb-3">
                     <label asp-for="Email" class="form-label"></label>
@@ -45,7 +77,7 @@
                     <i class="bi bi-lock" aria-hidden="true"></i>Entrar com e-mail e senha
                 </button>
             </form>
-        </div>
+        </details>
     </div>
 </div>
 

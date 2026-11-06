@@ -1247,3 +1247,167 @@ button.ms-botao-mais { border: 0; }
     }
     .ms-promo-texto { margin: 1rem; }
 }
+
+/* ---------- Acesso de visitante ao painel ---------- */
+
+/* O botão de visitante é um formulário (POST); fica em linha como um link. */
+.ms-form-visitante { display: inline; margin: 0; }
+
+.ms-faixa-demo {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: .25rem .75rem;
+}
+
+.ms-faixa-demo-link {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: #fff;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+}
+
+.ms-faixa-demo-link:hover { color: var(--ms-rosa); }
+
+.ms-nav-painel {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    border: 2px solid var(--ms-framboesa);
+    background: #fff;
+    color: var(--ms-framboesa);
+    font-weight: 700;
+    padding: .3rem .85rem;
+    border-radius: 999px;
+    transition: background var(--ms-transicao), color var(--ms-transicao);
+}
+
+.ms-nav-painel:hover { background: var(--ms-framboesa); color: #fff; }
+
+.ms-link-rodape {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: #fff;
+    font-weight: 700;
+    text-align: left;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+}
+
+.ms-link-rodape:hover { color: var(--ms-rosa); text-decoration: underline; }
+
+/* Convite da página inicial */
+.ms-painel-convite {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: center;
+    background: #fff;
+    border: 1px solid var(--ms-borda);
+    border-radius: 28px;
+    padding: 2rem 2.25rem;
+}
+
+.ms-painel-convite .ms-etiqueta { background: var(--ms-algodao); }
+.ms-painel-convite-texto p { color: var(--ms-ameixa-suave); }
+
+.ms-painel-convite-lista,
+.ms-cartao-visitante-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    display: grid;
+    gap: .5rem;
+}
+
+.ms-painel-convite-lista li,
+.ms-cartao-visitante-lista li { display: flex; gap: .6rem; align-items: flex-start; }
+
+.ms-painel-convite-lista i,
+.ms-cartao-visitante-lista i { color: var(--ms-framboesa); }
+
+.ms-mini-painel {
+    background: var(--ms-algodao);
+    border-radius: 20px;
+    padding: 1rem;
+    box-shadow: 0 18px 40px -24px rgba(46, 26, 36, .45);
+    transform: rotate(2deg);
+}
+
+.ms-mini-painel-topo { display: flex; gap: .35rem; margin-bottom: .85rem; }
+.ms-mini-painel-topo span { width: 10px; height: 10px; border-radius: 999px; background: var(--ms-rosa); }
+
+.ms-mini-painel-numeros { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin-bottom: .85rem; }
+.ms-mini-painel-numeros div { background: #fff; border-radius: 14px; padding: .7rem; display: grid; gap: .45rem; }
+.ms-mini-painel-numeros i { color: var(--ms-framboesa); font-size: 1.15rem; }
+.ms-mini-painel-numeros span { height: 10px; border-radius: 999px; background: var(--ms-rosa); width: 75%; }
+
+.ms-mini-painel-barras {
+    background: #fff;
+    border-radius: 14px;
+    height: 130px;
+    padding: .9rem;
+    display: flex;
+    align-items: flex-end;
+    gap: .6rem;
+}
+
+.ms-mini-painel-barras span { flex: 1; border-radius: 8px 8px 4px 4px; background: var(--ms-framboesa); opacity: .85; }
+.ms-mini-painel-barras span:nth-child(1) { height: 45%; }
+.ms-mini-painel-barras span:nth-child(2) { height: 70%; }
+.ms-mini-painel-barras span:nth-child(3) { height: 55%; background: var(--ms-menta); }
+.ms-mini-painel-barras span:nth-child(4) { height: 90%; }
+.ms-mini-painel-barras span:nth-child(5) { height: 65%; background: var(--ms-menta); }
+.ms-mini-painel-barras span:nth-child(6) { height: 80%; }
+
+/* Tela de entrada do painel */
+.ms-cartao-visitante {
+    background: var(--ms-algodao);
+    border: 2px solid var(--ms-rosa);
+    border-radius: 24px;
+    padding: 1.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.ms-cartao-visitante .ms-etiqueta { background: #fff; margin-bottom: 0; }
+
+.ms-acesso-admin {
+    background: #fff;
+    border: 1px solid var(--ms-borda);
+    border-radius: 24px;
+    padding: 1rem 1.5rem;
+}
+
+.ms-acesso-admin summary {
+    cursor: pointer;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    list-style: none;
+    padding: .25rem 0;
+}
+
+.ms-acesso-admin summary::-webkit-details-marker { display: none; }
+.ms-acesso-admin summary::after { content: "\F282"; font-family: "bootstrap-icons"; margin-left: auto; transition: transform var(--ms-transicao); }
+.ms-acesso-admin[open] summary::after { transform: rotate(180deg); }
+.ms-acesso-admin summary small { color: var(--ms-cinza-rosado); font-weight: 600; }
+.ms-acesso-admin summary i { color: var(--ms-cinza-rosado); }
+
+@media (max-width: 767.98px) {
+    .ms-painel-convite { grid-template-columns: 1fr; padding: 1.5rem; }
+    .ms-painel-convite-ilustracao { order: -1; }
+    .ms-mini-painel { transform: none; }
+    .ms-mini-painel-barras { height: 90px; }
+    .ms-nav-painel { padding: .3rem .6rem; }
+    .ms-cartao-visitante { padding: 1.25rem; }
+}
