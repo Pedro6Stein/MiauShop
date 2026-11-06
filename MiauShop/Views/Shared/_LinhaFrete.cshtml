@@ -1,0 +1,19 @@
+@model MiauShop.Models.Carrinho
+@* Linha "Frete" dos resumos (carrinho e checkout), dentro do <dl>. O valor vem pronto do servidor. *@
+<div>
+    <dt>Frete</dt>
+    <dd>
+        @if (!Model.FreteDefinido)
+        {
+            <span class="ms-frete-pendente">Calculado pelo CEP</span>
+        }
+        else if (Model.Frete == 0)
+        {
+            <span>Grátis</span>
+        }
+        else
+        {
+            <span>@Model.Frete.ToString("C")</span>
+        }
+    </dd>
+</div>

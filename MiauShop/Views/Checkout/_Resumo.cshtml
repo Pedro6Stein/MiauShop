@@ -24,8 +24,9 @@
     </ul>
     <dl>
         <div><dt>Subtotal</dt><dd>@Model.Subtotal.ToString("C")</dd></div>
-        <div><dt>Frete</dt><dd>@(Model.Frete == 0 ? "Grátis" : Model.Frete.ToString("C"))</dd></div>
-        <div class="ms-resumo-total"><dt>Total</dt><dd>@Model.Total.ToString("C")</dd></div>
+        <partial name="_LinhaFrete" model="Model" />
+        <div class="ms-resumo-total"><dt>Total@(Model.FreteDefinido ? "" : " (sem frete)")</dt><dd>@Model.Total.ToString("C")</dd></div>
     </dl>
+    <partial name="_DetalheFrete" model="Model" />
     <a class="d-block text-center small fw-bold" href="/Carrinho">Alterar carrinho</a>
 </aside>

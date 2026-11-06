@@ -1511,3 +1511,28 @@ button.ms-botao-mais { border: 0; }
         white-space: nowrap;
     }
 }
+
+/* ---------- Frete por distância ---------- */
+
+.ms-frete-pendente { color: var(--ms-cinza-rosado); font-weight: 600; }
+
+.ms-frete-detalhe {
+    display: grid;
+    gap: .2rem;
+    font-size: .85rem;
+    color: var(--ms-ameixa-suave);
+    background: var(--ms-algodao);
+    border-radius: 14px;
+    padding: .65rem .85rem;
+    margin: -.5rem 0 1.25rem;
+}
+
+.ms-frete-detalhe i { color: var(--ms-framboesa); }
+
+.ms-calcular-frete { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px dashed var(--ms-borda); }
+.ms-calcular-frete .form-label { font-size: .85rem; }
+
+.ms-simulacao > div { display: flex; justify-content: space-between; gap: 1rem; padding: .45rem 0; border-bottom: 1px dashed var(--ms-borda); }
+.ms-simulacao > div:last-child { border-bottom: 0; }
+.ms-simulacao dt { font-weight: 600; }
+.ms-simulacao dd { margin: 0; font-weight: 700; text-align: right; }

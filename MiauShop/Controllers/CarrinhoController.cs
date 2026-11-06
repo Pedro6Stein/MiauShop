@@ -58,6 +58,22 @@ public class CarrinhoController(ICarrinhoService carrinhoService, ICatalogoServi
         return await RespostaAsync();
     }
 
+    // POST /Carrinho/CalcularFrete — guarda o CEP e devolve o carrinho com frete e prazo.
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CalcularFrete(string? cep)
+    {
+        carrinhoService.DefinirCep(cep);
+
+        var modelo = await MontarModeloAsync();
+        if (!modelo.Carrinho.Vazio && modelo.Carrinho.Cotacao is null)
+            modelo = modelo with { ErroFrete = "Não encontramos esse CEP. Confira os 8 números." };
+
+        return Request.Headers.ContainsKey("X-Parcial")
+            ? PartialView("_Conteudo", modelo)
+            : View(nameof(Index), modelo);
+    }
+
     // Pelo JavaScript (cabeçalho X-Parcial): devolve só o conteúdo do carrinho já renderizado.
     // Sem JavaScript: recarrega a página do carrinho.
     private async Task<IActionResult> RespostaAsync() =>

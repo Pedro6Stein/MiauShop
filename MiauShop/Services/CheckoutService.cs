@@ -26,6 +26,10 @@ public class CheckoutService(
         if (carrinho.ItensForamRemovidos)
             throw new InvalidOperationException("Alguns itens ficaram indisponíveis. Confira o carrinho antes de finalizar.");
 
+        // O frete por distância precisa do CEP de entrega (o checkout grava o CEP no carrinho).
+        if (!carrinho.FreteDefinido)
+            throw new InvalidOperationException("Não foi possível calcular o frete para o CEP informado. Confira o CEP e tente de novo.");
+
         var pedido = Pedido.Criar(clienteNome, clienteEmail, clienteTelefone, enderecoEntrega, formaPagamento);
 
         foreach (var linha in carrinho.Linhas)

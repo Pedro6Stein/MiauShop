@@ -122,6 +122,15 @@ builder.Services.AddHttpClient<IConsultaCep, ViaCepService>(cliente =>
     cliente.Timeout = TimeSpan.FromSeconds(5);
 });
 
+// Frete por distância: coordenada do CEP pela AwesomeAPI (gratuita, sem chave), guardada 24 h em memória.
+builder.Services.AddMemoryCache();
+builder.Services.AddHttpClient<ILocalizacaoCep, LocalizacaoCepService>(cliente =>
+{
+    cliente.BaseAddress = new Uri("https://cep.awesomeapi.com.br/json/");
+    cliente.Timeout = TimeSpan.FromSeconds(4);
+});
+builder.Services.AddScoped<IFreteService, FreteService>();
+
 // Limitador de tentativas (recurso nativo do ASP.NET Core): busca de pedido aceita
 // no máximo 10 tentativas por minuto por IP; passou disso, volta para a tela com aviso.
 builder.Services.AddRateLimiter(opcoes =>

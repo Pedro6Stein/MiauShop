@@ -36,7 +36,7 @@
         <div class="row g-4">
             <div class="col-lg-8">
                 <div class="ms-barra-frete mb-3">
-                    @if (carrinho.Frete == 0)
+                    @if (carrinho.FaltaParaFreteGratis <= 0)
                     {
                         <p><i class="bi bi-gift" aria-hidden="true"></i> <strong>Você ganhou frete grátis!</strong></p>
                     }
@@ -111,12 +111,25 @@
                     <h2 class="h4" id="titulo-resumo">Resumo do pedido</h2>
                     <dl>
                         <div><dt>Subtotal (@carrinho.QuantidadeItens @(carrinho.QuantidadeItens == 1 ? "item" : "itens"))</dt><dd>@carrinho.Subtotal.ToString("C")</dd></div>
-                        <div>
-                            <dt>Frete</dt>
-                            <dd>@(carrinho.Frete == 0 ? "Grátis" : carrinho.Frete.ToString("C"))</dd>
-                        </div>
-                        <div class="ms-resumo-total"><dt>Total</dt><dd>@carrinho.Total.ToString("C")</dd></div>
+                        <partial name="_LinhaFrete" model="carrinho" />
+                        <div class="ms-resumo-total"><dt>Total@(carrinho.FreteDefinido ? "" : " (sem frete)")</dt><dd>@carrinho.Total.ToString("C")</dd></div>
                     </dl>
+                    <partial name="_DetalheFrete" model="carrinho" />
+
+                    @* Cálculo do frete pelo CEP: o servidor mede a distância até a loja e devolve o carrinho atualizado. *@
+                    <form class="ms-form ms-calcular-frete" method="post" action="/Carrinho/CalcularFrete" data-form-parcial>
+                        @Html.AntiForgeryToken()
+                        <label class="form-label" for="cep-frete">Calcular frete e prazo</label>
+                        <div class="d-flex gap-2">
+                            <input class="form-control" id="cep-frete" name="cep" inputmode="numeric" autocomplete="postal-code"
+                                   maxlength="9" placeholder="00000-000" value="@carrinho.CepFrete" />
+                            <button class="ms-botao ms-botao-claro ms-botao-pequeno" type="submit">Calcular</button>
+                        </div>
+                        @if (Model.ErroFrete is string erroFrete)
+                        {
+                            <span class="ms-erro" role="alert">@erroFrete</span>
+                        }
+                    </form>
                     <a class="ms-botao ms-botao-grande w-100" href="/Checkout">
                         Finalizar compra <i class="bi bi-arrow-right" aria-hidden="true"></i>
                     </a>

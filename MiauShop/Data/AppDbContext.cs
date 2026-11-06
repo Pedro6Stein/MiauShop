@@ -19,6 +19,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<ProdutoVariacao> ProdutoVariacoes => Set<ProdutoVariacao>();
     public DbSet<ProdutoImagem> ProdutoImagens => Set<ProdutoImagem>();
     public DbSet<AvaliacaoProduto> AvaliacoesProduto => Set<AvaliacaoProduto>();
+    public DbSet<ConfiguracaoFrete> ConfiguracoesFrete => Set<ConfiguracaoFrete>();
     public DbSet<Pedido> Pedidos => Set<Pedido>();
     public DbSet<ItemPedido> ItensPedido => Set<ItemPedido>();
     public DbSet<HistoricoStatusPedido> HistoricoStatusPedidos => Set<HistoricoStatusPedido>();
